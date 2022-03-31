@@ -10,33 +10,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAccountIdentifier(t *testing.T) {
+func TestAccountIdentifierCurrent(t *testing.T) {
 
-	header := NewAccountIdentifier()
+	header := NewAccountIdentifierCurrent()
 	require.NoError(t, header.Validate())
 
 	header.TypeCode2 = ""
 	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifier: invalid type code", header.Validate().Error())
+	require.Equal(t, "AccountIdentifierCurrent: invalid type code", header.Validate().Error())
 
 	header.TypeCode1 = ""
 	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifier: invalid type code", header.Validate().Error())
+	require.Equal(t, "AccountIdentifierCurrent: invalid type code", header.Validate().Error())
 
 	header.CurrencyCode = ""
 	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifier: invalid currency code", header.Validate().Error())
+	require.Equal(t, "AccountIdentifierCurrent: invalid currency code", header.Validate().Error())
 
 	header.RecordCode = ""
 	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifier: invalid record code", header.Validate().Error())
+	require.Equal(t, "AccountIdentifierCurrent: invalid record code", header.Validate().Error())
 
 }
 
-func TestAccountIdentifierWithSample(t *testing.T) {
+func TestAccountIdentifierCurrentWithSample(t *testing.T) {
 
 	sample := "03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/"
-	header := NewAccountIdentifier()
+	header := NewAccountIdentifierCurrent()
 
 	err := header.Parse(sample)
 	require.NoError(t, err)
@@ -51,9 +51,9 @@ func TestAccountIdentifierWithSample(t *testing.T) {
 
 	require.Equal(t, sample, header.String())
 
-	header = &AccountIdentifier{}
+	header = &AccountIdentifierCurrent{}
 	require.Error(t, header.Validate())
 
 	err = header.Parse(sample[:20])
-	require.Equal(t, "AccountIdentifier: length 20 is too short", err.Error())
+	require.Equal(t, "AccountIdentifierCurrent: length 20 is too short", err.Error())
 }

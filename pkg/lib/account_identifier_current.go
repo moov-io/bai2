@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	accountIdentifierLength = 59
+	accountIdentifierCurrentLength = 59
 )
 
-func NewAccountIdentifier() *AccountIdentifier {
-	return &AccountIdentifier{
+func NewAccountIdentifierCurrent() *AccountIdentifierCurrent {
+	return &AccountIdentifierCurrent{
 		RecordCode:   "03",
 		CurrencyCode: "USD",
 		TypeCode1:    "040",
@@ -26,7 +26,7 @@ func NewAccountIdentifier() *AccountIdentifier {
 
 }
 
-type AccountIdentifier struct {
+type AccountIdentifierCurrent struct {
 	RecordCode     string
 	AccountNumber  string
 	CurrencyCode   string
@@ -36,26 +36,26 @@ type AccountIdentifier struct {
 	ClosingBalance string
 }
 
-func (h *AccountIdentifier) Validate() error {
+func (h *AccountIdentifierCurrent) Validate() error {
 	if h.RecordCode != "03" {
-		return fmt.Errorf("AccountIdentifier: invalid record code")
+		return fmt.Errorf("AccountIdentifierCurrent: invalid record code")
 	}
 	if h.CurrencyCode != "USD" && h.CurrencyCode != "CAD" {
-		return fmt.Errorf("AccountIdentifier: invalid currency code")
+		return fmt.Errorf("AccountIdentifierCurrent: invalid currency code")
 	}
 	if h.TypeCode1 != "040" {
-		return fmt.Errorf("AccountIdentifier: invalid type code")
+		return fmt.Errorf("AccountIdentifierCurrent: invalid type code")
 	}
 	if h.TypeCode2 != "045" {
-		return fmt.Errorf("AccountIdentifier: invalid type code")
+		return fmt.Errorf("AccountIdentifierCurrent: invalid type code")
 	}
 
 	return nil
 }
 
-func (h *AccountIdentifier) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < accountIdentifierLength {
-		return fmt.Errorf("AccountIdentifier: length %d is too short", n)
+func (h *AccountIdentifierCurrent) Parse(line string) error {
+	if n := utf8.RuneCountInString(line); n < accountIdentifierCurrentLength {
+		return fmt.Errorf("AccountIdentifierCurrent: length %d is too short", n)
 	}
 
 	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
@@ -69,7 +69,7 @@ func (h *AccountIdentifier) Parse(line string) error {
 	return nil
 }
 
-func (h *AccountIdentifier) String() string {
+func (h *AccountIdentifierCurrent) String() string {
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("%2.2v,", h.RecordCode))
