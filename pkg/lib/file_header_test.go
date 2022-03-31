@@ -55,7 +55,7 @@ func TestFileHeaderWithSample(t *testing.T) {
 	require.Equal(t, "1", header.BlockSize)
 	require.Equal(t, "2", header.VersionNumber)
 
-	require.Equal(t, sample,header.String())
+	require.Equal(t, sample, header.String())
 
 	header = &FileHeader{}
 	require.Error(t, header.Validate())
