@@ -72,15 +72,15 @@ func (h *AccountIdentifierCurrent) Parse(line string) error {
 func (h *AccountIdentifierCurrent) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%11.11v,", h.AccountNumber))
-	buf.WriteString(fmt.Sprintf("%3.3v,", h.CurrencyCode))
-	buf.WriteString(fmt.Sprintf("%3.3v,", h.TypeCode1))
-	buf.WriteString(fmt.Sprintf("%13.13v,", h.OpeningBalance))
+	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%-11.11v,", h.AccountNumber))
+	buf.WriteString(fmt.Sprintf("%-3.3v,", h.CurrencyCode))
+	buf.WriteString(fmt.Sprintf("%-3.3v,", h.TypeCode1))
+	buf.WriteString(fmt.Sprintf("%-13.13v,", h.OpeningBalance))
 	buf.WriteString(fmt.Sprintf(","))
 	buf.WriteString(fmt.Sprintf(","))
-	buf.WriteString(fmt.Sprintf("%3.3v,", h.TypeCode2))
-	buf.WriteString(fmt.Sprintf("%13.13v,", h.ClosingBalance))
+	buf.WriteString(fmt.Sprintf("%-3.3v,", h.TypeCode2))
+	buf.WriteString(fmt.Sprintf("%-13.13v,", h.ClosingBalance))
 	buf.WriteString(fmt.Sprintf(","))
 	buf.WriteString(fmt.Sprintf("/"))
 

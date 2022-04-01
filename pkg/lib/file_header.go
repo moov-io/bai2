@@ -80,15 +80,15 @@ func (h *FileHeader) Parse(line string) error {
 func (h *FileHeader) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%4.4v,", h.Sender))
-	buf.WriteString(fmt.Sprintf("%5.5v,", h.Receiver))
-	buf.WriteString(fmt.Sprintf("%6.6v,", h.FileCreatedDate))
-	buf.WriteString(fmt.Sprintf("%4.4v,", h.FileCreatedTime))
-	buf.WriteString(fmt.Sprintf("%3.3v,", h.FileIdNumber))
-	buf.WriteString(fmt.Sprintf("%2.2v,", h.PhysicalRecordLength))
-	buf.WriteString(fmt.Sprintf("%1.1v,", h.BlockSize))
-	buf.WriteString(fmt.Sprintf("%1.1v/", h.VersionNumber))
+	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%-4.4v,", h.Sender))
+	buf.WriteString(fmt.Sprintf("%-5.5v,", h.Receiver))
+	buf.WriteString(fmt.Sprintf("%-6.6v,", h.FileCreatedDate))
+	buf.WriteString(fmt.Sprintf("%-4.4v,", h.FileCreatedTime))
+	buf.WriteString(fmt.Sprintf("%-3.3v,", h.FileIdNumber))
+	buf.WriteString(fmt.Sprintf("%-2.2v,", h.PhysicalRecordLength))
+	buf.WriteString(fmt.Sprintf("%-1.1v,", h.BlockSize))
+	buf.WriteString(fmt.Sprintf("%-1.1v/", h.VersionNumber))
 
 	return buf.String()
 }

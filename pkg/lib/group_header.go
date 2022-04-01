@@ -66,13 +66,13 @@ func (h *GroupHeader) Parse(line string) error {
 func (h *GroupHeader) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%5.5v,", h.Receiver))
-	buf.WriteString(fmt.Sprintf("%4.4v,", h.Sender))
-	buf.WriteString(fmt.Sprintf("%1.1v,", h.GroupStatus))
-	buf.WriteString(fmt.Sprintf("%6.6v,", h.AsOfDate))
+	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%-5.5v,", h.Receiver))
+	buf.WriteString(fmt.Sprintf("%-4.4v,", h.Sender))
+	buf.WriteString(fmt.Sprintf("%-1.1v,", h.GroupStatus))
+	buf.WriteString(fmt.Sprintf("%-6.6v,", h.AsOfDate))
 	buf.WriteString(fmt.Sprintf(","))
-	buf.WriteString(fmt.Sprintf("%3.3v,", h.CurrencyCode))
+	buf.WriteString(fmt.Sprintf("%-3.3v,", h.CurrencyCode))
 	buf.WriteString(fmt.Sprintf("/"))
 
 	return buf.String()

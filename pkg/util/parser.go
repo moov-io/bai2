@@ -4,7 +4,10 @@
 
 package util
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func EntryParser(entry, delimiter string) (string, error) {
 
@@ -18,4 +21,20 @@ func EntryParser(entry, delimiter string) (string, error) {
 	}
 
 	return entry[:size], nil
+}
+
+func EntryParserToInt(entry, delimiter string) (int64, error) {
+
+	if len(entry) < 1 {
+		return 0, fmt.Errorf("invalid length")
+	}
+
+	size := len(entry) - 1
+	if entry[size:] != delimiter {
+		return 0, fmt.Errorf("contains invalid delimiter")
+	}
+
+	value, _ := strconv.ParseInt(entry[:size], 10, 64)
+
+	return value, nil
 }
