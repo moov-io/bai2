@@ -7,6 +7,7 @@ package util
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func EntryParser(entry, delimiter string) (string, error) {
@@ -37,4 +38,14 @@ func EntryParserToInt(entry, delimiter string) (int64, error) {
 	value, _ := strconv.ParseInt(entry[:size], 10, 64)
 
 	return value, nil
+}
+
+func GetSize(line string) int64 {
+
+	size := strings.Index(line, "/")
+	if size > 0 {
+		return int64(size + 1)
+	}
+
+	return int64(size)
 }
