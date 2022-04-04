@@ -15,15 +15,15 @@ func TestFileHeader(t *testing.T) {
 	header := NewFileHeader()
 	require.NoError(t, header.Validate())
 
-	header.VersionNumber = ""
+	header.VersionNumber = 0
 	require.Error(t, header.Validate())
 	require.Equal(t, "FileHeader: invalid version number", header.Validate().Error())
 
-	header.BlockSize = ""
+	header.BlockSize = 0
 	require.Error(t, header.Validate())
 	require.Equal(t, "FileHeader: invalid block size", header.Validate().Error())
 
-	header.PhysicalRecordLength = ""
+	header.PhysicalRecordLength = 0
 	require.Error(t, header.Validate())
 	require.Equal(t, "FileHeader: invalid physical record length", header.Validate().Error())
 
@@ -50,10 +50,10 @@ func TestFileHeaderWithSample(t *testing.T) {
 	require.Equal(t, "12345", header.Receiver)
 	require.Equal(t, "060321", header.FileCreatedDate)
 	require.Equal(t, "0829", header.FileCreatedTime)
-	require.Equal(t, "001", header.FileIdNumber)
-	require.Equal(t, "80", header.PhysicalRecordLength)
-	require.Equal(t, "1", header.BlockSize)
-	require.Equal(t, "2", header.VersionNumber)
+	require.Equal(t, int64(1), header.FileIdNumber)
+	require.Equal(t, int64(80), header.PhysicalRecordLength)
+	require.Equal(t, int64(1), header.BlockSize)
+	require.Equal(t, int64(2), header.VersionNumber)
 
 	require.Equal(t, sample, header.String())
 
