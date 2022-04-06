@@ -7,6 +7,10 @@ ifndef VERSION
 	VERSION := $(shell git describe --tags --abbrev=0)
 endif
 
+ifndef VERSION
+    VERSION := v.0.0.0
+endif
+
 COMMIT_HASH :=$(shell git rev-parse --short HEAD)
 DEV_VERSION := dev-${COMMIT_HASH}
 
