@@ -26,6 +26,7 @@ install:
 	go mod vendor
 
 update:
+    go install github.com/markbates/pkger/cmd/pkger
 	pkger -include /configs/config.default.yml
 	go mod vendor
 
