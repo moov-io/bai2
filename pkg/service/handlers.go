@@ -7,7 +7,6 @@ package service
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -52,7 +51,7 @@ func parseInputFromRequest(r *http.Request) (*file.Bai2, error) {
 func outputBufferToWriter(w http.ResponseWriter, f *file.Bai2) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	fmt.Fprintf(w, f.String())
+	w.Write([]byte(f.String()))
 }
 
 // parse - parse bai2 report
