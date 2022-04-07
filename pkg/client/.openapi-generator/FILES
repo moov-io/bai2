@@ -1,0 +1,14 @@
+.gitignore
+.openapi-generator-ignore
+.travis.yml
+README.md
+api/openapi.yaml
+api_bai2_files.go
+client.go
+configuration.go
+docs/Bai2FilesApi.md
+git_push.sh
+go.mod
+go.sum
+response.go
+utils.go
