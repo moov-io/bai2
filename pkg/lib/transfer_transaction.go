@@ -71,7 +71,7 @@ func (h *TransferTransaction) String() string {
 	buf.WriteString(fmt.Sprintf("%-13.13v,", h.Amount))
 	buf.WriteString(fmt.Sprintf("%-1.1v,", h.FundsType))
 	buf.WriteString(fmt.Sprintf("%-6.6v,", h.ValueDate))
-	buf.WriteString(fmt.Sprintf(","))
+	buf.WriteString(",")
 	buf.WriteString(fmt.Sprintf("%-5.5v,", h.BankReference))
 	buf.WriteString(fmt.Sprintf("%-9.9v,", h.CustomerReference))
 	buf.WriteString(fmt.Sprintf("%-20.20v/", h.Description))
