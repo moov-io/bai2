@@ -55,24 +55,6 @@ func (suite *HandlersTest) getWriter(name string) (*multipart.Writer, *bytes.Buf
 	return writer, body
 }
 
-func (suite *HandlersTest) getErrWriter(name string) (*multipart.Writer, *bytes.Buffer) {
-
-	path := filepath.Join("..", "..", "data", name)
-	file, err := os.Open(path)
-	assert.Equal(suite.T(), nil, err)
-
-	defer file.Close()
-
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("err", filepath.Base(path))
-	assert.Equal(suite.T(), nil, err)
-
-	_, err = io.Copy(part, file)
-	assert.Equal(suite.T(), nil, err)
-	return writer, body
-}
-
 func (suite *HandlersTest) SetupTest() {
 
 	suite.testServer = mux.NewRouter()
