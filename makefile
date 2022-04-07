@@ -27,8 +27,8 @@ install:
 
 update:
 	go get github.com/markbates/pkger/cmd/pkger
-	pkger -include /configs/config.default.yml
 	go mod vendor
+	pkger -include /configs/config.default.yml
 
 build:
 	go build -mod=vendor -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2 github.com/moov-io/bai2/cmd/bai2
