@@ -77,12 +77,12 @@ func (h *AccountIdentifierCurrent) String() string {
 	buf.WriteString(fmt.Sprintf("%-3.3v,", h.CurrencyCode))
 	buf.WriteString(fmt.Sprintf("%-3.3v,", h.TypeCode1))
 	buf.WriteString(fmt.Sprintf("%-13.13v,", h.OpeningBalance))
-	buf.WriteString(fmt.Sprintf(","))
-	buf.WriteString(fmt.Sprintf(","))
+	buf.WriteString(",")
+	buf.WriteString(",")
 	buf.WriteString(fmt.Sprintf("%-3.3v,", h.TypeCode2))
 	buf.WriteString(fmt.Sprintf("%-13.13v,", h.ClosingBalance))
-	buf.WriteString(fmt.Sprintf(","))
-	buf.WriteString(fmt.Sprintf("/"))
+	buf.WriteString(",")
+	buf.WriteString("/")
 
 	return buf.String()
 }

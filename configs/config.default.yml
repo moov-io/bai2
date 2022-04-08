@@ -1,0 +1,12 @@
+bai2:
+  Servers:
+    Public:
+      Bind:
+        Address: ":8208"
+    Admin:
+      Bind:
+        Address: ":8209"
+  Database:
+    DatabaseName: "bai2"
+    SQLite:
+      Path: ":memory:"
