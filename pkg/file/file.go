@@ -7,6 +7,7 @@ package file
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 
@@ -122,6 +123,7 @@ func Parse(fd io.Reader) (*Bai2, error) {
 
 	var lineNum int
 	var group *Group
+	var hasBlock bool
 
 	scan := bufio.NewScanner(fd)
 	for scan.Scan() {
@@ -244,8 +246,17 @@ func Parse(fd io.Reader) (*Bai2, error) {
 
 			group.Details = append(group.Details, newRecord)
 
+		default:
+			continue
+
 		}
 
+		hasBlock = true
+
+	}
+
+	if !hasBlock {
+		return nil, errors.New("invalid file format")
 	}
 
 	return &file, nil

@@ -71,9 +71,9 @@ func (h *GroupHeader) String() string {
 	buf.WriteString(fmt.Sprintf("%-4.4v,", h.Sender))
 	buf.WriteString(fmt.Sprintf("%-1.1v,", h.GroupStatus))
 	buf.WriteString(fmt.Sprintf("%-6.6v,", h.AsOfDate))
-	buf.WriteString(fmt.Sprintf(","))
+	buf.WriteString(",")
 	buf.WriteString(fmt.Sprintf("%-3.3v,", h.CurrencyCode))
-	buf.WriteString(fmt.Sprintf("/"))
+	buf.WriteString("/")
 
 	return buf.String()
 }

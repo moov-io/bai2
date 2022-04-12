@@ -82,13 +82,13 @@ func (h *AccountIdentifierContinuation) String() string {
 	buf.WriteString(fmt.Sprintf("%05.5v,", h.TotalOfCredits1))
 	buf.WriteString(fmt.Sprintf("%-1.1v,", h.FundsType1))
 	buf.WriteString(fmt.Sprintf("%-6.6v,", h.ValueDate1))
-	buf.WriteString(fmt.Sprintf(","))
+	buf.WriteString(",")
 	buf.WriteString(fmt.Sprintf("%-3.3v,", h.TypeCode2))
 	buf.WriteString(fmt.Sprintf("%-15.15v,", h.TotalCreditAmount2))
 	buf.WriteString(fmt.Sprintf("%05.5v,", h.TotalOfCredits2))
 	buf.WriteString(fmt.Sprintf("%-1.1v,", h.FundsType2))
 	buf.WriteString(fmt.Sprintf("%-6.6v,", h.ValueDate2))
-	buf.WriteString(fmt.Sprintf("/"))
+	buf.WriteString("/")
 
 	return buf.String()
 }
