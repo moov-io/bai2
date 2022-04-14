@@ -12,10 +12,20 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+Corporate Transfer Service (CTS) Transaction Detail
+
+The CTS transaction detail record contains information about CTS activity. It always has a record code
+of 16.
+
+*/
+
 const (
 	transferTransactionLength = 68
 )
 
+// Creating CTS Transaction Detail
 func NewTransferTransaction() *TransferTransaction {
 	return &TransferTransaction{
 		RecordCode: "16",
@@ -24,6 +34,7 @@ func NewTransferTransaction() *TransferTransaction {
 
 }
 
+// CTS Transaction Detail
 type TransferTransaction struct {
 	RecordCode        string
 	TypeCode          string

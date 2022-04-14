@@ -12,10 +12,21 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+Group Trailer
+
+The group trailer is the second last record in a BAI format file. This record contains information on the
+group control total, the number of accounts and the number of records. The group control total is the
+sum of the account control totals in the group. The number of records is the total of all type 02, 03, 16, 49,
+88 and 98 records in the group.
+
+*/
+
 const (
 	groupTrailerLength = 42
 )
 
+// Creating Group Trailer
 func NewGroupTrailer() *GroupTrailer {
 	return &GroupTrailer{
 		RecordCode: "98",
@@ -23,6 +34,7 @@ func NewGroupTrailer() *GroupTrailer {
 
 }
 
+// Group Trailer
 type GroupTrailer struct {
 	RecordCode        string
 	GroupControlTotal string

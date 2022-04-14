@@ -12,18 +12,28 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+Account Transaction Detail
+
+The account transaction detail record contains information about current and personal deposit
+account activity. It always has a record code of 16.
+
+*/
+
 const (
 	accountTransactionLength = 56
 )
 
+// Creating Account Transaction Detail
 func NewAccountTransaction() *AccountTransaction {
 	return &AccountTransaction{
 		RecordCode: "16",
 		TypeCode:   "108",
 	}
-
 }
 
+// Account Transaction Detail
 type AccountTransaction struct {
 	RecordCode  string
 	TypeCode    string

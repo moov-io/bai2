@@ -12,10 +12,19 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+File Header
+
+The File Header is the first record in a BAI format file. It always has a record code of 01.
+
+*/
+
 const (
 	fileHeaderLength = 37
 )
 
+// Creating File Header
 func NewFileHeader() *FileHeader {
 	return &FileHeader{
 		RecordCode:           "01",
@@ -27,6 +36,7 @@ func NewFileHeader() *FileHeader {
 
 }
 
+// File Header
 type FileHeader struct {
 	RecordCode           string
 	Sender               string

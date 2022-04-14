@@ -12,10 +12,21 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+Account Identifier and Summary/Status for Current (CDA), Personal (PDA), and Loan accounts
+
+Loan Account
+This record contains the opening and closing balances for loan accounts. It always has a record code
+of 03. Each entry of the loan account identifier and summary record is described below:
+
+*/
+
 const (
 	accountIdentifierLoanLength = 79
 )
 
+// Creating Loan Account
 func NewAccountIdentifierLoan() *AccountIdentifierLoan {
 	return &AccountIdentifierLoan{
 		RecordCode:   "03",
@@ -26,6 +37,7 @@ func NewAccountIdentifierLoan() *AccountIdentifierLoan {
 
 }
 
+// Loan Account
 type AccountIdentifierLoan struct {
 	RecordCode     string
 	AccountNumber  string

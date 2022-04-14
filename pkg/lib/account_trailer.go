@@ -12,10 +12,22 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+Account Trailer
+
+The account trailer record contains information on the account control total and the number of
+records. The account control total is the sum of the amount values in the preceding type 03, 16 and 88
+records associated with the account. The number of records is the total of all records in the account,
+including the account trailer (type 49) record.
+
+*/
+
 const (
 	accountTrailerLength = 32
 )
 
+// Creating Account Trailer
 func NewAccountTrailer() *AccountTrailer {
 	return &AccountTrailer{
 		RecordCode: "49",
@@ -23,6 +35,7 @@ func NewAccountTrailer() *AccountTrailer {
 
 }
 
+// Account Trailer
 type AccountTrailer struct {
 	RecordCode          string
 	AccountControlTotal string
