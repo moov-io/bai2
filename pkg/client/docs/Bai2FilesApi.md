@@ -4,7 +4,7 @@ All URIs are relative to *http://localhost:8208*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Health**](Bai2FilesApi.md#Health) | **Get** /health | health metro2 service
+[**Health**](Bai2FilesApi.md#Health) | **Get** /health | health bai2 service
 [**Parse**](Bai2FilesApi.md#Parse) | **Post** /parse | Parse bai2 file after parse bin file
 [**Print**](Bai2FilesApi.md#Print) | **Post** /print | Print bai2 file after parse bin file
 
@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 > string Health(ctx).Execute()
 
-health metro2 service
+health bai2 service
 
 
 
