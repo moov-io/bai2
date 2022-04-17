@@ -87,10 +87,12 @@ func (r *Bai2) Validate() error {
 	return nil
 }
 
+// Creating new group object
 func NewGroup() *Group {
 	return &Group{}
 }
 
+// Group Format
 type Group struct {
 	Header  *lib.GroupHeader
 	Details []record.Record
