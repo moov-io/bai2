@@ -37,9 +37,9 @@ func (r ApiHealthRequest) Execute() (string, *http.Response, error) {
 }
 
 /*
-Health health metro2 service
+Health health bai2 service
 
-Check the metro2 service to check if running
+Check the bai2 service to check if running
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiHealthRequest

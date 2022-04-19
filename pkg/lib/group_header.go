@@ -12,10 +12,19 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+Group Header
+
+The Group Header is the second record in a BAI format file. It always has a record code of 02.
+
+*/
+
 const (
 	fileGroupLength = 29
 )
 
+// Creating Group Header
 func NewGroupHeader() *GroupHeader {
 	return &GroupHeader{
 		RecordCode:   "02",
@@ -25,6 +34,7 @@ func NewGroupHeader() *GroupHeader {
 
 }
 
+// Group Header
 type GroupHeader struct {
 	RecordCode   string
 	Receiver     string

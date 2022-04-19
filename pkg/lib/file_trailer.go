@@ -11,10 +11,22 @@ import (
 	"unicode/utf8"
 )
 
+/*
+
+File Trailer
+
+The file trailer is the last record in a BAI format file. This record contains information on the file control
+total, the number of groups and the number of records. The file control total is the sum of the group
+control totals in the file. The number of groups is the sum of type 02 records in the file. The number of
+records is the sum of all records in the file, including the file trailer (type 99) record.
+
+*/
+
 const (
 	fileTrailerLength = 42
 )
 
+// Creating File Trailer
 func NewFileTrailer() *FileTrailer {
 	return &FileTrailer{
 		RecordCode: "99",
@@ -22,6 +34,7 @@ func NewFileTrailer() *FileTrailer {
 
 }
 
+// File Trailer
 type FileTrailer struct {
 	RecordCode        string
 	GroupControlTotal string

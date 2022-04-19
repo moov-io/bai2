@@ -141,7 +141,7 @@ func initRootCmd() {
 	WebCmd.Flags().BoolP("test", "t", false, "test server")
 
 	rootCmd.SilenceUsage = true
-	rootCmd.PersistentFlags().StringVar(&documentFileName, "input", "", "bai2 report")
+	rootCmd.PersistentFlags().StringVar(&documentFileName, "input", "", "bai2 report file")
 	rootCmd.AddCommand(WebCmd)
 	rootCmd.AddCommand(Print)
 	rootCmd.AddCommand(Parse)

@@ -16,6 +16,17 @@ const (
 	accountIdentifierCurrentLength = 59
 )
 
+/*
+
+Account Identifier and Summary/Status for Current (CDA), Personal (PDA), and Loan accounts
+
+CDA and PDA accounts
+This record contains information on opening and closing balances for CDA and PDA accounts. It always
+has a record code of 03.
+
+*/
+
+// Creating CDA and PDA accounts
 func NewAccountIdentifierCurrent() *AccountIdentifierCurrent {
 	return &AccountIdentifierCurrent{
 		RecordCode:   "03",
@@ -26,6 +37,7 @@ func NewAccountIdentifierCurrent() *AccountIdentifierCurrent {
 
 }
 
+// CDA and PDA accounts
 type AccountIdentifierCurrent struct {
 	RecordCode     string
 	AccountNumber  string

@@ -12,10 +12,21 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+ Continuation of Account Summary Record - Current (CDA) and Personal (PDA) Accounts
+
+This record is a continuation of the account identifier and summary record (see Table 3) and contains
+value date and summary information (i.e. total credits and debits as well as total credit and debit dollar
+amounts). It always has a record code of 88.
+
+*/
+
 const (
 	accountIdentifierContinuationLength = 75
 )
 
+// Creating Continuation of Account Summary Record
 func NewAccountIdentifierContinuation() *AccountIdentifierContinuation {
 	return &AccountIdentifierContinuation{
 		RecordCode: "88",
@@ -25,6 +36,7 @@ func NewAccountIdentifierContinuation() *AccountIdentifierContinuation {
 
 }
 
+// Continuation of Account Summary Record
 type AccountIdentifierContinuation struct {
 	RecordCode         string
 	TypeCode1          string

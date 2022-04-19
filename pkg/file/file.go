@@ -16,10 +16,30 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
+/*
+
+The records in a balance reporting transmission file are ordered as follows:
+
+	----------------------------------------------------------------
+	Record Code | Record Name  						| Purpose
+	----------------------------------------------------------------
+			 01 | File Header  						| Begins File
+			 02 | Group Header 						| Begins Group
+			 03 | Account Identifier 				| Begins Account
+			 16 | Transaction Detail (Optional) 	| Within Account
+			 49 | Account Trailer 					| Ends Account
+			 98 | Group Trailer 					| Ends Group
+			 99 | File Trailer 						|Ends File
+	----------------------------------------------------------------
+
+*/
+
+// Creating new file object
 func NewBai2() Bai2 {
 	return Bai2{}
 }
 
+// FILE with BAI Format
 type Bai2 struct {
 	Header  *lib.FileHeader
 	Groups  []*Group
@@ -67,10 +87,12 @@ func (r *Bai2) Validate() error {
 	return nil
 }
 
+// Creating new group object
 func NewGroup() *Group {
 	return &Group{}
 }
 
+// Group Format
 type Group struct {
 	Header  *lib.GroupHeader
 	Details []record.Record
@@ -118,6 +140,7 @@ func (r *Group) Validate() error {
 	return nil
 }
 
+// Parse will return file object after parse
 func Parse(fd io.Reader) (*Bai2, error) {
 	file := NewBai2()
 
