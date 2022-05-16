@@ -3,7 +3,7 @@ module github.com/moov-io/bai2
 go 1.17
 
 require (
-	github.com/go-kit/log v0.2.0
+	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.0
 	github.com/markbates/pkger v0.17.1
 	github.com/moov-io/base v0.29.2
