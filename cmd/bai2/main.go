@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -127,7 +126,7 @@ var rootCmd = &cobra.Command{
 				return errors.New("invalid input file")
 			}
 
-			documentBuffer, err = ioutil.ReadFile(documentFileName)
+			documentBuffer, err = os.ReadFile(documentFileName)
 			if err != nil {
 				return err
 			}

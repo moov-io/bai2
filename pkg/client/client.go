@@ -18,7 +18,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -366,7 +365,7 @@ func (c *APIClient) decode(v interface{}, b []byte, contentType string) (err err
 		return nil
 	}
 	if f, ok := v.(**os.File); ok {
-		*f, err = ioutil.TempFile("", "HttpClientFile")
+		*f, err = os.CreateTemp("", "HttpClientFile")
 		if err != nil {
 			return
 		}

@@ -5,7 +5,6 @@
 package file
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +22,7 @@ func TestWithSampleData(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, bai.Validate())
 
-	raw, err := ioutil.ReadFile(samplePath)
+	raw, err := os.ReadFile(samplePath)
 	require.NoError(t, err)
 
 	rawStr := strings.ReplaceAll(string(raw), "\r\n", "\n")
