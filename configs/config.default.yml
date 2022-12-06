@@ -6,5 +6,3 @@ bai2:
     Admin:
       Bind:
         Address: ":8209"
-  Database:
-    DatabaseName: "bai2"

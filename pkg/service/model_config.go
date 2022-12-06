@@ -4,18 +4,13 @@
 
 package service
 
-import (
-	"github.com/moov-io/base/database"
-)
-
 type GlobalConfig struct {
 	Bai2 Config
 }
 
 // Config defines all the configuration for the app
 type Config struct {
-	Servers  ServerConfig
-	Database database.DatabaseConfig
+	Servers ServerConfig
 }
 
 // ServerConfig - Groups all the http configs for the servers and ports that get opened.
