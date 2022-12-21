@@ -58,7 +58,7 @@ The Bai2 project implements an HTTP server and [Go library](https://pkg.go.dev/g
 
 ### Docker
 
-We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release of Bai2. No configuration is required to serve on `:8080`. We also have Docker images for [OpenShift](https://quay.io/repository/moov/bai2?tab=tags) published as `quay.io/moov/bai2`.
+We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release of Bai2. No configuration is required to serve on `:8080`. <!-- We also have Docker images for [OpenShift](https://quay.io/repository/moov/bai2?tab=tags) published as `quay.io/moov/bai2`. -->
 
 Pull & start the Docker image:
 ```
