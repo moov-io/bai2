@@ -58,17 +58,17 @@ The Bai2 project implements an HTTP server and [Go library](https://pkg.go.dev/g
 
 ### Docker
 
-We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release of Bai2. No configuration is required to serve on `:8080`. <!-- We also have Docker images for [OpenShift](https://quay.io/repository/moov/bai2?tab=tags) published as `quay.io/moov/bai2`. -->
+We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release of Bai2. No configuration is required to serve on `:8208`. <!-- We also have Docker images for [OpenShift](https://quay.io/repository/moov/bai2?tab=tags) published as `quay.io/moov/bai2`. -->
 
 Pull & start the Docker image:
 ```
 docker pull moov/bai2:latest
-docker run -p 8080:8080 moov/bai2:latest
+docker run -p 8208:8208 moov/bai2:latest web
 ```
 
 Upload a file and pase it:
 ```
-curl -X POST --form "input=@sample.txt" http://localhost:8080/parse
+curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/parse
 ```
 ```
 {"status":"valid file"}
@@ -76,7 +76,7 @@ curl -X POST --form "input=@sample.txt" http://localhost:8080/parse
 
 Print a file after parse:
 ```
-curl -X POST --form "input=@sample.txt" http://localhost:8080/print
+curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/print
 ```
 ```
 01,0004,12345,060321,0829,001,80,1,2/
@@ -109,43 +109,6 @@ curl -X POST --form "input=@sample.txt" http://localhost:8080/print
 ...
 ```
 
-### Google Cloud Run
-
-To get started in a hosted environment you can deploy this project to the Google Cloud Platform.
-
-From your [Google Cloud dashboard](https://console.cloud.google.com/home/dashboard) create a new project and call it:
-```
-moov-bai2-demo
-```
-
-Enable the [Container Registry](https://cloud.google.com/container-registry) API for your project and associate a [billing account](https://cloud.google.com/billing/docs/how-to/manage-billing-account) if needed. Then, open the Cloud Shell terminal and run the following Docker commands, substituting your unique project ID:
-
-```
-docker pull moov/bai2
-docker tag moov/bai2 gcr.io/<PROJECT-ID>/bai2
-docker push gcr.io/<PROJECT-ID>/bai2
-```
-
-Deploy the container to Cloud Run:
-```
-gcloud run deploy --image gcr.io/<PROJECT-ID>/bai2 --port 8080
-```
-
-Select your target platform to `1`, service name to `bai2`, and region to the one closest to you (enable Google API service if a prompt appears). Upon a successful build you will be given a URL where the API has been deployed:
-
-```
-https://YOUR-BAI2-APP-URL.a.run.app
-```
-
-Now you can complete a health check:
-```
-curl https://YOUR-BAI2-APP-URL.a.run.app/health
-```
-You should get this response:
-```
-{"health":true}
-```
-
 ### Data persistence
 By design, Bai2  **does not persist** (save) any data about the files or entry details created. The only storage occurs in memory of the process and upon restart Bai2 will have no files or data saved. Also, no in-memory encryption of the data is performed.
 
@@ -166,15 +129,17 @@ $ go doc github.com/moov-io/bai2
 Bai2 has a command line interface to manage Bai 2 files and launch a web service.
 
 ```
-bai2 --help
-
+$ bai2 --help
+```
+```
 Usage:
    [command]
 
 Available Commands:
+  completion  Generate the autocompletion script for the specified shell
   help        Help about any command
-  print       Print bai2 file
-  parse       Parse bai2 file
+  parse       parse bai2 report
+  print       Print bai2 report
   web         Launches web server
 
 Flags:
@@ -184,15 +149,8 @@ Flags:
 Use " [command] --help" for more information about a command.
 ```
 
-Each interaction that the library supports is exposed in a command-line option:
-
- Command | Info
- ------- | -------
-`print`  | Print bai2 file
-`parse`  | Parse bai2 file
-`web`    | Launches web server
-
 ## Learn about Bai 2
+
 - [Bai 2](https://www.tdcommercialbanking.com/document/PDF/bai.pdf)
 - [Cash Management](https://www.bai.org/docs/default-source/libraries/site-general-downloads/cash_management_2005.pdf)
 
