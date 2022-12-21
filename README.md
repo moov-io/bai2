@@ -202,7 +202,7 @@ Each interaction that the library supports is exposed in a command-line option:
  ------- | -------
 Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
 [GitHub Issue](https://github.com/moov-io) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
-[moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
+[moov-io slack](https://slack.moov.io/) | Join our (`#bai2`) slack channel to have an interactive discussion about the development of the project.
 
 ## Supported and tested platforms
 
