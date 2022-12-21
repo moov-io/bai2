@@ -30,7 +30,7 @@
 
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
 
-Bai2 implements a reader, writer, and validator for the bank statement format of bank reconciliation in an HTTP server and Go library. The HTTP server is available in a [Docker image](#docker) and the Go package `github.com/moov-io/bai2` is available.
+Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) developed by Bank Administration Institute. This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`.
 
 ## Table of contents
 
