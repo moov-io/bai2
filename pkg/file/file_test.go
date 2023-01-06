@@ -22,7 +22,7 @@ func TestWithSampleData(t *testing.T) {
 		{"sample1.txt", true}, {"sample2.txt", true}, {"sample3.txt", false}}
 
 	for _, sample := range samples {
-		samplePath := filepath.Join("..", "..", "data", sample.FileName)
+		samplePath := filepath.Join("..", "..", "test", "testdata", sample.FileName)
 		fd, err := os.Open(samplePath)
 		require.NoError(t, err)
 
