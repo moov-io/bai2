@@ -87,7 +87,7 @@ func (h *ContinuationRecord) Parse(data string) (int, error) {
 func (h *ContinuationRecord) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%s", h.RecordCode))
+	buf.WriteString(h.RecordCode)
 
 	for _, composite := range h.Composite {
 		buf.WriteString(fmt.Sprintf(",%s", composite))

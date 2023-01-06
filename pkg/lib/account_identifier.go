@@ -156,7 +156,7 @@ func (h *AccountIdentifier) String() string {
 	buf.WriteString(fmt.Sprintf("%s,", h.TypeCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.Amount))
 	buf.WriteString(fmt.Sprintf("%s,", h.ItemCount))
-	buf.WriteString(fmt.Sprintf("%s", h.FundsType))
+	buf.WriteString(h.FundsType)
 
 	for _, composite := range h.Composite {
 		buf.WriteString(fmt.Sprintf(",%s", composite))
