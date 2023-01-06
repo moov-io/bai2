@@ -7,7 +7,6 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"unicode/utf8"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -24,7 +23,8 @@ including the account trailer (type 49) record.
 */
 
 const (
-	accountTrailerLength = 32
+	atParseErrorFmt    = "AccountTrailer: unable to parse %s"
+	atValidateErrorFmt = "AccountTrailer: invalid %s"
 )
 
 // Creating Account Trailer
@@ -44,30 +44,62 @@ type AccountTrailer struct {
 
 func (h *AccountTrailer) Validate() error {
 	if h.RecordCode != "49" {
-		return fmt.Errorf("AccountTrailer: invalid record code")
+		return fmt.Errorf(fmt.Sprintf(atValidateErrorFmt, "RecordCode"))
+	}
+	if h.AccountControlTotal != "" && !util.ValidateAmount(h.AccountControlTotal) {
+		return fmt.Errorf(fmt.Sprintf(atValidateErrorFmt, "Amount"))
 	}
 
 	return nil
 }
 
-func (h *AccountTrailer) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < accountTrailerLength {
-		return fmt.Errorf("AccountTrailer: length %d is too short", n)
+func (h *AccountTrailer) Parse(data string) (int, error) {
+
+	var line string
+	var err error
+	var size, read int
+
+	length := util.GetSize(data)
+	if length < 2 {
+		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "record"))
+	} else {
+		line = data[:length]
 	}
 
-	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
-	h.AccountControlTotal, _ = util.EntryParser(line[3:22], ",")
-	h.NumberRecords, _ = util.EntryParserToInt(line[22:32], "/")
+	// RecordCode
+	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "RecordCode"))
+	} else {
+		read += size
+	}
 
-	return nil
+	// AccountControlTotal
+	if h.AccountControlTotal, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "AccountControlTotal"))
+	} else {
+		read += size
+	}
+
+	// NumberRecords
+	if h.NumberRecords, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "NumberRecords"))
+	} else {
+		read += size
+	}
+
+	if err = h.Validate(); err != nil {
+		return 0, err
+	}
+
+	return read, nil
 }
 
 func (h *AccountTrailer) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%-18.18v,", h.AccountControlTotal))
-	buf.WriteString(fmt.Sprintf("%09.9v/", h.NumberRecords))
+	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", h.AccountControlTotal))
+	buf.WriteString(fmt.Sprintf("%d/", h.NumberRecords))
 
 	return buf.String()
 }

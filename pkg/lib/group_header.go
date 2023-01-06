@@ -7,7 +7,6 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"unicode/utf8"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -21,69 +20,147 @@ The Group Header is the second record in a BAI format file. It always has a reco
 */
 
 const (
-	fileGroupLength = 29
+	ghParseErrorFmt    = "GroupHeader: unable to parse %s"
+	ghValidateErrorFmt = "GroupHeader: invalid %s"
 )
 
 // Creating Group Header
 func NewGroupHeader() *GroupHeader {
 	return &GroupHeader{
-		RecordCode:   "02",
-		Sender:       "0004",
-		CurrencyCode: "USD",
+		RecordCode: "02",
 	}
-
 }
 
 // Group Header
 type GroupHeader struct {
-	RecordCode   string
-	Receiver     string
-	Sender       string
-	GroupStatus  string
-	AsOfDate     string
-	CurrencyCode string
+	RecordCode       string
+	Receiver         string `json:",omitempty"`
+	Originator       string
+	GroupStatus      int64
+	AsOfDate         string
+	AsOfTime         string `json:",omitempty"`
+	CurrencyCode     string `json:",omitempty"`
+	AsOfDateModifier int64  `json:",omitempty"`
 }
 
 func (h *GroupHeader) Validate() error {
 	if h.RecordCode != "02" {
-		return fmt.Errorf("GroupHeader: invalid record code")
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "RecordCode"))
 	}
-	if h.Sender != "0004" {
-		return fmt.Errorf("GroupHeader: invalid sender")
+	if h.Originator == "" {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "Originator"))
 	}
-	if h.CurrencyCode != "USD" && h.CurrencyCode != "CAD" {
-		return fmt.Errorf("GroupHeader: invalid currency code")
+	if h.GroupStatus < 0 || h.GroupStatus > 4 {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "GroupStatus"))
+	}
+	if h.AsOfDate == "" {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfDate"))
+	} else if !util.ValidateData(h.AsOfDate) {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfDate"))
+	}
+	if h.AsOfTime != "" && !util.ValidateTime(h.AsOfTime) {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfTime"))
+	}
+	if h.CurrencyCode != "" && !util.ValidateCurrencyCode(h.CurrencyCode) {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "CurrencyCode"))
+	}
+	if h.AsOfDateModifier < 0 || h.AsOfDateModifier > 4 {
+		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfDateModifier"))
 	}
 
 	return nil
 }
 
-func (h *GroupHeader) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < fileGroupLength {
-		return fmt.Errorf("GroupHeader: length %d is too short", n)
+func (h *GroupHeader) Parse(data string) (int, error) {
+
+	var line string
+	var err error
+	var size, read int
+
+	if length := util.GetSize(data); length < 2 {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "record"))
+	} else {
+		line = data[:length]
 	}
 
-	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
-	h.Receiver, _ = util.EntryParser(line[3:9], ",")
-	h.Sender, _ = util.EntryParser(line[9:14], ",")
-	h.GroupStatus, _ = util.EntryParser(line[14:16], ",")
-	h.AsOfDate, _ = util.EntryParser(line[16:23], ",")
-	h.CurrencyCode, _ = util.EntryParser(line[24:28], ",")
+	// RecordCode
+	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "RecordCode"))
+	} else {
+		read += size
+	}
 
-	return nil
+	// Receiver
+	if h.Receiver, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "Receiver"))
+	} else {
+		read += size
+	}
+
+	// Originator
+	if h.Originator, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "Originator"))
+	} else {
+		read += size
+	}
+
+	// GroupStatus
+	if h.GroupStatus, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "GroupStatus"))
+	} else {
+		read += size
+	}
+
+	// AsOfDate
+	if h.AsOfDate, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfDate"))
+	} else {
+		read += size
+	}
+
+	// AsOfTime
+	if h.AsOfTime, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfTime"))
+	} else {
+		read += size
+	}
+
+	// CurrencyCode
+	if h.CurrencyCode, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "CurrencyCode"))
+	} else {
+		read += size
+	}
+
+	// AsOfDateModifier
+	if h.AsOfDateModifier, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfDateModifier"))
+	} else {
+		read += size
+	}
+
+	if err = h.Validate(); err != nil {
+		return 0, err
+	}
+
+	return read, nil
 }
 
 func (h *GroupHeader) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%-5.5v,", h.Receiver))
-	buf.WriteString(fmt.Sprintf("%-4.4v,", h.Sender))
-	buf.WriteString(fmt.Sprintf("%-1.1v,", h.GroupStatus))
-	buf.WriteString(fmt.Sprintf("%-6.6v,", h.AsOfDate))
-	buf.WriteString(",")
-	buf.WriteString(fmt.Sprintf("%-3.3v,", h.CurrencyCode))
-	buf.WriteString("/")
+	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", h.Receiver))
+	buf.WriteString(fmt.Sprintf("%s,", h.Originator))
+	buf.WriteString(fmt.Sprintf("%d,", h.GroupStatus))
+	buf.WriteString(fmt.Sprintf("%s,", h.AsOfDate))
+	buf.WriteString(fmt.Sprintf("%s,", h.AsOfTime))
+	buf.WriteString(fmt.Sprintf("%s,", h.CurrencyCode))
+	if h.AsOfDateModifier > 0 {
+		buf.WriteString(fmt.Sprintf("%d/", h.AsOfDateModifier))
+	} else {
+		buf.WriteString("/")
+	}
 
 	return buf.String()
 }

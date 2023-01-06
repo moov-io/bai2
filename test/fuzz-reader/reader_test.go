@@ -42,7 +42,7 @@ func TestCorpusSymlinks(t *testing.T) {
 func TestFuzzWithValidData(t *testing.T) {
 
 	validFileSamples := []string{
-		"sample.txt",
+		"sample1.txt",
 	}
 	for _, sample := range validFileSamples {
 		byteData, err := os.ReadFile(filepath.Join("..", "..", "data", sample))

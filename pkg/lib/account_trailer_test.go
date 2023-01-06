@@ -12,32 +12,27 @@ import (
 
 func TestAccountTrailer(t *testing.T) {
 
-	header := NewAccountTrailer()
-	require.NoError(t, header.Validate())
+	record := NewAccountTrailer()
+	require.NoError(t, record.Validate())
 
-	header.RecordCode = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "AccountTrailer: invalid record code", header.Validate().Error())
+	record.RecordCode = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "AccountTrailer: invalid RecordCode", record.Validate().Error())
 
 }
 
 func TestAccountTrailerWithSample(t *testing.T) {
 
-	sample := "49,+00000000000446000,000000009/"
-	header := NewAccountTrailer()
+	sample := "49,+00000000000446000,9/"
+	record := NewAccountTrailer()
 
-	err := header.Parse(sample)
+	size, err := record.Parse(sample)
 	require.NoError(t, err)
+	require.Equal(t, 24, size)
 
-	require.Equal(t, "49", header.RecordCode)
-	require.Equal(t, "+00000000000446000", header.AccountControlTotal)
-	require.Equal(t, int64(9), header.NumberRecords)
+	require.Equal(t, "49", record.RecordCode)
+	require.Equal(t, "+00000000000446000", record.AccountControlTotal)
+	require.Equal(t, int64(9), record.NumberRecords)
 
-	require.Equal(t, sample, header.String())
-
-	header = &AccountTrailer{}
-	require.Error(t, header.Validate())
-
-	err = header.Parse(sample[:20])
-	require.Equal(t, "AccountTrailer: length 20 is too short", err.Error())
+	require.Equal(t, sample, record.String())
 }

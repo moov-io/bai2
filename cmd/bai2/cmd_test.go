@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	testFileName = filepath.Join("..", "..", "data", "sample.txt")
+	testFileName = filepath.Join("..", "..", "data", "sample1.txt")
 )
 
 func TestMain(m *testing.M) {

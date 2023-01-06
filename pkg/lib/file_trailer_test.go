@@ -12,33 +12,28 @@ import (
 
 func TestFileTrailer(t *testing.T) {
 
-	header := NewFileTrailer()
-	require.NoError(t, header.Validate())
+	record := NewFileTrailer()
+	require.NoError(t, record.Validate())
 
-	header.RecordCode = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "FileTrailer: invalid record code", header.Validate().Error())
+	record.RecordCode = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "FileTrailer: invalid RecordCode", record.Validate().Error())
 
 }
 
 func TestFileTrailerWithSample(t *testing.T) {
 
-	sample := "99,+00000000001280000,000000001,000000027/"
-	header := NewFileTrailer()
+	sample := "99,+00000000001280000,1,27/"
+	record := NewFileTrailer()
 
-	err := header.Parse(sample)
+	size, err := record.Parse(sample)
 	require.NoError(t, err)
+	require.Equal(t, 27, size)
 
-	require.Equal(t, "99", header.RecordCode)
-	require.Equal(t, "+00000000001280000", header.GroupControlTotal)
-	require.Equal(t, int64(1), header.NumberOfGroups)
-	require.Equal(t, int64(27), header.NumberOfRecords)
+	require.Equal(t, "99", record.RecordCode)
+	require.Equal(t, "+00000000001280000", record.FileControlTotal)
+	require.Equal(t, int64(1), record.NumberOfGroups)
+	require.Equal(t, int64(27), record.NumberOfRecords)
 
-	require.Equal(t, sample, header.String())
-
-	header = &FileTrailer{}
-	require.Error(t, header.Validate())
-
-	err = header.Parse(sample[:20])
-	require.Equal(t, "FileTrailer: length 20 is too short", err.Error())
+	require.Equal(t, sample, record.String())
 }

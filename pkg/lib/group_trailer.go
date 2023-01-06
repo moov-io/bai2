@@ -7,7 +7,6 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"unicode/utf8"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -23,7 +22,8 @@ sum of the account control totals in the group. The number of records is the tot
 */
 
 const (
-	groupTrailerLength = 42
+	gtParseErrorFmt    = "GroupTrailer: unable to parse %s"
+	gtValidateErrorFmt = "GroupTrailer: invalid %s"
 )
 
 // Creating Group Trailer
@@ -44,32 +44,69 @@ type GroupTrailer struct {
 
 func (h *GroupTrailer) Validate() error {
 	if h.RecordCode != "98" {
-		return fmt.Errorf("GroupTrailer: invalid record code")
+		return fmt.Errorf(fmt.Sprintf(gtValidateErrorFmt, "RecordCode"))
+	}
+	if h.GroupControlTotal != "" && !util.ValidateAmount(h.GroupControlTotal) {
+		return fmt.Errorf(fmt.Sprintf(gtValidateErrorFmt, "GroupControlTotal"))
 	}
 
 	return nil
 }
 
-func (h *GroupTrailer) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < groupTrailerLength {
-		return fmt.Errorf("GroupTrailer: length %d is too short", n)
+func (h *GroupTrailer) Parse(data string) (int, error) {
+
+	var line string
+	var err error
+	var size, read int
+
+	if length := util.GetSize(data); length < 2 {
+		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "record"))
+	} else {
+		line = data[:length]
 	}
 
-	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
-	h.GroupControlTotal, _ = util.EntryParser(line[3:22], ",")
-	h.NumberOfAccounts, _ = util.EntryParserToInt(line[22:32], ",")
-	h.NumberOfRecords, _ = util.EntryParserToInt(line[32:42], "/")
+	// RecordCode
+	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "RecordCode"))
+	} else {
+		read += size
+	}
 
-	return nil
+	// GroupControlTotal
+	if h.GroupControlTotal, size, err = util.ReadField(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "GroupControlTotal"))
+	} else {
+		read += size
+	}
+
+	// NumberOfAccounts
+	if h.NumberOfAccounts, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfAccounts"))
+	} else {
+		read += size
+	}
+
+	// NumberOfRecords
+	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfRecords"))
+	} else {
+		read += size
+	}
+
+	if err = h.Validate(); err != nil {
+		return 0, err
+	}
+
+	return read, nil
 }
 
 func (h *GroupTrailer) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%-18.18v,", h.GroupControlTotal))
-	buf.WriteString(fmt.Sprintf("%09.9v,", h.NumberOfAccounts))
-	buf.WriteString(fmt.Sprintf("%09.9v/", h.NumberOfRecords))
+	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", h.GroupControlTotal))
+	buf.WriteString(fmt.Sprintf("%d,", h.NumberOfAccounts))
+	buf.WriteString(fmt.Sprintf("%d/", h.NumberOfRecords))
 
 	return buf.String()
 }

@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	testFileName = "sample.txt"
+	testFileName = "sample1.txt"
 )
 
 type HandlersTest struct {

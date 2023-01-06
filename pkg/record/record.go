@@ -6,6 +6,6 @@ package record
 
 type Record interface {
 	Validate() error
-	Parse(line string) error
+	Parse(line string) (int, error)
 	String() string
 }

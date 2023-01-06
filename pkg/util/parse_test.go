@@ -10,14 +10,30 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestEntryParser(t *testing.T) {
+func TestReadField(t *testing.T) {
 
-	entry, err := EntryParser("01,", ",")
+	entry, size, err := ReadField("01,")
 	require.NoError(t, err)
+	require.Equal(t, 3, size)
 	require.Equal(t, "01", entry)
 
-	entry, err = EntryParser("2/", "/")
+	entry, size, err = ReadField("01/")
 	require.NoError(t, err)
-	require.Equal(t, "2", entry)
+	require.Equal(t, 3, size)
+	require.Equal(t, "01", entry)
+
+}
+
+func TestReadFieldAsInt(t *testing.T) {
+
+	entry, size, err := ReadFieldAsInt("11,")
+	require.NoError(t, err)
+	require.Equal(t, 3, size)
+	require.Equal(t, int64(11), entry)
+
+	entry, size, err = ReadFieldAsInt("11/")
+	require.NoError(t, err)
+	require.Equal(t, 3, size)
+	require.Equal(t, int64(11), entry)
 
 }
