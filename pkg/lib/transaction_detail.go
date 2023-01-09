@@ -72,28 +72,28 @@ func (h *TransactionDetail) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// TypeCode
-	if h.TypeCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.TypeCode, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "TypeCode"))
 	} else {
 		read += size
 	}
 
 	// Amount
-	if h.Amount, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.Amount, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Amount"))
 	} else {
 		read += size
 	}
 
 	// FundsType
-	if h.FundsType, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.FundsType, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType"))
 	} else {
 		read += size
@@ -101,7 +101,7 @@ func (h *TransactionDetail) Parse(data string) (int, error) {
 
 	for int64(read) < length {
 		var composite string
-		if composite, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+		if composite, size, err = util.ReadField(line, read); err != nil {
 			return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Composite"))
 		} else {
 			read += size

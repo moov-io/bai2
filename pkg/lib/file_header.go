@@ -89,63 +89,63 @@ func (h *FileHeader) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// Sender
-	if h.Sender, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.Sender, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Sender"))
 	} else {
 		read += size
 	}
 
 	// Receiver
-	if h.Receiver, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.Receiver, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Receiver"))
 	} else {
 		read += size
 	}
 
 	// FileCreatedDate
-	if h.FileCreatedDate, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.FileCreatedDate, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedDate"))
 	} else {
 		read += size
 	}
 
 	// FileCreatedTime
-	if h.FileCreatedTime, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.FileCreatedTime, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedTime"))
 	} else {
 		read += size
 	}
 
 	// FileIdNumber
-	if h.FileIdNumber, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
+	if h.FileIdNumber, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileIdNumber"))
 	} else {
 		read += size
 	}
 
 	// PhysicalRecordLength
-	if h.PhysicalRecordLength, size, err = util.ReadFieldAsInt(util.GetNextData(line, read)); err != nil {
+	if h.PhysicalRecordLength, size, err = util.ReadFieldAsInt(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "PhysicalRecordLength"))
 	} else {
 		read += size
 	}
 
 	// BlockSize
-	if h.BlockSize, size, err = util.ReadFieldAsInt(util.GetNextData(line, read)); err != nil {
+	if h.BlockSize, size, err = util.ReadFieldAsInt(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "BlockSize"))
 	} else {
 		read += size
 	}
 
 	// VersionNumber
-	if h.VersionNumber, size, err = util.ReadFieldAsInt(util.GetNextData(line, read)); err != nil {
+	if h.VersionNumber, size, err = util.ReadFieldAsInt(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "VersionNumber"))
 	} else {
 		read += size

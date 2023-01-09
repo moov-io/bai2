@@ -20,32 +20,44 @@ func getIndex(input string) int {
 	return idx1
 }
 
-func ReadField(input string) (string, int, error) {
+func ReadField(input string, start int) (string, int, error) {
 
-	if input == "" {
+	data := ""
+
+	if start < len(input) {
+		data = input[start:]
+	}
+
+	if data == "" {
 		return "", 0, fmt.Errorf("doesn't enough input string")
 	}
 
-	idx := getIndex(input)
+	idx := getIndex(data)
 	if idx == -1 {
 		return "", 0, fmt.Errorf("doesn't have valid delimiter")
 	}
 
-	return input[:idx], idx + 1, nil
+	return data[:idx], idx + 1, nil
 }
 
-func ReadFieldAsInt(input string) (int64, int, error) {
+func ReadFieldAsInt(input string, start int) (int64, int, error) {
 
-	if input == "" {
+	data := ""
+
+	if start < len(input) {
+		data = input[start:]
+	}
+
+	if data == "" {
 		return 0, 0, fmt.Errorf("doesn't enough input string")
 	}
 
-	idx := getIndex(input)
+	idx := getIndex(data)
 	if idx == -1 {
 		return 0, 0, fmt.Errorf("doesn't have valid delimiter")
 	}
 
-	value, _ := strconv.ParseInt(input[:idx], 10, 64)
+	value, _ := strconv.ParseInt(data[:idx], 10, 64)
 
 	return value, idx + 1, nil
 }
@@ -58,13 +70,4 @@ func GetSize(line string) int64 {
 	}
 
 	return int64(size)
-}
-
-func GetNextData(line string, start int) string {
-
-	if start < len(line) {
-		return line[start:]
-	}
-
-	return ""
 }
