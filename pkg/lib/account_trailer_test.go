@@ -44,6 +44,7 @@ func TestAccountTrailerWithSample2(t *testing.T) {
 
 	size, err := record.Parse(sample)
 	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+	require.Equal(t, 0, size)
 
 	sample = "49,+00000000000446000/"
 	size, err = record.Parse(sample)

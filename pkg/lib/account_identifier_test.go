@@ -92,6 +92,7 @@ func TestAccountIdentifierCurrentWithSample4(t *testing.T) {
 
 	size, err := record.Parse(sample)
 	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+	require.Equal(t, 0, size)
 
 	sample = "03,5765432,/"
 	size, err = record.Parse(sample)
