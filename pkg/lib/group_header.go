@@ -84,56 +84,56 @@ func (h *GroupHeader) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.RecordCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// Receiver
-	if h.Receiver, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.Receiver, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "Receiver"))
 	} else {
 		read += size
 	}
 
 	// Originator
-	if h.Originator, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.Originator, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "Originator"))
 	} else {
 		read += size
 	}
 
 	// GroupStatus
-	if h.GroupStatus, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
+	if h.GroupStatus, size, err = util.ReadFieldAsInt(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "GroupStatus"))
 	} else {
 		read += size
 	}
 
 	// AsOfDate
-	if h.AsOfDate, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.AsOfDate, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfDate"))
 	} else {
 		read += size
 	}
 
 	// AsOfTime
-	if h.AsOfTime, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.AsOfTime, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfTime"))
 	} else {
 		read += size
 	}
 
 	// CurrencyCode
-	if h.CurrencyCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.CurrencyCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "CurrencyCode"))
 	} else {
 		read += size
 	}
 
 	// AsOfDateModifier
-	if h.AsOfDateModifier, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
+	if h.AsOfDateModifier, size, err = util.ReadFieldAsInt(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ghParseErrorFmt, "AsOfDateModifier"))
 	} else {
 		read += size

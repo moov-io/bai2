@@ -60,10 +60,10 @@ func GetSize(line string) int64 {
 	return int64(size)
 }
 
-func GetField(line string, position int) string {
+func GetNextData(line string, start int) string {
 
-	if position < len(line) {
-		return line[position:]
+	if start < len(line) {
+		return line[start:]
 	}
 
 	return ""

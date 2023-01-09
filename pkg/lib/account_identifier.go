@@ -82,49 +82,49 @@ func (h *AccountIdentifier) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.RecordCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// AccountNumber
-	if h.AccountNumber, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.AccountNumber, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "AccountNumber"))
 	} else {
 		read += size
 	}
 
 	// CurrencyCode
-	if h.CurrencyCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.CurrencyCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "CurrencyCode"))
 	} else {
 		read += size
 	}
 
 	// TypeCode
-	if h.TypeCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.TypeCode, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "TypeCode"))
 	} else {
 		read += size
 	}
 
 	// Amount
-	if h.Amount, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.Amount, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "Amount"))
 	} else {
 		read += size
 	}
 
 	// ItemCount
-	if h.ItemCount, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.ItemCount, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "ItemCount"))
 	} else {
 		read += size
 	}
 
 	// FundsType
-	if h.FundsType, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+	if h.FundsType, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "FundsType"))
 	} else {
 		read += size
@@ -132,7 +132,7 @@ func (h *AccountIdentifier) Parse(data string) (int, error) {
 
 	for int64(read) < length {
 		var composite string
-		if composite, size, err = util.ReadField(util.GetField(line, read)); err != nil {
+		if composite, size, err = util.ReadField(util.GetNextData(line, read)); err != nil {
 			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "Composite"))
 		} else {
 			read += size
