@@ -276,13 +276,9 @@ func scanRecord(data []byte, atEOF bool) (advance int, token []byte, err error) 
 	}
 
 	index := util.GetSize(string(data))
-	if index < 0 && !atEOF {
+	if index < 1 || !atEOF {
 		// need more data
 		return 0, nil, nil
-	}
-
-	if index == 0 {
-		return len(data), data, nil
 	}
 
 	return int(index), data[:int(index)], nil

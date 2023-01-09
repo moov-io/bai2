@@ -53,7 +53,7 @@ func ReadFieldAsInt(input string) (int64, int, error) {
 func GetSize(line string) int64 {
 
 	size := strings.Index(line, "/")
-	if size > 0 {
+	if size >= 0 {
 		return int64(size + 1)
 	}
 
