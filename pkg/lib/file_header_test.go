@@ -127,7 +127,7 @@ func TestFileHeaderWithInvalidSample2(t *testing.T) {
 
 	sample = "01,2,12345/"
 	size, err = record.Parse(sample)
-	require.Equal(t, "AccountIdentifier: unable to parse Amount", err.Error())
+	require.Equal(t, "AccountIdentifier: unable to parse TypeCode", err.Error())
 	require.Equal(t, 0, size)
 
 }
