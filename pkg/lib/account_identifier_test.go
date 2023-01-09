@@ -19,54 +19,54 @@ func mockAccountIdentifier() *AccountIdentifier {
 
 func TestAccountIdentifierCurrent(t *testing.T) {
 
-	header := mockAccountIdentifier()
-	require.NoError(t, header.Validate())
+	record := mockAccountIdentifier()
+	require.NoError(t, record.Validate())
 
-	header.AccountNumber = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifierCurrent: invalid AccountNumber", header.Validate().Error())
+	record.AccountNumber = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "AccountIdentifierCurrent: invalid AccountNumber", record.Validate().Error())
 
-	header.RecordCode = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "AccountIdentifierCurrent: invalid RecordCode", header.Validate().Error())
+	record.RecordCode = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "AccountIdentifierCurrent: invalid RecordCode", record.Validate().Error())
 
 }
 
 func TestAccountIdentifierCurrentWithSample1(t *testing.T) {
 
 	sample := "03,10200123456,CAD,040,+000000000000,,,045,+000000000000,4,0/"
-	header := NewAccountIdentifier()
+	record := NewAccountIdentifier()
 
-	size, err := header.Parse(sample)
+	size, err := record.Parse(sample)
 	require.NoError(t, err)
 	require.Equal(t, 61, size)
 
-	require.Equal(t, "03", header.RecordCode)
-	require.Equal(t, "10200123456", header.AccountNumber)
-	require.Equal(t, "CAD", header.CurrencyCode)
-	require.Equal(t, "040", header.TypeCode)
-	require.Equal(t, "+000000000000", header.Amount)
-	require.Equal(t, "045", header.Composite[0])
-	require.Equal(t, "+000000000000", header.Composite[1])
-	require.Equal(t, "4", header.Composite[2])
-	require.Equal(t, "0", header.Composite[3])
+	require.Equal(t, "03", record.RecordCode)
+	require.Equal(t, "10200123456", record.AccountNumber)
+	require.Equal(t, "CAD", record.CurrencyCode)
+	require.Equal(t, "040", record.TypeCode)
+	require.Equal(t, "+000000000000", record.Amount)
+	require.Equal(t, "045", record.Composite[0])
+	require.Equal(t, "+000000000000", record.Composite[1])
+	require.Equal(t, "4", record.Composite[2])
+	require.Equal(t, "0", record.Composite[3])
 
-	require.Equal(t, sample, header.String())
+	require.Equal(t, sample, record.String())
 }
 
 func TestAccountIdentifierCurrentWithSample2(t *testing.T) {
 
 	sample := "03,5765432,,,,,/"
-	header := NewAccountIdentifier()
+	record := NewAccountIdentifier()
 
-	size, err := header.Parse(sample)
+	size, err := record.Parse(sample)
 	require.NoError(t, err)
 	require.Equal(t, 16, size)
 
-	require.Equal(t, "03", header.RecordCode)
-	require.Equal(t, "5765432", header.AccountNumber)
+	require.Equal(t, "03", record.RecordCode)
+	require.Equal(t, "5765432", record.AccountNumber)
 
-	require.Equal(t, sample, header.String())
+	require.Equal(t, sample, record.String())
 }
 
 func TestAccountIdentifierCurrentWithSample3(t *testing.T) {
@@ -83,4 +83,19 @@ func TestAccountIdentifierCurrentWithSample3(t *testing.T) {
 	require.Equal(t, 1, len(record.Composite))
 
 	require.Equal(t, sample, record.String())
+}
+
+func TestAccountIdentifierCurrentWithSample4(t *testing.T) {
+
+	sample := "03,5765432,"
+	record := NewAccountIdentifier()
+
+	size, err := record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+
+	sample = "03,5765432,/"
+	size, err = record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse TypeCode", err.Error())
+	require.Equal(t, 0, size)
+
 }

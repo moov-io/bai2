@@ -67,21 +67,21 @@ func (h *AccountTrailer) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+	if h.RecordCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// AccountControlTotal
-	if h.AccountControlTotal, size, err = util.ReadField(line[read:]); err != nil {
+	if h.AccountControlTotal, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "AccountControlTotal"))
 	} else {
 		read += size
 	}
 
 	// NumberRecords
-	if h.NumberRecords, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+	if h.NumberRecords, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "NumberRecords"))
 	} else {
 		read += size

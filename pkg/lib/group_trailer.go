@@ -66,28 +66,28 @@ func (h *GroupTrailer) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+	if h.RecordCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// GroupControlTotal
-	if h.GroupControlTotal, size, err = util.ReadField(line[read:]); err != nil {
+	if h.GroupControlTotal, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "GroupControlTotal"))
 	} else {
 		read += size
 	}
 
 	// NumberOfAccounts
-	if h.NumberOfAccounts, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+	if h.NumberOfAccounts, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfAccounts"))
 	} else {
 		read += size
 	}
 
 	// NumberOfRecords
-	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfRecords"))
 	} else {
 		read += size

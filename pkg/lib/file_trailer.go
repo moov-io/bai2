@@ -67,28 +67,28 @@ func (h *FileTrailer) Parse(data string) (int, error) {
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line[read:]); err != nil {
+	if h.RecordCode, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "RecordCode"))
 	} else {
 		read += size
 	}
 
 	// GroupControlTotal
-	if h.FileControlTotal, size, err = util.ReadField(line[read:]); err != nil {
+	if h.FileControlTotal, size, err = util.ReadField(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "GroupControlTotal"))
 	} else {
 		read += size
 	}
 
 	// NumberOfGroups
-	if h.NumberOfGroups, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+	if h.NumberOfGroups, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfGroups"))
 	} else {
 		read += size
 	}
 
 	// NumberOfRecords
-	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line[read:]); err != nil {
+	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(util.GetField(line, read)); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfRecords"))
 	} else {
 		read += size

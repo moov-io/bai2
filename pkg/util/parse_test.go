@@ -22,6 +22,11 @@ func TestReadField(t *testing.T) {
 	require.Equal(t, 3, size)
 	require.Equal(t, "01", entry)
 
+	entry, size, err = ReadField("ODFI’,")
+	require.NoError(t, err)
+	require.Equal(t, 8, size)
+	require.Equal(t, "ODFI’", entry)
+
 }
 
 func TestReadFieldAsInt(t *testing.T) {
@@ -35,5 +40,10 @@ func TestReadFieldAsInt(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 3, size)
 	require.Equal(t, int64(11), entry)
+
+	entry, size, err = ReadFieldAsInt("ODFI’,")
+	require.NoError(t, err)
+	require.Equal(t, 8, size)
+	require.Equal(t, int64(0), entry)
 
 }

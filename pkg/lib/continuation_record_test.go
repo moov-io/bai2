@@ -12,12 +12,12 @@ import (
 
 func TestContinuationRecord(t *testing.T) {
 
-	header := NewContinuationRecord()
-	require.NoError(t, header.Validate())
+	record := NewContinuationRecord()
+	require.NoError(t, record.Validate())
 
-	header.RecordCode = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "ContinuationRecord: invalid RecordCode", header.Validate().Error())
+	record.RecordCode = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "ContinuationRecord: invalid RecordCode", record.Validate().Error())
 
 }
 
@@ -34,5 +34,20 @@ func TestContinuationRecordWithSample(t *testing.T) {
 	require.Equal(t, 12, len(record.Composite))
 	require.Equal(t, "100", record.Composite[0])
 	require.Equal(t, "000000000208500", record.Composite[1])
+
+}
+
+func TestContinuationRecordWithSample2(t *testing.T) {
+
+	sample := "88,100,000000000208500"
+	record := NewAccountIdentifier()
+
+	size, err := record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+
+	sample = "88,100,000000000208500,/"
+	size, err = record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse Amount", err.Error())
+	require.Equal(t, 0, size)
 
 }

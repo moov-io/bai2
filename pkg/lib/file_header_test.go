@@ -115,3 +115,18 @@ func TestFileHeaderWithInvalidSample(t *testing.T) {
 	_, err = record.Parse("01,2,12345,060321,082a,1,,,2/")
 	require.Error(t, err)
 }
+
+func TestFileHeaderWithInvalidSample2(t *testing.T) {
+
+	sample := "01,2,12345,06032,0829,1"
+	record := NewAccountIdentifier()
+
+	size, err := record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+
+	sample = "01,2,12345/"
+	size, err = record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse Amount", err.Error())
+	require.Equal(t, 0, size)
+
+}

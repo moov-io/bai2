@@ -36,3 +36,18 @@ func TestAccountTrailerWithSample(t *testing.T) {
 
 	require.Equal(t, sample, record.String())
 }
+
+func TestAccountTrailerWithSample2(t *testing.T) {
+
+	sample := "49,+00000000000446000"
+	record := NewAccountIdentifier()
+
+	size, err := record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+
+	sample = "49,+00000000000446000/"
+	size, err = record.Parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse CurrencyCode", err.Error())
+	require.Equal(t, 0, size)
+
+}

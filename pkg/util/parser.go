@@ -22,6 +22,10 @@ func getIndex(input string) int {
 
 func ReadField(input string) (string, int, error) {
 
+	if input == "" {
+		return "", 0, fmt.Errorf("doesn't enough input string")
+	}
+
 	idx := getIndex(input)
 	if idx == -1 {
 		return "", 0, fmt.Errorf("doesn't have valid delimiter")
@@ -32,12 +36,17 @@ func ReadField(input string) (string, int, error) {
 
 func ReadFieldAsInt(input string) (int64, int, error) {
 
+	if input == "" {
+		return 0, 0, fmt.Errorf("doesn't enough input string")
+	}
+
 	idx := getIndex(input)
 	if idx == -1 {
 		return 0, 0, fmt.Errorf("doesn't have valid delimiter")
 	}
 
 	value, _ := strconv.ParseInt(input[:idx], 10, 64)
+
 	return value, idx + 1, nil
 }
 
@@ -49,4 +58,13 @@ func GetSize(line string) int64 {
 	}
 
 	return int64(size)
+}
+
+func GetField(line string, position int) string {
+
+	if position < len(line) {
+		return line[position:]
+	}
+
+	return ""
 }
