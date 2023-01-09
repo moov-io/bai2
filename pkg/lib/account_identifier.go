@@ -133,7 +133,7 @@ func (h *AccountIdentifier) Parse(data string) (int, error) {
 	for int64(read) < length {
 		var composite string
 		if composite, size, err = util.ReadField(util.GetField(line, read)); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "ExtAmount1"))
+			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "Composite"))
 		} else {
 			read += size
 		}

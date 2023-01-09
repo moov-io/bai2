@@ -70,7 +70,7 @@ func (h *ContinuationRecord) Parse(data string) (int, error) {
 	for int64(read) < length {
 		var composite string
 		if composite, size, err = util.ReadField(util.GetField(line, read)); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(crParseErrorFmt, "ExtAmount1"))
+			return 0, fmt.Errorf(fmt.Sprintf(crParseErrorFmt, "Composite"))
 		} else {
 			read += size
 		}
