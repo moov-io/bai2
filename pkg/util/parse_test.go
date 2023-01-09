@@ -12,17 +12,17 @@ import (
 
 func TestReadField(t *testing.T) {
 
-	entry, size, err := ReadField("01,")
+	entry, size, err := ReadField("01,", 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, size)
 	require.Equal(t, "01", entry)
 
-	entry, size, err = ReadField("01/")
+	entry, size, err = ReadField("01/", 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, size)
 	require.Equal(t, "01", entry)
 
-	entry, size, err = ReadField("ODFI’,")
+	entry, size, err = ReadField("ODFI’,", 0)
 	require.NoError(t, err)
 	require.Equal(t, 8, size)
 	require.Equal(t, "ODFI’", entry)
@@ -31,17 +31,17 @@ func TestReadField(t *testing.T) {
 
 func TestReadFieldAsInt(t *testing.T) {
 
-	entry, size, err := ReadFieldAsInt("11,")
+	entry, size, err := ReadFieldAsInt("11,", 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, size)
 	require.Equal(t, int64(11), entry)
 
-	entry, size, err = ReadFieldAsInt("11/")
+	entry, size, err = ReadFieldAsInt("11/", 0)
 	require.NoError(t, err)
 	require.Equal(t, 3, size)
 	require.Equal(t, int64(11), entry)
 
-	entry, size, err = ReadFieldAsInt("ODFI’,")
+	entry, size, err = ReadFieldAsInt("ODFI’,", 0)
 	require.NoError(t, err)
 	require.Equal(t, 8, size)
 	require.Equal(t, int64(0), entry)
