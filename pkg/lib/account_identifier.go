@@ -40,7 +40,7 @@ type AccountIdentifier struct {
 	CurrencyCode  string   `json:",omitempty"`
 	TypeCode      string   `json:",omitempty"`
 	Amount        string   `json:",omitempty"`
-	ItemCount     string   `json:",omitempty"`
+	ItemCount     int64    `json:",omitempty"`
 	FundsType     string   `json:",omitempty"`
 	Composite     []string `json:",omitempty"`
 }
@@ -117,7 +117,7 @@ func (h *AccountIdentifier) Parse(data string) (int, error) {
 	}
 
 	// ItemCount
-	if h.ItemCount, size, err = util.ReadField(line, read); err != nil {
+	if h.ItemCount, size, err = util.ReadFieldAsInt(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "ItemCount"))
 	} else {
 		read += size
@@ -155,7 +155,11 @@ func (h *AccountIdentifier) String() string {
 	buf.WriteString(fmt.Sprintf("%s,", h.CurrencyCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.TypeCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.Amount))
-	buf.WriteString(fmt.Sprintf("%s,", h.ItemCount))
+	if h.ItemCount > 0 {
+		buf.WriteString(fmt.Sprintf("%d,", h.ItemCount))
+	} else {
+		buf.WriteString(",")
+	}
 	buf.WriteString(h.FundsType)
 
 	for _, composite := range h.Composite {
