@@ -57,8 +57,11 @@ func ReadFieldAsInt(input string, start int) (int64, int, error) {
 		return 0, 0, fmt.Errorf("doesn't have valid delimiter")
 	}
 
-	value, err := strconv.ParseInt(data[:idx], 10, 64)
+	if data[:idx] == "" {
+		return 0, 1, nil
+	}
 
+	value, err := strconv.ParseInt(data[:idx], 10, 64)
 	if err != nil {
 		return 0, 0, fmt.Errorf("doesn't have valid value")
 	}

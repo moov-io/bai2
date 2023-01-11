@@ -33,6 +33,28 @@ func TestReadField(t *testing.T) {
 	samples := []testSample{
 		{
 			Input: input{
+				Data:  ",",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  1,
+				Value: "",
+			},
+		},
+		{
+			Input: input{
+				Data:  "/",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  1,
+				Value: "",
+			},
+		},
+		{
+			Input: input{
 				Data:  "01,",
 				Start: 0,
 			},
@@ -181,9 +203,8 @@ func TestReadFieldAsInt(t *testing.T) {
 				Start: 7,
 			},
 			Want: want{
-				Error:    true,
-				ErrorMsg: "doesn't have valid value",
-				Read:     0,
+				Error:    false,
+				Read:     1,
 				IntValue: 0,
 			},
 		},
@@ -208,6 +229,28 @@ func TestReadFieldAsInt(t *testing.T) {
 				Error:    true,
 				ErrorMsg: "doesn't enough input string",
 				Read:     0,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  "/",
+				Start: 0,
+			},
+			Want: want{
+				Error:    false,
+				Read:     1,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  ",",
+				Start: 0,
+			},
+			Want: want{
+				Error:    false,
+				Read:     1,
 				IntValue: 0,
 			},
 		},
