@@ -10,40 +10,216 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type input struct {
+	Data  string
+	Start int
+}
+
+type want struct {
+	Error    bool
+	ErrorMsg string
+	Read     int
+	Value    string
+	IntValue int64
+}
+
+type testSample struct {
+	Input input
+	Want  want
+}
+
 func TestReadField(t *testing.T) {
 
-	entry, size, err := ReadField("01,", 0)
-	require.NoError(t, err)
-	require.Equal(t, 3, size)
-	require.Equal(t, "01", entry)
+	samples := []testSample{
+		{
+			Input: input{
+				Data:  "01,",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  3,
+				Value: "01",
+			},
+		},
+		{
+			Input: input{
+				Data:  "01/",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  3,
+				Value: "01",
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  8,
+				Value: "ODFI’",
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 6,
+			},
+			Want: want{
+				Error: false,
+				Read:  2,
+				Value: "\x99",
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 7,
+			},
+			Want: want{
+				Error: false,
+				Read:  1,
+				Value: "",
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 8,
+			},
+			Want: want{
+				Error:    true,
+				ErrorMsg: "doesn't enough input string",
+				Read:     0,
+				Value:    "",
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 10,
+			},
+			Want: want{
+				Error:    true,
+				ErrorMsg: "doesn't enough input string",
+				Read:     0,
+				Value:    "",
+			},
+		},
+	}
 
-	entry, size, err = ReadField("01/", 0)
-	require.NoError(t, err)
-	require.Equal(t, 3, size)
-	require.Equal(t, "01", entry)
+	for _, sample := range samples {
+		value, size, err := ReadField(sample.Input.Data, sample.Input.Start)
+		if !sample.Want.Error {
+			require.NoError(t, err)
+		} else {
 
-	entry, size, err = ReadField("ODFI’,", 0)
-	require.NoError(t, err)
-	require.Equal(t, 8, size)
-	require.Equal(t, "ODFI’", entry)
-
+			require.Error(t, err)
+			require.Equal(t, sample.Want.ErrorMsg, err.Error())
+		}
+		require.Equal(t, sample.Want.Read, size)
+		require.Equal(t, sample.Want.Value, value)
+	}
 }
 
 func TestReadFieldAsInt(t *testing.T) {
 
-	entry, size, err := ReadFieldAsInt("11,", 0)
-	require.NoError(t, err)
-	require.Equal(t, 3, size)
-	require.Equal(t, int64(11), entry)
+	samples := []testSample{
+		{
+			Input: input{
+				Data:  "11,",
+				Start: 0,
+			},
+			Want: want{
+				Error:    false,
+				Read:     3,
+				IntValue: 11,
+			},
+		},
+		{
+			Input: input{
+				Data:  "01/",
+				Start: 0,
+			},
+			Want: want{
+				Error:    false,
+				Read:     3,
+				IntValue: 1,
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 0,
+			},
+			Want: want{
+				Error:    false,
+				Read:     8,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 6,
+			},
+			Want: want{
+				Error:    false,
+				Read:     2,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 7,
+			},
+			Want: want{
+				Error:    false,
+				Read:     1,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 8,
+			},
+			Want: want{
+				Error:    true,
+				ErrorMsg: "doesn't enough input string",
+				Read:     0,
+				IntValue: 0,
+			},
+		},
+		{
+			Input: input{
+				Data:  "ODFI’,",
+				Start: 10,
+			},
+			Want: want{
+				Error:    true,
+				ErrorMsg: "doesn't enough input string",
+				Read:     0,
+				IntValue: 0,
+			},
+		},
+	}
 
-	entry, size, err = ReadFieldAsInt("11/", 0)
-	require.NoError(t, err)
-	require.Equal(t, 3, size)
-	require.Equal(t, int64(11), entry)
+	for _, sample := range samples {
+		value, size, err := ReadFieldAsInt(sample.Input.Data, sample.Input.Start)
+		if !sample.Want.Error {
+			require.NoError(t, err)
+		} else {
 
-	entry, size, err = ReadFieldAsInt("ODFI’,", 0)
-	require.NoError(t, err)
-	require.Equal(t, 8, size)
-	require.Equal(t, int64(0), entry)
-
+			require.Error(t, err)
+			require.Equal(t, sample.Want.ErrorMsg, err.Error())
+		}
+		require.Equal(t, sample.Want.Read, size)
+		require.Equal(t, sample.Want.IntValue, value)
+	}
 }
