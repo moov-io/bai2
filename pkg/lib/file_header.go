@@ -7,7 +7,6 @@ package lib
 import (
 	"bytes"
 	"fmt"
-	"unicode/utf8"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -21,17 +20,15 @@ The File Header is the first record in a BAI format file. It always has a record
 */
 
 const (
-	fileHeaderLength = 37
+	fhParseErrorFmt    = "FileHeader: unable to parse %s"
+	fhValidateErrorFmt = "FileHeader: invalid %s"
 )
 
 // Creating File Header
 func NewFileHeader() *FileHeader {
 	return &FileHeader{
-		RecordCode:           "01",
-		Sender:               "0004",
-		PhysicalRecordLength: 80,
-		BlockSize:            1,
-		VersionNumber:        2,
+		RecordCode:    "01",
+		VersionNumber: 2,
 	}
 
 }
@@ -43,62 +40,144 @@ type FileHeader struct {
 	Receiver             string
 	FileCreatedDate      string
 	FileCreatedTime      string
-	FileIdNumber         int64
-	PhysicalRecordLength int64
-	BlockSize            int64
+	FileIdNumber         string
+	PhysicalRecordLength int64 `json:",omitempty"`
+	BlockSize            int64 `json:",omitempty"`
 	VersionNumber        int64
 }
 
 func (h *FileHeader) Validate() error {
 	if h.RecordCode != "01" {
-		return fmt.Errorf("FileHeader: invalid record code")
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "RecordCode"))
 	}
-	if h.Sender != "0004" {
-		return fmt.Errorf("FileHeader: invalid sender")
+	if h.Sender == "" {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Sender"))
 	}
-	if h.PhysicalRecordLength != 80 {
-		return fmt.Errorf("FileHeader: invalid physical record length")
+	if h.Receiver == "" {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Receiver"))
 	}
-	if h.BlockSize != 1 {
-		return fmt.Errorf("FileHeader: invalid block size")
+	if h.FileCreatedDate == "" {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
+	} else if !util.ValidateData(h.FileCreatedDate) {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
+	}
+	if h.FileCreatedTime == "" {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedTime"))
+	} else if !util.ValidateTime(h.FileCreatedTime) {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedTime"))
+	}
+	if h.FileIdNumber == "" {
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileIdNumber"))
 	}
 	if h.VersionNumber != 2 {
-		return fmt.Errorf("FileHeader: invalid version number")
+		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "VersionNumber"))
 	}
 
 	return nil
 }
 
-func (h *FileHeader) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < fileHeaderLength {
-		return fmt.Errorf("FileHeader: length %d is too short", n)
+func (h *FileHeader) Parse(data string) (int, error) {
+
+	var line string
+	var err error
+	var size, read int
+
+	if length := util.GetSize(data); length < 2 {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "record"))
+	} else {
+		line = data[:length]
 	}
 
-	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
-	h.Sender, _ = util.EntryParser(line[3:8], ",")
-	h.Receiver, _ = util.EntryParser(line[8:14], ",")
-	h.FileCreatedDate, _ = util.EntryParser(line[14:21], ",")
-	h.FileCreatedTime, _ = util.EntryParser(line[21:26], ",")
-	h.FileIdNumber, _ = util.EntryParserToInt(line[26:30], ",")
-	h.PhysicalRecordLength, _ = util.EntryParserToInt(line[30:33], ",")
-	h.BlockSize, _ = util.EntryParserToInt(line[33:35], ",")
-	h.VersionNumber, _ = util.EntryParserToInt(line[35:37], "/")
+	// RecordCode
+	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+	} else {
+		read += size
+	}
 
-	return nil
+	// Sender
+	if h.Sender, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Sender"))
+	} else {
+		read += size
+	}
+
+	// Receiver
+	if h.Receiver, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Receiver"))
+	} else {
+		read += size
+	}
+
+	// FileCreatedDate
+	if h.FileCreatedDate, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedDate"))
+	} else {
+		read += size
+	}
+
+	// FileCreatedTime
+	if h.FileCreatedTime, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedTime"))
+	} else {
+		read += size
+	}
+
+	// FileIdNumber
+	if h.FileIdNumber, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileIdNumber"))
+	} else {
+		read += size
+	}
+
+	// PhysicalRecordLength
+	if h.PhysicalRecordLength, size, err = util.ReadFieldAsInt(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "PhysicalRecordLength"))
+	} else {
+		read += size
+	}
+
+	// BlockSize
+	if h.BlockSize, size, err = util.ReadFieldAsInt(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "BlockSize"))
+	} else {
+		read += size
+	}
+
+	// VersionNumber
+	if h.VersionNumber, size, err = util.ReadFieldAsInt(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "VersionNumber"))
+	} else {
+		read += size
+	}
+
+	if err = h.Validate(); err != nil {
+		return 0, err
+	}
+
+	return read, nil
 }
 
 func (h *FileHeader) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%-4.4v,", h.Sender))
-	buf.WriteString(fmt.Sprintf("%-5.5v,", h.Receiver))
-	buf.WriteString(fmt.Sprintf("%-6.6v,", h.FileCreatedDate))
-	buf.WriteString(fmt.Sprintf("%-4.4v,", h.FileCreatedTime))
-	buf.WriteString(fmt.Sprintf("%03.3v,", h.FileIdNumber))
-	buf.WriteString(fmt.Sprintf("%02.2v,", h.PhysicalRecordLength))
-	buf.WriteString(fmt.Sprintf("%01.1v,", h.BlockSize))
-	buf.WriteString(fmt.Sprintf("%01.1v/", h.VersionNumber))
+	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", h.Sender))
+	buf.WriteString(fmt.Sprintf("%s,", h.Receiver))
+	buf.WriteString(fmt.Sprintf("%s,", h.FileCreatedDate))
+	buf.WriteString(fmt.Sprintf("%s,", h.FileCreatedTime))
+	buf.WriteString(fmt.Sprintf("%s,", h.FileIdNumber))
+	if h.PhysicalRecordLength > 0 {
+		buf.WriteString(fmt.Sprintf("%d,", h.PhysicalRecordLength))
+	} else {
+		buf.WriteString(",")
+	}
+	if h.BlockSize > 0 {
+		buf.WriteString(fmt.Sprintf("%d,", h.BlockSize))
+	} else {
+		buf.WriteString(",")
+	}
+	buf.WriteString(fmt.Sprintf("%d/", h.VersionNumber))
 
 	return buf.String()
 }

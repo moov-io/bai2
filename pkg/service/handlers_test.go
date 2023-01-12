@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	testFileName = "sample.txt"
+	testFileName = "sample1.txt"
 )
 
 type HandlersTest struct {
@@ -39,7 +39,7 @@ func (suite *HandlersTest) makeRequest(method, url, body string) (*httptest.Resp
 
 func (suite *HandlersTest) getWriter(name string) (*multipart.Writer, *bytes.Buffer) {
 
-	path := filepath.Join("..", "..", "data", name)
+	path := filepath.Join("..", "..", "test", "testdata", name)
 	file, err := os.Open(path)
 	assert.Equal(suite.T(), nil, err)
 

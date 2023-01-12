@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/moov-io/bai2/pkg/lib"
 	"github.com/moov-io/bai2/pkg/record"
@@ -149,24 +150,26 @@ func Parse(fd io.Reader) (*Bai2, error) {
 	var hasBlock bool
 
 	scan := bufio.NewScanner(fd)
+	scan.Split(scanRecord)
+
 	for scan.Scan() {
-		line := scan.Text()
+
+		// don't expect new line
+		line := strings.ReplaceAll(scan.Text(), "\n", "")
 		lineNum++
 
-		if len(line) < 2 {
+		// find record code
+		recordIndex := strings.Index(line, ",")
+		if recordIndex < 2 {
 			continue
 		}
-
-		size := util.GetSize(line)
-		if size < 0 {
-			continue
-		}
+		line = line[recordIndex-2:]
 
 		switch line[0:2] {
 		case "01":
 
 			newRecord := lib.NewFileHeader()
-			err := newRecord.Parse(line)
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing file header on line %d - %v", lineNum, err)
 			}
@@ -176,7 +179,7 @@ func Parse(fd io.Reader) (*Bai2, error) {
 		case "99":
 
 			newRecord := lib.NewFileTrailer()
-			err := newRecord.Parse(line)
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing file trailer on line %d - %v", lineNum, err)
 			}
@@ -189,7 +192,7 @@ func Parse(fd io.Reader) (*Bai2, error) {
 			group = NewGroup()
 
 			newRecord := lib.NewGroupHeader()
-			err := newRecord.Parse(line)
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing file header on line %d - %v", lineNum, err)
 			}
@@ -199,7 +202,7 @@ func Parse(fd io.Reader) (*Bai2, error) {
 		case "98":
 
 			newRecord := lib.NewGroupTrailer()
-			err := newRecord.Parse(line)
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing file trailer on line %d - %v", lineNum, err)
 			}
@@ -211,28 +214,18 @@ func Parse(fd io.Reader) (*Bai2, error) {
 
 		case "03":
 
-			if size == 59 {
-				newRecord := lib.NewAccountIdentifierCurrent()
-				err := newRecord.Parse(line)
-				if err != nil {
-					return &file, fmt.Errorf("ERROR parsing account indentifier on line %d - %v", lineNum, err)
-				}
-
-				group.Details = append(group.Details, newRecord)
-			} else if size == 79 {
-				newRecord := lib.NewAccountIdentifierLoan()
-				err := newRecord.Parse(line)
-				if err != nil {
-					return &file, fmt.Errorf("ERROR parsing account indentifier on line %d - %v", lineNum, err)
-				}
-
-				group.Details = append(group.Details, newRecord)
+			newRecord := lib.NewAccountIdentifier()
+			_, err := newRecord.Parse(line)
+			if err != nil {
+				return &file, fmt.Errorf("ERROR parsing account indentifier on line %d - %v", lineNum, err)
 			}
+
+			group.Details = append(group.Details, newRecord)
 
 		case "49":
 
 			newRecord := lib.NewAccountTrailer()
-			err := newRecord.Parse(line)
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing account trailer on line %d - %v", lineNum, err)
 			}
@@ -241,28 +234,18 @@ func Parse(fd io.Reader) (*Bai2, error) {
 
 		case "16":
 
-			if size == 56 {
-				newRecord := lib.NewAccountTransaction()
-				err := newRecord.Parse(line)
-				if err != nil {
-					return &file, fmt.Errorf("ERROR parsing account transaction detail on line %d - %v", lineNum, err)
-				}
-
-				group.Details = append(group.Details, newRecord)
-			} else if size == 68 {
-				newRecord := lib.NewTransferTransaction()
-				err := newRecord.Parse(line)
-				if err != nil {
-					return &file, fmt.Errorf("ERROR parsing account transaction detail on line %d - %v", lineNum, err)
-				}
-
-				group.Details = append(group.Details, newRecord)
+			newRecord := lib.NewTransactionDetail()
+			_, err := newRecord.Parse(line)
+			if err != nil {
+				return &file, fmt.Errorf("ERROR parsing account transaction detail on line %d - %v", lineNum, err)
 			}
+
+			group.Details = append(group.Details, newRecord)
 
 		case "88":
 
-			newRecord := lib.NewAccountIdentifierContinuation()
-			err := newRecord.Parse(line)
+			newRecord := lib.NewContinuationRecord()
+			_, err := newRecord.Parse(line)
 			if err != nil {
 				return &file, fmt.Errorf("ERROR parsing continuation of account summary record on line %d - %v", lineNum, err)
 			}
@@ -283,4 +266,20 @@ func Parse(fd io.Reader) (*Bai2, error) {
 	}
 
 	return &file, nil
+}
+
+// scanRecord allows Reader to read each segment
+func scanRecord(data []byte, atEOF bool) (advance int, token []byte, err error) {
+
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+
+	index := util.GetSize(string(data))
+	if index < 1 || !atEOF {
+		// need more data
+		return 0, nil, nil
+	}
+
+	return int(index), data[:int(index)], nil
 }

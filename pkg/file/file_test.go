@@ -14,17 +14,28 @@ import (
 )
 
 func TestWithSampleData(t *testing.T) {
-	samplePath := filepath.Join("..", "..", "data", "sample.txt")
-	fd, err := os.Open(samplePath)
-	require.NoError(t, err)
+	type testData struct {
+		FileName string
+		EqualRaw bool
+	}
+	samples := []testData{
+		{"sample1.txt", true}, {"sample2.txt", true}, {"sample3.txt", false}}
 
-	bai, err := Parse(fd)
-	require.NoError(t, err)
-	require.NoError(t, bai.Validate())
+	for _, sample := range samples {
+		samplePath := filepath.Join("..", "..", "test", "testdata", sample.FileName)
+		fd, err := os.Open(samplePath)
+		require.NoError(t, err)
 
-	raw, err := os.ReadFile(samplePath)
-	require.NoError(t, err)
+		bai, err := Parse(fd)
+		require.NoError(t, err)
+		require.NoError(t, bai.Validate())
 
-	rawStr := strings.ReplaceAll(string(raw), "\r\n", "\n")
-	require.Equal(t, rawStr, bai.String())
+		if sample.EqualRaw {
+			raw, err := os.ReadFile(samplePath)
+			require.NoError(t, err)
+
+			rawStr := strings.ReplaceAll(string(raw), "\r\n", "\n")
+			require.Equal(t, rawStr, bai.String())
+		}
+	}
 }

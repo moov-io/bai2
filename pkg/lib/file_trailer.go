@@ -7,8 +7,8 @@ package lib
 import (
 	"bytes"
 	"fmt"
+
 	"github.com/moov-io/bai2/pkg/util"
-	"unicode/utf8"
 )
 
 /*
@@ -23,7 +23,8 @@ records is the sum of all records in the file, including the file trailer (type 
 */
 
 const (
-	fileTrailerLength = 42
+	ftParseErrorFmt    = "FileTrailer: unable to parse %s"
+	ftValidateErrorFmt = "FileTrailer: invalid %s"
 )
 
 // Creating File Trailer
@@ -36,40 +37,77 @@ func NewFileTrailer() *FileTrailer {
 
 // File Trailer
 type FileTrailer struct {
-	RecordCode        string
-	GroupControlTotal string
-	NumberOfGroups    int64
-	NumberOfRecords   int64
+	RecordCode       string
+	FileControlTotal string
+	NumberOfGroups   int64
+	NumberOfRecords  int64
 }
 
 func (h *FileTrailer) Validate() error {
 	if h.RecordCode != "99" {
-		return fmt.Errorf("FileTrailer: invalid record code")
+		return fmt.Errorf(fmt.Sprintf(ftValidateErrorFmt, "RecordCode"))
+	}
+	if h.FileControlTotal != "" && !util.ValidateAmount(h.FileControlTotal) {
+		return fmt.Errorf(fmt.Sprintf(ftValidateErrorFmt, "FileControlTotal"))
 	}
 
 	return nil
 }
 
-func (h *FileTrailer) Parse(line string) error {
-	if n := utf8.RuneCountInString(line); n < fileTrailerLength {
-		return fmt.Errorf("FileTrailer: length %d is too short", n)
+func (h *FileTrailer) Parse(data string) (int, error) {
+
+	var line string
+	var err error
+	var size, read int
+
+	if length := util.GetSize(data); length < 2 {
+		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "record"))
+	} else {
+		line = data[:length]
 	}
 
-	h.RecordCode, _ = util.EntryParser(line[0:3], ",")
-	h.GroupControlTotal, _ = util.EntryParser(line[3:22], ",")
-	h.NumberOfGroups, _ = util.EntryParserToInt(line[22:32], ",")
-	h.NumberOfRecords, _ = util.EntryParserToInt(line[32:42], "/")
+	// RecordCode
+	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "RecordCode"))
+	} else {
+		read += size
+	}
 
-	return nil
+	// GroupControlTotal
+	if h.FileControlTotal, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "GroupControlTotal"))
+	} else {
+		read += size
+	}
+
+	// NumberOfGroups
+	if h.NumberOfGroups, size, err = util.ReadFieldAsInt(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfGroups"))
+	} else {
+		read += size
+	}
+
+	// NumberOfRecords
+	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfRecords"))
+	} else {
+		read += size
+	}
+
+	if err = h.Validate(); err != nil {
+		return 0, err
+	}
+
+	return read, nil
 }
 
 func (h *FileTrailer) String() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%-2.2v,", h.RecordCode))
-	buf.WriteString(fmt.Sprintf("%-18.18v,", h.GroupControlTotal))
-	buf.WriteString(fmt.Sprintf("%09.9v,", h.NumberOfGroups))
-	buf.WriteString(fmt.Sprintf("%09.9v/", h.NumberOfRecords))
+	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", h.FileControlTotal))
+	buf.WriteString(fmt.Sprintf("%d,", h.NumberOfGroups))
+	buf.WriteString(fmt.Sprintf("%d/", h.NumberOfRecords))
 
 	return buf.String()
 }

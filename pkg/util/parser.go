@@ -10,40 +10,69 @@ import (
 	"strings"
 )
 
-func EntryParser(entry, delimiter string) (string, error) {
+func getIndex(input string) int {
+	idx1 := strings.Index(input, ",")
+	idx2 := strings.Index(input, "/")
 
-	if len(entry) < 1 {
-		return "", fmt.Errorf("invalid length")
+	if idx1 == -1 {
+		return idx2
 	}
-
-	size := len(entry) - 1
-	if entry[size:] != delimiter {
-		return "", fmt.Errorf("contains invalid delimiter")
-	}
-
-	return entry[:size], nil
+	return idx1
 }
 
-func EntryParserToInt(entry, delimiter string) (int64, error) {
+func ReadField(input string, start int) (string, int, error) {
 
-	if len(entry) < 1 {
-		return 0, fmt.Errorf("invalid length")
+	data := ""
+
+	if start < len(input) {
+		data = input[start:]
 	}
 
-	size := len(entry) - 1
-	if entry[size:] != delimiter {
-		return 0, fmt.Errorf("contains invalid delimiter")
+	if data == "" {
+		return "", 0, fmt.Errorf("doesn't enough input string")
 	}
 
-	value, _ := strconv.ParseInt(entry[:size], 10, 64)
+	idx := getIndex(data)
+	if idx == -1 {
+		return "", 0, fmt.Errorf("doesn't have valid delimiter")
+	}
 
-	return value, nil
+	return data[:idx], idx + 1, nil
+}
+
+func ReadFieldAsInt(input string, start int) (int64, int, error) {
+
+	data := ""
+
+	if start < len(input) {
+		data = input[start:]
+	}
+
+	if data == "" {
+		return 0, 0, fmt.Errorf("doesn't enough input string")
+	}
+
+	idx := getIndex(data)
+	if idx == -1 {
+		return 0, 0, fmt.Errorf("doesn't have valid delimiter")
+	}
+
+	if data[:idx] == "" {
+		return 0, 1, nil
+	}
+
+	value, err := strconv.ParseInt(data[:idx], 10, 64)
+	if err != nil {
+		return 0, 0, fmt.Errorf("doesn't have valid value")
+	}
+
+	return value, idx + 1, nil
 }
 
 func GetSize(line string) int64 {
 
 	size := strings.Index(line, "/")
-	if size > 0 {
+	if size >= 0 {
 		return int64(size + 1)
 	}
 

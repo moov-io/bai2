@@ -12,33 +12,28 @@ import (
 
 func TestGroupTrailer(t *testing.T) {
 
-	header := NewGroupTrailer()
-	require.NoError(t, header.Validate())
+	record := NewGroupTrailer()
+	require.NoError(t, record.Validate())
 
-	header.RecordCode = ""
-	require.Error(t, header.Validate())
-	require.Equal(t, "GroupTrailer: invalid record code", header.Validate().Error())
+	record.RecordCode = ""
+	require.Error(t, record.Validate())
+	require.Equal(t, "GroupTrailer: invalid RecordCode", record.Validate().Error())
 
 }
 
 func TestGroupTrailerWithSample(t *testing.T) {
 
-	sample := "98,+00000000001280000,000000002,000000025/"
-	header := NewGroupTrailer()
+	sample := "98,+00000000001280000,2,25/"
+	record := NewGroupTrailer()
 
-	err := header.Parse(sample)
+	size, err := record.Parse(sample)
 	require.NoError(t, err)
+	require.Equal(t, 27, size)
 
-	require.Equal(t, "98", header.RecordCode)
-	require.Equal(t, "+00000000001280000", header.GroupControlTotal)
-	require.Equal(t, int64(2), header.NumberOfAccounts)
-	require.Equal(t, int64(25), header.NumberOfRecords)
+	require.Equal(t, "98", record.RecordCode)
+	require.Equal(t, "+00000000001280000", record.GroupControlTotal)
+	require.Equal(t, int64(2), record.NumberOfAccounts)
+	require.Equal(t, int64(25), record.NumberOfRecords)
 
-	require.Equal(t, sample, header.String())
-
-	header = &GroupTrailer{}
-	require.Error(t, header.Validate())
-
-	err = header.Parse(sample[:20])
-	require.Equal(t, "GroupTrailer: length 20 is too short", err.Error())
+	require.Equal(t, sample, record.String())
 }
