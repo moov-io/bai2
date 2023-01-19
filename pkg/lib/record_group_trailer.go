@@ -11,41 +11,18 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
-/*
-Group Trailer
-
-The group trailer is the second last record in a BAI format file. This record contains information on the
-group control total, the number of accounts and the number of records. The group control total is the
-sum of the account control totals in the group. The number of records is the total of all type 02, 03, 16, 49,
-88 and 98 records in the group.
-
-*/
-
 const (
 	gtParseErrorFmt    = "GroupTrailer: unable to parse %s"
 	gtValidateErrorFmt = "GroupTrailer: invalid %s"
 )
 
-// Creating Group Trailer
-func NewGroupTrailer() *GroupTrailer {
-	return &GroupTrailer{
-		RecordCode: "98",
-	}
-
-}
-
-// Group Trailer
-type GroupTrailer struct {
-	RecordCode        string
+type groupTrailer struct {
 	GroupControlTotal string
 	NumberOfAccounts  int64
 	NumberOfRecords   int64
 }
 
-func (h *GroupTrailer) Validate() error {
-	if h.RecordCode != "98" {
-		return fmt.Errorf(fmt.Sprintf(gtValidateErrorFmt, "RecordCode"))
-	}
+func (h *groupTrailer) validate() error {
 	if h.GroupControlTotal != "" && !util.ValidateAmount(h.GroupControlTotal) {
 		return fmt.Errorf(fmt.Sprintf(gtValidateErrorFmt, "GroupControlTotal"))
 	}
@@ -53,24 +30,23 @@ func (h *GroupTrailer) Validate() error {
 	return nil
 }
 
-func (h *GroupTrailer) Parse(data string) (int, error) {
+func (h *groupTrailer) parse(data string) (int, error) {
 
 	var line string
 	var err error
 	var size, read int
 
-	if length := util.GetSize(data); length < 2 {
+	if length := util.GetSize(data); length < 3 {
 		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "record"))
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "RecordCode"))
-	} else {
-		read += size
+	if util.GroupTrailerCode != data[:2] {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
 	}
+	read += 3
 
 	// GroupControlTotal
 	if h.GroupControlTotal, size, err = util.ReadField(line, read); err != nil {
@@ -93,17 +69,17 @@ func (h *GroupTrailer) Parse(data string) (int, error) {
 		read += size
 	}
 
-	if err = h.Validate(); err != nil {
+	if err = h.validate(); err != nil {
 		return 0, err
 	}
 
 	return read, nil
 }
 
-func (h *GroupTrailer) String() string {
+func (h *groupTrailer) string() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", util.GroupTrailerCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.GroupControlTotal))
 	buf.WriteString(fmt.Sprintf("%d,", h.NumberOfAccounts))
 	buf.WriteString(fmt.Sprintf("%d/", h.NumberOfRecords))

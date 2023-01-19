@@ -11,40 +11,24 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
-/*
-
-Account Transaction Detail
-
-The account transaction detail record contains information about current and personal deposit
-account activity. It always has a record code of 16.
-
-*/
-
 const (
 	tdParseErrorFmt    = "AccountTransaction: unable to parse %s"
 	tdValidateErrorFmt = "AccountTransaction: invalid %s"
 )
 
-// Creating Transaction Detail
+// Creating new transaction detail
 func NewTransactionDetail() *TransactionDetail {
-	return &TransactionDetail{
-		RecordCode: "16",
-	}
+	return &TransactionDetail{}
 }
 
-// Transaction Detail
 type TransactionDetail struct {
-	RecordCode string
-	TypeCode   string   `json:",omitempty"`
-	Amount     string   `json:",omitempty"`
-	FundsType  string   `json:",omitempty"`
-	Composite  []string `json:",omitempty"`
+	TypeCode  string   `json:",omitempty"`
+	Amount    string   `json:",omitempty"`
+	FundsType string   `json:",omitempty"`
+	Composite []string `json:",omitempty"`
 }
 
-func (h *TransactionDetail) Validate() error {
-	if h.RecordCode != "16" {
-		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "RecordCode"))
-	}
+func (h *TransactionDetail) validate() error {
 	if h.TypeCode != "" && !util.ValidateTypeCode(h.TypeCode) {
 		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "TypeCode"))
 	}
@@ -58,25 +42,24 @@ func (h *TransactionDetail) Validate() error {
 	return nil
 }
 
-func (h *TransactionDetail) Parse(data string) (int, error) {
+func (h *TransactionDetail) parse(data string) (int, error) {
 
 	var line string
 	var err error
 	var size, read int
 
 	length := util.GetSize(data)
-	if length < 2 {
+	if length < 3 {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "record"))
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "RecordCode"))
-	} else {
-		read += size
+	if util.TransactionDetailCode != data[:2] {
+		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
 	}
+	read += 3
 
 	// TypeCode
 	if h.TypeCode, size, err = util.ReadField(line, read); err != nil {
@@ -109,17 +92,18 @@ func (h *TransactionDetail) Parse(data string) (int, error) {
 		h.Composite = append(h.Composite, composite)
 	}
 
-	if err = h.Validate(); err != nil {
+	if err = h.validate(); err != nil {
 		return 0, err
 	}
 
 	return read, nil
 }
 
-func (h *TransactionDetail) String() string {
+func (h *TransactionDetail) string() string {
+
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", util.TransactionDetailCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.TypeCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.Amount))
 	buf.WriteString(h.FundsType)

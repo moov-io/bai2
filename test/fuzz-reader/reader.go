@@ -6,8 +6,7 @@ package fuzzreader
 
 import (
 	"bytes"
-
-	"github.com/moov-io/bai2/pkg/file"
+	"github.com/moov-io/bai2/pkg/lib"
 )
 
 // Return codes (from go-fuzz docs)
@@ -19,34 +18,35 @@ import (
 // reserved for future use.
 func Fuzz(data []byte) int {
 
-	f, err := file.Parse(bytes.NewReader(data))
+	f := lib.NewBai2()
+	err := f.Read(lib.NewBai2Scanner(bytes.NewReader(data)))
 	if err != nil {
 		return 0
 	}
 
 	// If we're missing a record the file is close, but we should continue around
 	// that input value.
-	if f.Header == nil {
+	if f.Sender == "" {
 		return -1
 	}
 
-	if f.Trailer == nil {
+	if f.FileControlTotal == "" {
 		return -1
 	}
 
 	for _, g := range f.Groups {
 
-		if g.Header == nil {
+		if g.Receiver == "" {
 			return -1
 		}
 
-		if g.Trailer == nil {
+		if g.GroupControlTotal == "" {
 			return -1
 		}
 
 	}
 
-	if err := f.Validate(); err != nil {
+	if err = f.Validate(); err != nil {
 		return 0
 	}
 

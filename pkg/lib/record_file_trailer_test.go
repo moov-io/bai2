@@ -12,28 +12,23 @@ import (
 
 func TestFileTrailer(t *testing.T) {
 
-	record := NewFileTrailer()
-	require.NoError(t, record.Validate())
-
-	record.RecordCode = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileTrailer: invalid RecordCode", record.Validate().Error())
+	record := fileTrailer{}
+	require.NoError(t, record.validate())
 
 }
 
 func TestFileTrailerWithSample(t *testing.T) {
 
 	sample := "99,+00000000001280000,1,27/"
-	record := NewFileTrailer()
+	record := fileTrailer{}
 
-	size, err := record.Parse(sample)
+	size, err := record.parse(sample)
 	require.NoError(t, err)
 	require.Equal(t, 27, size)
 
-	require.Equal(t, "99", record.RecordCode)
 	require.Equal(t, "+00000000001280000", record.FileControlTotal)
 	require.Equal(t, int64(1), record.NumberOfGroups)
 	require.Equal(t, int64(27), record.NumberOfRecords)
 
-	require.Equal(t, sample, record.String())
+	require.Equal(t, sample, record.string())
 }
