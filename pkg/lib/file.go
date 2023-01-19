@@ -194,7 +194,7 @@ func (r *Bai2) Read(scan Bai2Scanner) error {
 			r.NumberOfGroups = newRecord.NumberOfGroups
 			r.NumberOfRecords = newRecord.NumberOfRecords
 
-			break
+			return nil
 
 		case util.GroupHeaderCode:
 

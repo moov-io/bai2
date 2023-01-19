@@ -163,7 +163,7 @@ func (r *Group) Read(scan Bai2Scanner, input string, lineNum int) (int, string, 
 			r.NumberOfAccounts = newRecord.NumberOfAccounts
 			r.NumberOfRecords = newRecord.NumberOfRecords
 
-			break
+			return lineNum, "", nil
 
 		case util.AccountIdentifierCode:
 
