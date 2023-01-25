@@ -14,7 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/moov-io/bai2/pkg/file"
+	"github.com/moov-io/bai2/pkg/lib"
 	"github.com/moov-io/bai2/pkg/service"
 	baseLog "github.com/moov-io/base/log"
 )
@@ -58,7 +58,8 @@ var Parse = &cobra.Command{
 
 		var err error
 
-		f, err := file.Parse(bytes.NewReader(documentBuffer))
+		f := lib.NewBai2()
+		err = f.Read(lib.NewBai2Scanner(bytes.NewReader(documentBuffer)))
 		if err != nil {
 			return err
 		}
@@ -82,7 +83,8 @@ var Print = &cobra.Command{
 
 		var err error
 
-		f, err := file.Parse(bytes.NewReader(documentBuffer))
+		f := lib.NewBai2()
+		err = f.Read(lib.NewBai2Scanner(bytes.NewReader(documentBuffer)))
 		if err != nil {
 			return err
 		}

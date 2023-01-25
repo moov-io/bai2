@@ -11,7 +11,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/moov-io/bai2/pkg/file"
+	"github.com/moov-io/bai2/pkg/lib"
 )
 
 func outputError(w http.ResponseWriter, code int, err error) {
@@ -30,7 +30,7 @@ func outputSuccess(w http.ResponseWriter, output string) {
 	})
 }
 
-func parseInputFromRequest(r *http.Request) (*file.Bai2, error) {
+func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 	inputFile, _, err := r.FormFile("input")
 	if err != nil {
 		return nil, err
@@ -43,12 +43,16 @@ func parseInputFromRequest(r *http.Request) (*file.Bai2, error) {
 	}
 
 	// convert byte slice to io.Reader
-	reader := bytes.NewReader(input.Bytes())
+	f := lib.NewBai2()
+	err = f.Read(lib.NewBai2Scanner(bytes.NewReader(input.Bytes())))
+	if err != nil {
+		return nil, err
+	}
 
-	return file.Parse(reader)
+	return f, nil
 }
 
-func outputBufferToWriter(w http.ResponseWriter, f *file.Bai2) {
+func outputBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte(f.String()))

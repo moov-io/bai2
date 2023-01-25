@@ -10,9 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func mockFileHeader() *FileHeader {
-	return &FileHeader{
-		RecordCode:           "01",
+func mockFileHeader() *fileHeader {
+	return &fileHeader{
 		Sender:               "0004",
 		Receiver:             "12345",
 		FileCreatedDate:      "060321",
@@ -27,48 +26,43 @@ func mockFileHeader() *FileHeader {
 func TestFileHeader(t *testing.T) {
 
 	record := mockFileHeader()
-	require.NoError(t, record.Validate())
+	require.NoError(t, record.validate())
 
 	record.VersionNumber = 0
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid VersionNumber", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid VersionNumber", record.validate().Error())
 
 	record.FileIdNumber = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid FileIdNumber", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid FileIdNumber", record.validate().Error())
 
 	record.FileCreatedTime = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid FileCreatedTime", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid FileCreatedTime", record.validate().Error())
 
 	record.FileCreatedDate = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid FileCreatedDate", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid FileCreatedDate", record.validate().Error())
 
 	record.Receiver = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid Receiver", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid Receiver", record.validate().Error())
 
 	record.Sender = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid Sender", record.Validate().Error())
-
-	record.RecordCode = ""
-	require.Error(t, record.Validate())
-	require.Equal(t, "FileHeader: invalid RecordCode", record.Validate().Error())
+	require.Error(t, record.validate())
+	require.Equal(t, "FileHeader: invalid Sender", record.validate().Error())
 
 }
 
 func TestFileHeaderWithOptional(t *testing.T) {
 
 	sample := "01,0004,12345,060321,0829,001,80,1,2/"
-	record := NewFileHeader()
+	record := fileHeader{}
 
-	size, err := record.Parse(sample)
+	size, err := record.parse(sample)
 	require.NoError(t, err)
 	require.Equal(t, 37, size)
 
-	require.Equal(t, "01", record.RecordCode)
 	require.Equal(t, "0004", record.Sender)
 	require.Equal(t, "12345", record.Receiver)
 	require.Equal(t, "060321", record.FileCreatedDate)
@@ -78,19 +72,18 @@ func TestFileHeaderWithOptional(t *testing.T) {
 	require.Equal(t, int64(1), record.BlockSize)
 	require.Equal(t, int64(2), record.VersionNumber)
 
-	require.Equal(t, sample, record.String())
+	require.Equal(t, sample, record.string())
 }
 
 func TestFileHeaderWithoutOptional(t *testing.T) {
 
 	sample := "01,2,12345,060321,0829,1,,,2/"
-	record := NewFileHeader()
+	record := fileHeader{}
 
-	size, err := record.Parse(sample)
+	size, err := record.parse(sample)
 	require.NoError(t, err)
 	require.Equal(t, 29, size)
 
-	require.Equal(t, "01", record.RecordCode)
 	require.Equal(t, "2", record.Sender)
 	require.Equal(t, "12345", record.Receiver)
 	require.Equal(t, "060321", record.FileCreatedDate)
@@ -100,34 +93,34 @@ func TestFileHeaderWithoutOptional(t *testing.T) {
 	require.Equal(t, int64(0), record.BlockSize)
 	require.Equal(t, int64(2), record.VersionNumber)
 
-	require.Equal(t, sample, record.String())
+	require.Equal(t, sample, record.string())
 }
 
 func TestFileHeaderWithInvalidSample(t *testing.T) {
 
-	record := NewFileHeader()
-	_, err := record.Parse("01,2,12345,06032,0829,1,,,2/")
+	record := fileHeader{}
+	_, err := record.parse("01,2,12345,06032,0829,1,,,2/")
 	require.Error(t, err)
 
-	_, err = record.Parse("01,2,12345,060321,082,1,,,2/")
+	_, err = record.parse("01,2,12345,060321,082,1,,,2/")
 	require.Error(t, err)
 
-	_, err = record.Parse("01,2,12345,060321,082a,1,,,2/")
+	_, err = record.parse("01,2,12345,060321,082a,1,,,2/")
 	require.Error(t, err)
 }
 
 func TestFileHeaderWithInvalidSample2(t *testing.T) {
 
 	sample := "01,2,12345,06032,0829,1"
-	record := NewAccountIdentifier()
+	record := accountIdentifier{}
 
-	size, err := record.Parse(sample)
+	size, err := record.parse(sample)
 	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
 	require.Equal(t, 0, size)
 
 	sample = "01,2,12345/"
-	size, err = record.Parse(sample)
-	require.Equal(t, "AccountIdentifier: unable to parse TypeCode", err.Error())
+	size, err = record.parse(sample)
+	require.Equal(t, "AccountIdentifier: unable to parse RecordCode", err.Error())
 	require.Equal(t, 0, size)
 
 }

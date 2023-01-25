@@ -11,31 +11,12 @@ import (
 	"github.com/moov-io/bai2/pkg/util"
 )
 
-/*
-
-File Header
-
-The File Header is the first record in a BAI format file. It always has a record code of 01.
-
-*/
-
 const (
 	fhParseErrorFmt    = "FileHeader: unable to parse %s"
 	fhValidateErrorFmt = "FileHeader: invalid %s"
 )
 
-// Creating File Header
-func NewFileHeader() *FileHeader {
-	return &FileHeader{
-		RecordCode:    "01",
-		VersionNumber: 2,
-	}
-
-}
-
-// File Header
-type FileHeader struct {
-	RecordCode           string
+type fileHeader struct {
 	Sender               string
 	Receiver             string
 	FileCreatedDate      string
@@ -46,10 +27,7 @@ type FileHeader struct {
 	VersionNumber        int64
 }
 
-func (h *FileHeader) Validate() error {
-	if h.RecordCode != "01" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "RecordCode"))
-	}
+func (h *fileHeader) validate() error {
 	if h.Sender == "" {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Sender"))
 	}
@@ -76,24 +54,23 @@ func (h *FileHeader) Validate() error {
 	return nil
 }
 
-func (h *FileHeader) Parse(data string) (int, error) {
+func (h *fileHeader) parse(data string) (int, error) {
 
 	var line string
 	var err error
 	var size, read int
 
-	if length := util.GetSize(data); length < 2 {
+	if length := util.GetSize(data); length < 3 {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "record"))
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
-	if h.RecordCode, size, err = util.ReadField(line, read); err != nil {
+	if util.FileHeaderCode != line[:2] {
 		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
-	} else {
-		read += size
 	}
+	read += 3
 
 	// Sender
 	if h.Sender, size, err = util.ReadField(line, read); err != nil {
@@ -151,17 +128,17 @@ func (h *FileHeader) Parse(data string) (int, error) {
 		read += size
 	}
 
-	if err = h.Validate(); err != nil {
+	if err = h.validate(); err != nil {
 		return 0, err
 	}
 
 	return read, nil
 }
 
-func (h *FileHeader) String() string {
+func (h *fileHeader) string() string {
 	var buf bytes.Buffer
 
-	buf.WriteString(fmt.Sprintf("%s,", h.RecordCode))
+	buf.WriteString(fmt.Sprintf("%s,", util.FileHeaderCode))
 	buf.WriteString(fmt.Sprintf("%s,", h.Sender))
 	buf.WriteString(fmt.Sprintf("%s,", h.Receiver))
 	buf.WriteString(fmt.Sprintf("%s,", h.FileCreatedDate))
