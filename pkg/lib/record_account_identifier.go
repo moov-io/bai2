@@ -148,7 +148,7 @@ func (h *accountIdentifier) string(opts ...int64) string {
 
 	for _, composite := range h.Composite {
 		if maxLen > 0 {
-			if buf.Len()+len(composite)+2 > int(maxLen) {
+			if int64(buf.Len()+len(composite)+2) > maxLen {
 				// refresh buf
 				buf.WriteString("/" + "\n") // added new line
 				totalBuf.WriteString(buf.String())
