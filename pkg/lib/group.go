@@ -80,14 +80,14 @@ func (r *Group) copyRecords() {
 
 }
 
-func (r *Group) String() string {
+func (r *Group) String(opts ...int64) string {
 
 	r.copyRecords()
 
 	var buf bytes.Buffer
 	buf.WriteString(r.header.string() + "\n")
 	for i := range r.Accounts {
-		buf.WriteString(r.Accounts[i].String() + "\n")
+		buf.WriteString(r.Accounts[i].String(opts...) + "\n")
 	}
 	buf.WriteString(r.trailer.string())
 

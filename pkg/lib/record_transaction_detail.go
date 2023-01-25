@@ -99,8 +99,9 @@ func (h *TransactionDetail) parse(data string) (int, error) {
 	return read, nil
 }
 
-func (h *TransactionDetail) string() string {
+func (h *TransactionDetail) string(opts ...int64) string {
 
+	var totalBuf bytes.Buffer
 	var buf bytes.Buffer
 
 	buf.WriteString(fmt.Sprintf("%s,", util.TransactionDetailCode))
@@ -108,11 +109,29 @@ func (h *TransactionDetail) string() string {
 	buf.WriteString(fmt.Sprintf("%s,", h.Amount))
 	buf.WriteString(h.FundsType)
 
+	var maxLen int64
+	if len(opts) > 0 {
+		maxLen = opts[0]
+	}
+
 	for _, composite := range h.Composite {
+		if maxLen > 0 {
+			if buf.Len()+len(composite)+2 > int(maxLen) {
+				// refresh buf
+				buf.WriteString("/" + "\n") // added new line
+				totalBuf.WriteString(buf.String())
+
+				// new buf
+				buf = bytes.Buffer{}
+				buf.WriteString(util.ContinuationCode)
+			}
+		}
+
 		buf.WriteString(fmt.Sprintf(",%s", composite))
 	}
 
 	buf.WriteString("/")
+	totalBuf.WriteString(buf.String())
 
-	return buf.String()
+	return totalBuf.String()
 }

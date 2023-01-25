@@ -115,7 +115,7 @@ func (r *Bai2) String() string {
 	var buf bytes.Buffer
 	buf.WriteString(r.header.string() + "\n")
 	for i := range r.Groups {
-		buf.WriteString(r.Groups[i].String() + "\n")
+		buf.WriteString(r.Groups[i].String(r.PhysicalRecordLength) + "\n")
 	}
 	buf.WriteString(r.trailer.string())
 

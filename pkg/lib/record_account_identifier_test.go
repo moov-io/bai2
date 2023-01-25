@@ -92,3 +92,39 @@ func TestAccountIdentifierCurrentWithSample4(t *testing.T) {
 	require.Equal(t, 0, size)
 
 }
+
+func TestAccountIdentifierOutputWithContinuationRecords(t *testing.T) {
+
+	record := accountIdentifier{
+		AccountNumber: "10200123456",
+		CurrencyCode:  "CAD",
+		TypeCode:      "040",
+		Amount:        "+000000000000",
+		ItemCount:     10,
+	}
+
+	for i := 0; i < 10; i++ {
+		record.Composite = append(record.Composite, "test-composite")
+	}
+
+	result := record.string()
+	expectResult := `03,10200123456,CAD,040,+000000000000,10,,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 191)
+
+	result = record.string(80)
+	expectResult = `03,10200123456,CAD,040,+000000000000,10,,test-composite,test-composite/
+88,test-composite,test-composite,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 199)
+
+	result = record.string(50)
+	expectResult = `03,10200123456,CAD,040,+000000000000,10,/
+88,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite/
+88,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 207)
+}

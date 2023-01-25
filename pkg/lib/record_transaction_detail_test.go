@@ -41,3 +41,36 @@ func TestTransactionDetailWithSample(t *testing.T) {
 
 	require.Equal(t, sample, record.string())
 }
+
+func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
+
+	record := TransactionDetail{
+		TypeCode:  "409",
+		Amount:    "000000000002500",
+		FundsType: "V",
+	}
+
+	for i := 0; i < 10; i++ {
+		record.Composite = append(record.Composite, "test-composite")
+	}
+
+	result := record.string()
+	expectResult := `16,409,000000000002500,V,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 175)
+
+	result = record.string(80)
+	expectResult = `16,409,000000000002500,V,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite,test-composite,test-composite/
+88,test-composite,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 183)
+
+	result = record.string(50)
+	expectResult = `16,409,000000000002500,V,test-composite/
+88,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite/
+88,test-composite,test-composite,test-composite/`
+	require.Equal(t, expectResult, result)
+	require.Equal(t, len(expectResult), 187)
+}

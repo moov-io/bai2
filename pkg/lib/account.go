@@ -73,14 +73,14 @@ func (r *Account) copyRecords() {
 
 }
 
-func (r *Account) String() string {
+func (r *Account) String(opts ...int64) string {
 
 	r.copyRecords()
 
 	var buf bytes.Buffer
-	buf.WriteString(r.header.string() + "\n")
+	buf.WriteString(r.header.string(opts...) + "\n")
 	for i := range r.Details {
-		buf.WriteString(r.Details[i].string() + "\n")
+		buf.WriteString(r.Details[i].string(opts...) + "\n")
 	}
 	buf.WriteString(r.trailer.string())
 
