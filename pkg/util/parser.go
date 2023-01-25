@@ -6,6 +6,7 @@ package util
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -66,7 +67,12 @@ func ReadFieldAsInt(input string, start int) (int64, int, error) {
 		return 0, 0, fmt.Errorf("doesn't have valid value")
 	}
 
-	return value, idx + 1, nil
+	// check for lower and uppper bounds
+	if value > 0 && value <= math.MaxInt64 {
+		return value, idx + 1, nil
+	}
+
+	return 0, idx + 1, nil
 }
 
 func GetSize(line string) int64 {
