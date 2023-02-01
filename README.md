@@ -30,13 +30,7 @@
 
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
 
-Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) developed by Bank Administration Institute. This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`.
-
-BAI is the financial services industry’s leading professional organization focused on enhancing employee and organizational performance. 
-Through ground-breaking research and an awardwinning magazine, Banking Strategies, BAI provides the latest insights on complex, strategic issues in financial services. 
-Through seminars, graduate schools and conferences—including the industry’s premier event, BAI’s Retail Delivery Conference & Expo—BAI reaches thousands of financial services professionals each year to deliver content designed around critical business needs and to facilitate vital connections between financial services professionals, industry experts and solutions providers. 
-Focusing on business issues and performance drivers, BAI applies its extensive line of training, metrics and employee assessments to help clients leverage their most important asset— their employees. 
-For more information, visit www.bai.org
+Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) developed by [Bank Administration Institute](https://www.bai.org) (BAI). This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`.
 
 ## Table of contents
 
@@ -56,7 +50,7 @@ For more information, visit www.bai.org
 
 ## Project status
 
-Moov Bai2 is actively used in multiple production environments. Please star the project if you are interested in its progress. If you have layers above Bai2 to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
+Moov Bai2 is being used in pre-production and production environments. We are actively improving the library and refactoring to make the interfaces better for developers. Please star the project if you are interested in its progress. If you have layers above Bai2 to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
 
 ## Usage
 
