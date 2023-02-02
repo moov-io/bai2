@@ -157,7 +157,7 @@ func (f *FundsType) parse(data string) (int, error) {
 			read += size
 		}
 
-		for index := 0; index < int(f.DistributionNumber); index++ {
+		for index := int64(0); index < f.DistributionNumber; index++ {
 
 			var amount, day int64
 
