@@ -11,7 +11,7 @@ import (
 )
 
 func getIndex(input string) int {
-	
+
 	idx1 := strings.Index(input, ",")
 	idx2 := strings.Index(input, "/")
 
