@@ -58,8 +58,9 @@ var Parse = &cobra.Command{
 
 		var err error
 
+		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
 		f := lib.NewBai2()
-		err = f.Read(lib.NewBai2Scanner(bytes.NewReader(documentBuffer)))
+		err = f.Read(&scan)
 		if err != nil {
 			return err
 		}
@@ -83,8 +84,9 @@ var Print = &cobra.Command{
 
 		var err error
 
+		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
 		f := lib.NewBai2()
-		err = f.Read(lib.NewBai2Scanner(bytes.NewReader(documentBuffer)))
+		err = f.Read(&scan)
 		if err != nil {
 			return err
 		}

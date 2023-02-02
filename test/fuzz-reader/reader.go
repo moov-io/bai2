@@ -18,8 +18,9 @@ import (
 // reserved for future use.
 func Fuzz(data []byte) int {
 
+	scan := lib.NewBai2Scanner(bytes.NewReader(data))
 	f := lib.NewBai2()
-	err := f.Read(lib.NewBai2Scanner(bytes.NewReader(data)))
+	err := f.Read(&scan)
 	if err != nil {
 		return 0
 	}

@@ -12,21 +12,23 @@ import (
 
 func TestTransactionDetail(t *testing.T) {
 
-	record := TransactionDetail{
+	record := transactionDetail{
 		TypeCode: "890",
 	}
 	require.NoError(t, record.validate())
 
 	record.TypeCode = "AAA"
 	require.Error(t, record.validate())
-	require.Equal(t, "AccountTransaction: invalid TypeCode", record.validate().Error())
+	require.Equal(t, "TransactionDetail: invalid TypeCode", record.validate().Error())
 
 }
 
 func TestTransactionDetailWithSample(t *testing.T) {
 
 	sample := "16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     /"
-	record := NewTransactionDetail()
+	record := transactionDetail{
+		TypeCode: "890",
+	}
 
 	size, err := record.parse(sample)
 	require.NoError(t, err)
@@ -34,43 +36,79 @@ func TestTransactionDetailWithSample(t *testing.T) {
 
 	require.Equal(t, "409", record.TypeCode)
 	require.Equal(t, "000000000002500", record.Amount)
-	require.Equal(t, "V", record.FundsType)
-	require.Equal(t, 5, len(record.Composite))
-	require.Equal(t, "060316", record.Composite[0])
-	require.Equal(t, "RETURNED CHEQUE     ", record.Composite[4])
+	require.Equal(t, "V", string(record.FundsType.TypeCode))
+	require.Equal(t, "060316", record.FundsType.Date)
+	require.Equal(t, "", record.FundsType.Time)
+	require.Equal(t, "", record.BankReferenceNumber)
+	require.Equal(t, "", record.CustomerReferenceNumber)
+	require.Equal(t, "RETURNED CHEQUE     ", record.Text)
 
 	require.Equal(t, sample, record.string())
 }
 
 func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
 
-	record := TransactionDetail{
-		TypeCode:  "409",
-		Amount:    "000000000002500",
-		FundsType: "V",
-	}
-
-	for i := 0; i < 10; i++ {
-		record.Composite = append(record.Composite, "test-composite")
+	record := transactionDetail{
+		TypeCode:                "409",
+		Amount:                  "111111111111111",
+		BankReferenceNumber:     "222222222222222",
+		CustomerReferenceNumber: "333333333333333",
+		Text:                    "RETURNED CHEQUE     444444444444444",
+		FundsType: FundsType{
+			TypeCode:           FundsTypeD,
+			DistributionNumber: 5,
+			Distributions: []Distribution{
+				{
+					Day:    1,
+					Amount: 1000000000,
+				},
+				{
+					Day:    2,
+					Amount: 2000000000,
+				},
+				{
+					Day:    3,
+					Amount: 3000000000,
+				},
+				{
+					Day:    4,
+					Amount: 4000000000,
+				},
+				{
+					Day:    5,
+					Amount: 5000000000,
+				},
+				{
+					Day:    6,
+					Amount: 6000000000,
+				},
+				{
+					Day:    7,
+					Amount: 7000000000,
+				},
+			},
+		},
 	}
 
 	result := record.string()
-	expectResult := `16,409,000000000002500,V,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite,test-composite/`
+	expectResult := `16,409,111111111111111,D,5,1,1000000000,2,2000000000,3,3000000000,4,4000000000,5,5000000000,6,6000000000,7,7000000000,222222222222222,333333333333333,RETURNED CHEQUE     444444444444444/`
 	require.Equal(t, expectResult, result)
-	require.Equal(t, len(expectResult), 175)
+	require.Equal(t, len(expectResult), len(result))
 
 	result = record.string(80)
-	expectResult = `16,409,000000000002500,V,test-composite,test-composite,test-composite/
-88,test-composite,test-composite,test-composite,test-composite,test-composite/
-88,test-composite,test-composite/`
+	expectResult = `16,409,111111111111111,D,5,1,1000000000,2,2000000000,3,3000000000,4,4000000000/
+88,5,5000000000,6,6000000000,7,7000000000,222222222222222,333333333333333/
+88,RETURNED CHEQUE     444444444444444/`
 	require.Equal(t, expectResult, result)
-	require.Equal(t, len(expectResult), 183)
+	require.Equal(t, len(expectResult), len(result))
 
 	result = record.string(50)
-	expectResult = `16,409,000000000002500,V,test-composite/
-88,test-composite,test-composite,test-composite/
-88,test-composite,test-composite,test-composite/
-88,test-composite,test-composite,test-composite/`
+	expectResult = `16,409,111111111111111,D,5,1,1000000000,2/
+88,2000000000,3,3000000000,4,4000000000,5/
+88,5000000000,6,6000000000,7,7000000000/
+88,222222222222222,333333333333333/
+88,RETURNED CHEQUE     444444444444444/`
 	require.Equal(t, expectResult, result)
-	require.Equal(t, len(expectResult), 187)
+	require.Equal(t, len(expectResult), len(result))
+
 }

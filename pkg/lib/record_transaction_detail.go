@@ -12,37 +12,34 @@ import (
 )
 
 const (
-	tdParseErrorFmt    = "AccountTransaction: unable to parse %s"
-	tdValidateErrorFmt = "AccountTransaction: invalid %s"
+	tdParseErrorFmt    = "TransactionDetail: unable to parse %s"
+	tdValidateErrorFmt = "TransactionDetail: invalid %s"
 )
 
-// Creating new transaction detail
-func NewTransactionDetail() *TransactionDetail {
-	return &TransactionDetail{}
+type transactionDetail struct {
+	TypeCode                string
+	Amount                  string
+	FundsType               FundsType
+	BankReferenceNumber     string
+	CustomerReferenceNumber string
+	Text                    string
 }
 
-type TransactionDetail struct {
-	TypeCode  string   `json:",omitempty"`
-	Amount    string   `json:",omitempty"`
-	FundsType string   `json:",omitempty"`
-	Composite []string `json:",omitempty"`
-}
-
-func (h *TransactionDetail) validate() error {
-	if h.TypeCode != "" && !util.ValidateTypeCode(h.TypeCode) {
+func (r *transactionDetail) validate() error {
+	if r.TypeCode != "" && !util.ValidateTypeCode(r.TypeCode) {
 		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "TypeCode"))
 	}
-	if h.Amount != "" && !util.ValidateAmount(h.Amount) {
+	if r.Amount != "" && !util.ValidateAmount(r.Amount) {
 		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "Amount"))
 	}
-	if h.FundsType != "" && !util.ValidateFundsType(h.FundsType) {
+	if r.FundsType.Validate() != nil {
 		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "FundsType"))
 	}
 
 	return nil
 }
 
-func (h *TransactionDetail) parse(data string) (int, error) {
+func (r *transactionDetail) parse(data string) (int, error) {
 
 	var line string
 	var err error
@@ -57,81 +54,85 @@ func (h *TransactionDetail) parse(data string) (int, error) {
 
 	// RecordCode
 	if util.TransactionDetailCode != data[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "RecordCode"))
 	}
 	read += 3
 
 	// TypeCode
-	if h.TypeCode, size, err = util.ReadField(line, read); err != nil {
+	if r.TypeCode, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "TypeCode"))
 	} else {
 		read += size
 	}
 
 	// Amount
-	if h.Amount, size, err = util.ReadField(line, read); err != nil {
+	if r.Amount, size, err = util.ReadField(line, read); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Amount"))
 	} else {
 		read += size
 	}
 
 	// FundsType
-	if h.FundsType, size, err = util.ReadField(line, read); err != nil {
+	if size, err = r.FundsType.parse(line[read:]); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType"))
 	} else {
 		read += size
 	}
 
-	for int64(read) < length {
-		var composite string
-		if composite, size, err = util.ReadField(line, read); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Composite"))
-		} else {
-			read += size
-		}
-		h.Composite = append(h.Composite, composite)
+	// BankReferenceNumber
+	if r.BankReferenceNumber, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "BankReferenceNumber"))
+	} else {
+		read += size
 	}
 
-	if err = h.validate(); err != nil {
+	// CustomerReferenceNumber
+	if r.CustomerReferenceNumber, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "CustomerReferenceNumber"))
+	} else {
+		read += size
+	}
+
+	// Text
+	if r.Text, size, err = util.ReadField(line, read); err != nil {
+		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Text"))
+	} else {
+		read += size
+	}
+
+	if err = r.validate(); err != nil {
 		return 0, err
 	}
 
 	return read, nil
 }
 
-func (h *TransactionDetail) string(opts ...int64) string {
-
-	var totalBuf bytes.Buffer
-	var buf bytes.Buffer
-
-	buf.WriteString(fmt.Sprintf("%s,", util.TransactionDetailCode))
-	buf.WriteString(fmt.Sprintf("%s,", h.TypeCode))
-	buf.WriteString(fmt.Sprintf("%s,", h.Amount))
-	buf.WriteString(h.FundsType)
+func (r *transactionDetail) string(opts ...int64) string {
 
 	var maxLen int64
 	if len(opts) > 0 {
 		maxLen = opts[0]
 	}
 
-	for _, composite := range h.Composite {
-		if maxLen > 0 {
-			if int64(buf.Len()+len(composite)+2) > maxLen {
-				// refresh buf
-				buf.WriteString("/" + "\n") // added new line
-				totalBuf.WriteString(buf.String())
+	var total, buf bytes.Buffer
 
-				// new buf
-				buf = bytes.Buffer{}
-				buf.WriteString(util.ContinuationCode)
-			}
-		}
+	buf.WriteString(fmt.Sprintf("%s,", util.TransactionDetailCode))
+	buf.WriteString(fmt.Sprintf("%s,", r.TypeCode))
+	buf.WriteString(fmt.Sprintf("%s,", r.Amount))
 
-		buf.WriteString(fmt.Sprintf(",%s", composite))
-	}
+	util.WriteBuffer(&total, &buf, r.FundsType.String(), maxLen)
+	buf.WriteString(",")
 
+	util.WriteBuffer(&total, &buf, r.BankReferenceNumber, maxLen)
+	buf.WriteString(",")
+
+	util.WriteBuffer(&total, &buf, r.CustomerReferenceNumber, maxLen)
+	buf.WriteString(",")
+
+	util.WriteBuffer(&total, &buf, r.Text, maxLen)
 	buf.WriteString("/")
-	totalBuf.WriteString(buf.String())
 
-	return totalBuf.String()
+	total.WriteString(buf.String())
+
+	return total.String()
 }
