@@ -46,7 +46,7 @@ func (f *FundsType) Validate() error {
 		return err
 	}
 
-	if strings.ToUpper(string(f.TypeCode)) == FundsTypeD && int(f.DistributionNumber) != len(f.Distributions) {
+	if strings.ToUpper(string(f.TypeCode)) == FundsTypeD && f.DistributionNumber != int64(len(f.Distributions)) {
 		return errors.New("number of distributions is not match")
 	}
 
