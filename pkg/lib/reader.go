@@ -31,9 +31,16 @@ func (b *Bai2Scanner) GetLine() string {
 	return strings.TrimSpace(strings.ReplaceAll(b.scan.Text(), "\n", ""))
 }
 
-func (b *Bai2Scanner) ScanLine(isRead bool) string {
+// ScanLine returns a line from the underlying reader
+// arg[0]: useCurrentLine (if false read a new line)
+func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 
-	if isRead {
+	useCurrentLine := false
+	if len(arg) > 0 {
+		useCurrentLine = arg[0]
+	}
+
+	if useCurrentLine {
 		return b.GetLine()
 	}
 

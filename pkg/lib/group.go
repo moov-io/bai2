@@ -115,17 +115,14 @@ func (r *Group) Validate() error {
 	return nil
 }
 
-func (r *Group) Read(scan *Bai2Scanner, isRead bool) error {
-
+func (r *Group) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 	if scan == nil {
 		return errors.New("invalid bai2 scanner")
 	}
 
 	var err error
-
-	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
-
-		isRead = false
+	for line := scan.ScanLine(useCurrentLine); line != ""; line = scan.ScanLine(useCurrentLine) {
+		useCurrentLine = false
 
 		// find record code
 		if len(line) < 3 {
@@ -134,7 +131,6 @@ func (r *Group) Read(scan *Bai2Scanner, isRead bool) error {
 
 		switch line[:2] {
 		case util.GroupHeaderCode:
-
 			newRecord := groupHeader{}
 			_, err = newRecord.parse(line)
 			if err != nil {
@@ -150,7 +146,6 @@ func (r *Group) Read(scan *Bai2Scanner, isRead bool) error {
 			r.AsOfDateModifier = newRecord.AsOfDateModifier
 
 		case util.AccountIdentifierCode:
-
 			newAccount := NewAccount()
 			err = newAccount.Read(scan, true)
 			if err != nil {
@@ -160,7 +155,6 @@ func (r *Group) Read(scan *Bai2Scanner, isRead bool) error {
 			r.Accounts = append(r.Accounts, *newAccount)
 
 		case util.GroupTrailerCode:
-
 			newRecord := groupTrailer{}
 			_, err = newRecord.parse(line)
 			if err != nil {

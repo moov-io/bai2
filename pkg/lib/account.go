@@ -100,14 +100,12 @@ func (r *Account) Validate() error {
 	return nil
 }
 
-func (r *Account) Read(scan *Bai2Scanner, isRead bool) error {
-
+func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 	if scan == nil {
 		return errors.New("invalid bai2 scanner")
 	}
 
 	parseAccountIdentifier := func(raw string) error {
-
 		if raw == "" {
 			return nil
 		}
@@ -129,32 +127,27 @@ func (r *Account) Read(scan *Bai2Scanner, isRead bool) error {
 	find := false
 	isBreak := false
 
-	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
-
+	for line := scan.ScanLine(useCurrentLine); line != ""; line = scan.ScanLine(useCurrentLine) {
 		// find record code
 		if len(line) < 3 {
 			continue
 		}
 
+		useCurrentLine = false
 		switch line[:2] {
 		case util.AccountIdentifierCode:
-
 			if find {
 				isBreak = true
 				break
 			}
 
-			isRead = false
 			rawData = line
 			find = true
 
 		case util.ContinuationCode:
-
-			isRead = false
 			rawData = rawData[:len(rawData)-1] + "," + line[3:]
 
 		case util.AccountTrailerCode:
-
 			if err := parseAccountIdentifier(rawData); err != nil {
 				return err
 			} else {
@@ -173,7 +166,6 @@ func (r *Account) Read(scan *Bai2Scanner, isRead bool) error {
 			return nil
 
 		case util.TransactionDetailCode:
-
 			if err := parseAccountIdentifier(rawData); err != nil {
 				return err
 			} else {
@@ -187,7 +179,7 @@ func (r *Account) Read(scan *Bai2Scanner, isRead bool) error {
 			}
 
 			r.Details = append(r.Details, *detail)
-			isRead = true
+			useCurrentLine = true
 
 		default:
 			return fmt.Errorf("ERROR parsing file on line %d (unabled to read record type %s)", scan.GetLineIndex(), line[0:2])

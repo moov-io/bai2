@@ -33,8 +33,7 @@ func (r *Detail) String(opts ...int64) string {
 	return (*transactionDetail)(r).string(opts...)
 }
 
-func (r *Detail) Read(scan *Bai2Scanner, isRead bool) error {
-
+func (r *Detail) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 	if scan == nil {
 		return errors.New("invalid bai2 scanner")
 	}
@@ -43,9 +42,8 @@ func (r *Detail) Read(scan *Bai2Scanner, isRead bool) error {
 	find := false
 	isBreak := false
 
-	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
-
-		isRead = false
+	for line := scan.ScanLine(useCurrentLine); line != ""; line = scan.ScanLine(useCurrentLine) {
+		useCurrentLine = false
 
 		// find record code
 		if len(line) < 3 {
@@ -63,7 +61,6 @@ func (r *Detail) Read(scan *Bai2Scanner, isRead bool) error {
 			find = true
 
 		case util.ContinuationCode:
-
 			rawData = rawData[:len(rawData)-1] + "," + line[3:]
 
 		default:

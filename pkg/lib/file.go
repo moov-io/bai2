@@ -150,9 +150,7 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 	}
 
 	var err error
-
-	isRead := false
-	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
+	for line := scan.ScanLine(); line != ""; line = scan.ScanLine() {
 
 		// find record code
 		if len(line) < 3 {
@@ -186,7 +184,6 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 			}
 
 			r.Groups = append(r.Groups, *newGroup)
-			isRead = false
 
 		case util.FileTrailerCode:
 
