@@ -6,8 +6,8 @@ package lib
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -143,33 +143,29 @@ func (r *Bai2) Validate() error {
 	return nil
 }
 
-func (r *Bai2) Read(scan Bai2Scanner) error {
+func (r *Bai2) Read(scan *Bai2Scanner) error {
+
+	if scan == nil {
+		return errors.New("invalid bai2 scanner")
+	}
 
 	var err error
 
-	input := ""
-	lineNum := 0
-	for line := scan.ScanLine(input); line != ""; line = scan.ScanLine(input) {
-
-		input = ""
-
-		// don't expect new line
-		line = strings.TrimSpace(strings.ReplaceAll(line, "\n", ""))
+	isRead := false
+	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
 
 		// find record code
 		if len(line) < 3 {
-			lineNum++
 			continue
 		}
 
 		switch line[0:2] {
 		case util.FileHeaderCode:
 
-			lineNum++
 			newRecord := fileHeader{}
 			_, err = newRecord.parse(line)
 			if err != nil {
-				return fmt.Errorf("ERROR parsing file header on line %d - %v", lineNum, err)
+				return fmt.Errorf("ERROR parsing file header on line %d (%v)", scan.GetLineIndex(), err)
 			}
 
 			r.Sender = newRecord.Sender
@@ -181,13 +177,23 @@ func (r *Bai2) Read(scan Bai2Scanner) error {
 			r.BlockSize = newRecord.BlockSize
 			r.VersionNumber = newRecord.VersionNumber
 
+		case util.GroupHeaderCode:
+
+			newGroup := NewGroup()
+			err = newGroup.Read(scan, true)
+			if err != nil {
+				return err
+			}
+
+			r.Groups = append(r.Groups, *newGroup)
+			isRead = false
+
 		case util.FileTrailerCode:
 
-			lineNum++
 			newRecord := fileTrailer{}
 			_, err = newRecord.parse(line)
 			if err != nil {
-				return fmt.Errorf("ERROR parsing file trailer on line %d - %v", lineNum, err)
+				return fmt.Errorf("ERROR parsing file trailer on line %d (%v)", scan.GetLineIndex(), err)
 			}
 
 			r.FileControlTotal = newRecord.FileControlTotal
@@ -196,18 +202,8 @@ func (r *Bai2) Read(scan Bai2Scanner) error {
 
 			return nil
 
-		case util.GroupHeaderCode:
-
-			newGroup := NewGroup()
-			lineNum, input, err = newGroup.Read(scan, line, lineNum)
-			if err != nil {
-				return err
-			}
-
-			r.Groups = append(r.Groups, *newGroup)
-
 		default:
-
+			return fmt.Errorf("ERROR parsing file on line %d (unsupported record type %s)", scan.GetLineIndex(), line[0:2])
 		}
 	}
 

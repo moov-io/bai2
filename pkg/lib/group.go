@@ -6,8 +6,8 @@ package lib
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -115,31 +115,30 @@ func (r *Group) Validate() error {
 	return nil
 }
 
-func (r *Group) Read(scan Bai2Scanner, input string, lineNum int) (int, string, error) {
+func (r *Group) Read(scan *Bai2Scanner, isRead bool) error {
+
+	if scan == nil {
+		return errors.New("invalid bai2 scanner")
+	}
 
 	var err error
 
-	for line := scan.ScanLine(input); line != ""; line = scan.ScanLine(input) {
+	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
 
-		input = ""
-
-		// don't expect new line
-		line = strings.TrimSpace(strings.ReplaceAll(line, "\n", ""))
+		isRead = false
 
 		// find record code
 		if len(line) < 3 {
-			lineNum++
 			continue
 		}
 
 		switch line[:2] {
 		case util.GroupHeaderCode:
 
-			lineNum++
 			newRecord := groupHeader{}
 			_, err = newRecord.parse(line)
 			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing group header on line %d - %v", lineNum, err)
+				return fmt.Errorf("ERROR parsing group header on line %d (%v)", scan.GetLineIndex(), err)
 			}
 
 			r.Receiver = newRecord.Receiver
@@ -150,37 +149,34 @@ func (r *Group) Read(scan Bai2Scanner, input string, lineNum int) (int, string, 
 			r.CurrencyCode = newRecord.CurrencyCode
 			r.AsOfDateModifier = newRecord.AsOfDateModifier
 
+		case util.AccountIdentifierCode:
+
+			newAccount := NewAccount()
+			err = newAccount.Read(scan, true)
+			if err != nil {
+				return err
+			}
+
+			r.Accounts = append(r.Accounts, *newAccount)
+
 		case util.GroupTrailerCode:
 
-			lineNum++
 			newRecord := groupTrailer{}
 			_, err = newRecord.parse(line)
 			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing group trailer on line %d - %v", lineNum, err)
+				return fmt.Errorf("ERROR parsing group trailer on line %d (%v)", scan.GetLineIndex(), err)
 			}
 
 			r.GroupControlTotal = newRecord.GroupControlTotal
 			r.NumberOfAccounts = newRecord.NumberOfAccounts
 			r.NumberOfRecords = newRecord.NumberOfRecords
 
-			return lineNum, "", nil
-
-		case util.AccountIdentifierCode:
-
-			newAccount := NewAccount()
-			lineNum, input, err = newAccount.Read(scan, line, lineNum)
-			if err != nil {
-				return lineNum, input, err
-			}
-
-			r.Accounts = append(r.Accounts, *newAccount)
+			return nil
 
 		default:
-
-			return lineNum, line, err
-
+			return fmt.Errorf("ERROR parsing file on line %d (unabled to read record type %s)", scan.GetLineIndex(), line[0:2])
 		}
 	}
 
-	return lineNum, "", nil
+	return nil
 }

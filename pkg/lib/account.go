@@ -6,8 +6,8 @@ package lib
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -36,19 +36,15 @@ func NewAccount() *Account {
 // Account Format
 type Account struct {
 	// Account Identifier
-	AccountNumber string   `json:"accountNumber"`
-	CurrencyCode  string   `json:"currencyCode,omitempty"`
-	TypeCode      string   `json:"typeCode,omitempty"`
-	Amount        string   `json:"amount,omitempty"`
-	ItemCount     int64    `json:"itemCount,omitempty"`
-	FundsType     string   `json:"fundsType,omitempty"`
-	Composite     []string `json:"composite,omitempty"`
+	AccountNumber string           `json:"accountNumber"`
+	CurrencyCode  string           `json:"currencyCode,omitempty"`
+	Summaries     []AccountSummary `json:"summaries,omitempty"`
 
 	// Account Trailer
 	AccountControlTotal string `json:"accountControlTotal"`
 	NumberRecords       int64  `json:"numberRecords"`
 
-	Details []TransactionDetail
+	Details []Detail
 
 	header  accountIdentifier
 	trailer accountTrailer
@@ -59,11 +55,7 @@ func (r *Account) copyRecords() {
 	r.header = accountIdentifier{
 		AccountNumber: r.AccountNumber,
 		CurrencyCode:  r.CurrencyCode,
-		TypeCode:      r.TypeCode,
-		Amount:        r.Amount,
-		ItemCount:     r.ItemCount,
-		FundsType:     r.FundsType,
-		Composite:     r.Composite,
+		Summaries:     r.Summaries,
 	}
 
 	r.trailer = accountTrailer{
@@ -80,7 +72,7 @@ func (r *Account) String(opts ...int64) string {
 	var buf bytes.Buffer
 	buf.WriteString(r.header.string(opts...) + "\n")
 	for i := range r.Details {
-		buf.WriteString(r.Details[i].string(opts...) + "\n")
+		buf.WriteString(r.Details[i].String(opts...) + "\n")
 	}
 	buf.WriteString(r.trailer.string())
 
@@ -96,7 +88,7 @@ func (r *Account) Validate() error {
 	}
 
 	for i := range r.Details {
-		if err := r.Details[i].validate(); err != nil {
+		if err := r.Details[i].Validate(); err != nil {
 			return err
 		}
 	}
@@ -108,94 +100,104 @@ func (r *Account) Validate() error {
 	return nil
 }
 
-func (r *Account) Read(scan Bai2Scanner, input string, lineNum int) (int, string, error) {
+func (r *Account) Read(scan *Bai2Scanner, isRead bool) error {
 
-	var detail *TransactionDetail
+	if scan == nil {
+		return errors.New("invalid bai2 scanner")
+	}
 
-	for line := scan.ScanLine(input); line != ""; line = scan.ScanLine(input) {
+	parseAccountIdentifier := func(raw string) error {
 
-		input = ""
+		if raw == "" {
+			return nil
+		}
 
-		// don't expect new line
-		line = strings.TrimSpace(strings.ReplaceAll(line, "\n", ""))
+		newRecord := accountIdentifier{}
+		_, err := newRecord.parse(raw)
+		if err != nil {
+			return fmt.Errorf("ERROR parsing account identifier on line %d (%v)", scan.GetLineIndex(), err)
+		}
+
+		r.AccountNumber = newRecord.AccountNumber
+		r.CurrencyCode = newRecord.CurrencyCode
+		r.Summaries = newRecord.Summaries
+
+		return nil
+	}
+
+	var rawData string
+	find := false
+	isBreak := false
+
+	for line := scan.ScanLine(isRead); line != ""; line = scan.ScanLine(isRead) {
 
 		// find record code
 		if len(line) < 3 {
-			lineNum++
 			continue
 		}
 
 		switch line[:2] {
 		case util.AccountIdentifierCode:
 
-			lineNum++
-			newRecord := accountIdentifier{}
-			_, err := newRecord.parse(line)
-			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing account identifier on line %d - %v", lineNum, err)
+			if find {
+				isBreak = true
+				break
 			}
 
-			r.AccountNumber = newRecord.AccountNumber
-			r.CurrencyCode = newRecord.CurrencyCode
-			r.TypeCode = newRecord.TypeCode
-			r.Amount = newRecord.Amount
-			r.ItemCount = newRecord.ItemCount
-			r.FundsType = newRecord.FundsType
-			r.Composite = newRecord.Composite
+			isRead = false
+			rawData = line
+			find = true
+
+		case util.ContinuationCode:
+
+			isRead = false
+			rawData = rawData[:len(rawData)-1] + "," + line[3:]
 
 		case util.AccountTrailerCode:
 
-			lineNum++
+			if err := parseAccountIdentifier(rawData); err != nil {
+				return err
+			} else {
+				rawData = ""
+			}
+
 			newRecord := accountTrailer{}
 			_, err := newRecord.parse(line)
 			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing account trailer on line %d - %v", lineNum, err)
+				return fmt.Errorf("ERROR parsing account trailer on line %d (%v)", scan.GetLineIndex(), err)
 			}
 
 			r.AccountControlTotal = newRecord.AccountControlTotal
 			r.NumberRecords = newRecord.NumberRecords
 
-			if detail != nil {
-				r.Details = append(r.Details, *detail)
-			}
-
-			return lineNum, "", nil
+			return nil
 
 		case util.TransactionDetailCode:
 
-			lineNum++
-			if detail != nil {
-				r.Details = append(r.Details, *detail)
-				detail = nil
-			}
-
-			detail = NewTransactionDetail()
-			_, err := detail.parse(line)
-			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing transaction detail on line %d - %v", lineNum, err)
-			}
-
-		case util.ContinuationCode:
-
-			lineNum++
-			newRecord := continuationRecord{}
-			_, err := newRecord.parse(line)
-			if err != nil {
-				return lineNum, line, fmt.Errorf("ERROR parsing continuation on line %d - %v", lineNum, err)
-			}
-
-			if detail == nil {
-				r.Composite = append(r.Composite, newRecord.Composite...)
+			if err := parseAccountIdentifier(rawData); err != nil {
+				return err
 			} else {
-				detail.Composite = append(detail.Composite, newRecord.Composite...)
+				rawData = ""
 			}
+
+			detail := NewDetail()
+			err := detail.Read(scan, true)
+			if err != nil {
+				return err
+			}
+
+			r.Details = append(r.Details, *detail)
+			isRead = true
 
 		default:
+			return fmt.Errorf("ERROR parsing file on line %d (unabled to read record type %s)", scan.GetLineIndex(), line[0:2])
 
-			return lineNum, line, nil
+		}
 
+		if isBreak {
+			break
 		}
 	}
 
-	return lineNum, "", nil
+	return nil
 }

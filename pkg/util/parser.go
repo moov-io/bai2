@@ -11,12 +11,18 @@ import (
 )
 
 func getIndex(input string) int {
+	
 	idx1 := strings.Index(input, ",")
 	idx2 := strings.Index(input, "/")
 
 	if idx1 == -1 {
 		return idx2
 	}
+
+	if idx2 > -1 && idx2 < idx1 {
+		return idx2
+	}
+
 	return idx1
 }
 

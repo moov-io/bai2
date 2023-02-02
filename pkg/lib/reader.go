@@ -7,12 +7,14 @@ package lib
 import (
 	"bufio"
 	"io"
+	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
 
 type Bai2Scanner struct {
-	scan *bufio.Scanner
+	scan  *bufio.Scanner
+	index int
 }
 
 func NewBai2Scanner(fd io.Reader) Bai2Scanner {
@@ -21,17 +23,26 @@ func NewBai2Scanner(fd io.Reader) Bai2Scanner {
 	return Bai2Scanner{scan: scan}
 }
 
-func (b *Bai2Scanner) ScanLine(line string) string {
+func (b *Bai2Scanner) GetLineIndex() int {
+	return b.index
+}
 
-	if len(line) > 0 {
-		return line
+func (b *Bai2Scanner) GetLine() string {
+	return strings.TrimSpace(strings.ReplaceAll(b.scan.Text(), "\n", ""))
+}
+
+func (b *Bai2Scanner) ScanLine(isRead bool) string {
+
+	if isRead {
+		return b.GetLine()
 	}
 
 	if !b.scan.Scan() {
 		return ""
 	}
 
-	return b.scan.Text()
+	b.index++
+	return b.GetLine()
 }
 
 // scanRecord allows Reader to read each segment
