@@ -1,13 +1,15 @@
-## v0.2.0 (Unreleased)
+## v0.2.0 (Released 2023-02-03)
 
 IMPROVEMENTS
 
 - feat: support varialble length records
 - feat: Implemented file structure that included File, Group, Account
 - feat: Handle contiuation records by returning merged records for callers
+- fix: Updated returned types to return better results
 
 BUILD
 
+- chore(deps): update golang docker tag to v1.20
 - fix(deps): update module golang.org/x/oauth2 to v0.4.0
 - fix(deps): update module github.com/moov-io/base to v0.39.0
 
