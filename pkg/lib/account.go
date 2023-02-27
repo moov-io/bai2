@@ -150,8 +150,6 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		case util.AccountTrailerCode:
 			if err := parseAccountIdentifier(rawData); err != nil {
 				return err
-			} else {
-				rawData = ""
 			}
 
 			newRecord := accountTrailer{}
