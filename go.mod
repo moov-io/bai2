@@ -8,7 +8,7 @@ require (
 	github.com/markbates/pkger v0.17.1
 	github.com/moov-io/base v0.42.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	golang.org/x/oauth2 v0.8.0
 )
 
