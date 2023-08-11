@@ -46,15 +46,11 @@ endif
 teardown:
 	-docker-compose down --remove-orphans
 
-docker: update docker-hub docker-fuzz
+docker: update docker-hub
 
 docker-hub:
 	docker build --pull --build-arg VERSION=${VERSION} -t moov/bai2:${VERSION} -f Dockerfile .
 	docker tag moov/bai2:${VERSION} moov/bai2:latest
-
-docker-fuzz:
-	docker build --pull -t moov/bai2fuzz:$(VERSION) . -f Dockerfile-fuzz
-	docker tag moov/bai2fuzz:$(VERSION) moov/bai2fuzz:latest
 
 docker-push:
 	docker push moov/bai2:${VERSION}
