@@ -34,9 +34,14 @@ func populateCorpus(f *testing.F) {
 	f.Helper()
 
 	err := filepath.Walk(filepath.Join("..", "testdata"), func(path string, info fs.FileInfo, _ error) error {
+		// Skip directories and some files
 		if info.IsDir() {
 			return nil
 		}
+		if strings.HasSuffix(path, ".output") {
+			return nil // skip
+		}
+		f.Logf("adding %s", path)
 
 		bs, err := os.ReadFile(path)
 		if err != nil {
