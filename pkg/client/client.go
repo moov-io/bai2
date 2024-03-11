@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -365,7 +366,7 @@ func (c *APIClient) decode(v interface{}, b []byte, contentType string) (err err
 		return nil
 	}
 	if f, ok := v.(**os.File); ok {
-		*f, err = os.CreateTemp("", "HttpClientFile")
+		*f, err = ioutil.TempFile("", "HttpClientFile")
 		if err != nil {
 			return
 		}
@@ -447,11 +448,7 @@ func setBody(body interface{}, contentType string) (bodyBuf *bytes.Buffer, err e
 	} else if jsonCheck.MatchString(contentType) {
 		err = json.NewEncoder(bodyBuf).Encode(body)
 	} else if xmlCheck.MatchString(contentType) {
-		enc := xml.NewEncoder(bodyBuf)
-		err = enc.Encode(body)
-		if closeErr := enc.Close(); closeErr != nil {
-			err = fmt.Errorf("%v: close error %v", err, closeErr)
-		}
+		err = xml.NewEncoder(bodyBuf).Encode(body)
 	}
 
 	if err != nil {

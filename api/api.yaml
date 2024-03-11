@@ -153,3 +153,36 @@ paths:
               schema:
                 type: string
                 example: invalid file format
+
+  /format:
+    post:
+      tags: ['Bai2 Files']
+      summary: Format bai2 file after parse bin file
+      description: format bai2 file.
+      operationId: format
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                input:
+                  type: string
+                  description: bai2 bin file
+                  format: binary
+            encoding:
+              file:
+                contentType: text/plain
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: invalid file format

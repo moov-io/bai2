@@ -79,6 +79,7 @@ All URIs are relative to *http://localhost:8208*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*Bai2FilesApi* | [**Format**](docs/Bai2FilesApi.md#format) | **Post** /format | Format bai2 file after parse bin file
 *Bai2FilesApi* | [**Health**](docs/Bai2FilesApi.md#health) | **Get** /health | health bai2 service
 *Bai2FilesApi* | [**Parse**](docs/Bai2FilesApi.md#parse) | **Post** /parse | Parse bai2 file after parse bin file
 *Bai2FilesApi* | [**Print**](docs/Bai2FilesApi.md#print) | **Post** /print | Print bai2 file after parse bin file

@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"encoding/json"
 
 	"github.com/spf13/cobra"
 
@@ -96,6 +97,31 @@ var Print = &cobra.Command{
 	},
 }
 
+var Format = &cobra.Command{
+	Use:   "format",
+	Short: "Format bai2 report",
+	Long:  "Format an incoming bai2 report after parse",
+	RunE: func(cmd *cobra.Command, args []string) error {
+
+		var err error
+
+		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
+		f := lib.NewBai2()
+		err = f.Read(&scan)
+		if err != nil {
+			return err
+		}
+		
+		body, ferr := json.Marshal(f)
+		if ferr != nil {
+			return ferr
+		}
+		
+		fmt.Println(string(body))
+		return nil
+	},
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "",
 	Short: "",
@@ -148,6 +174,7 @@ func initRootCmd() {
 	rootCmd.AddCommand(WebCmd)
 	rootCmd.AddCommand(Print)
 	rootCmd.AddCommand(Parse)
+	rootCmd.AddCommand(Format)
 }
 
 func main() {

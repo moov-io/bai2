@@ -4,10 +4,77 @@ All URIs are relative to *http://localhost:8208*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**Format**](Bai2FilesApi.md#Format) | **Post** /format | Format bai2 file after parse bin file
 [**Health**](Bai2FilesApi.md#Health) | **Get** /health | health bai2 service
 [**Parse**](Bai2FilesApi.md#Parse) | **Post** /parse | Parse bai2 file after parse bin file
 [**Print**](Bai2FilesApi.md#Print) | **Post** /print | Print bai2 file after parse bin file
 
+
+
+## Format
+
+> map[string]interface{} Format(ctx).Input(input).Execute()
+
+Format bai2 file after parse bin file
+
+
+
+### Example
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "os"
+    openapiclient "./openapi"
+)
+
+func main() {
+    input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
+
+    configuration := openapiclient.NewConfiguration()
+    apiClient := openapiclient.NewAPIClient(configuration)
+    resp, r, err := apiClient.Bai2FilesApi.Format(context.Background()).Input(input).Execute()
+    if err != nil {
+        fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Format``: %v\n", err)
+        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+    }
+    // response from `Format`: map[string]interface{}
+    fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Format`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiFormatRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **input** | ***os.File** | bai2 bin file | 
+
+### Return type
+
+**map[string]interface{}**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
+- **Accept**: application/json, text/plain
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## Health

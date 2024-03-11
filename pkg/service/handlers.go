@@ -59,6 +59,16 @@ func outputBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
 	w.Write([]byte(f.String()))
 }
 
+func outputJsonBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
+	body, err := json.Marshal(f)
+	if err != nil {
+		panic(err)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write(body)
+}
+
 // parse - parse bai2 report
 func parse(w http.ResponseWriter, r *http.Request) {
 	f, err := parseInputFromRequest(r)
@@ -87,6 +97,17 @@ func print(w http.ResponseWriter, r *http.Request) {
 	outputBufferToWriter(w, f)
 }
 
+// format - format bai2 report after parse
+func format(w http.ResponseWriter, r *http.Request) {
+	f, err := parseInputFromRequest(r)
+	if err != nil {
+		outputError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	outputJsonBufferToWriter(w, f)
+}
+
 // health - health check
 func health(w http.ResponseWriter, r *http.Request) {
 	outputSuccess(w, "alive")
@@ -98,6 +119,7 @@ func ConfigureHandlers(r *mux.Router) error {
 	r.HandleFunc("/health", health).Methods("GET")
 	r.HandleFunc("/print", print).Methods("POST")
 	r.HandleFunc("/parse", parse).Methods("POST")
+	r.HandleFunc("/format", format).Methods("POST")
 
 	return nil
 }
