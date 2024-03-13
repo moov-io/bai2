@@ -168,7 +168,7 @@ func (r *Group) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			return nil
 
 		default:
-			return fmt.Errorf("ERROR parsing file on line %d (unabled to read record type %s)", scan.GetLineIndex(), line[0:2])
+			return fmt.Errorf("ERROR parsing group on line %d (unable to read record type %s)", scan.GetLineIndex(), line[0:2])
 		}
 	}
 
