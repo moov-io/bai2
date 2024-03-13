@@ -60,13 +60,9 @@ func outputBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
 }
 
 func outputJsonBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
-	body, err := json.Marshal(f)
-	if err != nil {
-		panic(err)
-	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write(body)
+	json.NewEncoder(w).Encode(f)
 }
 
 // parse - parse bai2 report

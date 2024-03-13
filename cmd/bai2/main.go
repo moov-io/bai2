@@ -6,12 +6,12 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"encoding/json"
 
 	"github.com/spf13/cobra"
 
@@ -111,12 +111,12 @@ var Format = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		
+
 		body, ferr := json.Marshal(f)
 		if ferr != nil {
 			return ferr
 		}
-		
+
 		fmt.Println(string(body))
 		return nil
 	},
