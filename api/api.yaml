@@ -200,7 +200,7 @@ components:
         summaries:
           type: array
           items:
-            $ref: '#/components/schema/AccountSummary'
+            $ref: '#/components/schemas/AccountSummary'
         accountControlTotal:
           type: string
           example: "+00000000000834000"
@@ -210,7 +210,7 @@ components:
         Details:
           type: array
           items:
-            $ref: '#/components/schema/Detail'
+            $ref: '#/components/schemas/Detail'
     AccountSummary:
       properties:
         TypeCode:
@@ -223,7 +223,7 @@ components:
           type: integer
           example: 0
         FundsType:
-          $ref: '#/components/schema/FundsType'
+          $ref: '#/components/schemas/FundsType'
     Detail:
       properties:
         TypeCode:
@@ -233,7 +233,7 @@ components:
           type: string
           example: "000000000002500"
         FundsType:
-          $ref: '#/components/schema/FundsType'
+          $ref: '#/components/schemas/FundsType'
         BankReferenceNumber:
           type: string
           example: ""
@@ -243,6 +243,12 @@ components:
         Text:
           type: string
           example: "TFR 1020 0345678    "
+    Distribution:
+      properties:
+        day:
+          type: integer
+        amount:
+          type: integer
     File:
       properties:
         sender:
@@ -290,6 +296,20 @@ components:
         date:
           type: string
           example: "060316"
+        time:
+          type: string
+        immediate_amount:
+          type: string
+        one_day_amount:
+          type: string
+        two_day_amount:
+          type: string
+        distribution_number:
+          type: integer
+        distributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Distribution'
     Group:
       properties:
         receiver:

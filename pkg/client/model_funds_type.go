@@ -16,8 +16,14 @@ import (
 
 // FundsType struct for FundsType
 type FundsType struct {
-	TypeCode *string `json:"type_code,omitempty"`
-	Date     *string `json:"date,omitempty"`
+	TypeCode           *string        `json:"type_code,omitempty"`
+	Date               *string        `json:"date,omitempty"`
+	Time               *string        `json:"time,omitempty"`
+	ImmediateAmount    *string        `json:"immediate_amount,omitempty"`
+	OneDayAmount       *string        `json:"one_day_amount,omitempty"`
+	TwoDayAmount       *string        `json:"two_day_amount,omitempty"`
+	DistributionNumber *int32         `json:"distribution_number,omitempty"`
+	Distributions      []Distribution `json:"distributions,omitempty"`
 }
 
 // NewFundsType instantiates a new FundsType object
@@ -101,6 +107,198 @@ func (o *FundsType) SetDate(v string) {
 	o.Date = &v
 }
 
+// GetTime returns the Time field value if set, zero value otherwise.
+func (o *FundsType) GetTime() string {
+	if o == nil || o.Time == nil {
+		var ret string
+		return ret
+	}
+	return *o.Time
+}
+
+// GetTimeOk returns a tuple with the Time field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetTimeOk() (*string, bool) {
+	if o == nil || o.Time == nil {
+		return nil, false
+	}
+	return o.Time, true
+}
+
+// HasTime returns a boolean if a field has been set.
+func (o *FundsType) HasTime() bool {
+	if o != nil && o.Time != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTime gets a reference to the given string and assigns it to the Time field.
+func (o *FundsType) SetTime(v string) {
+	o.Time = &v
+}
+
+// GetImmediateAmount returns the ImmediateAmount field value if set, zero value otherwise.
+func (o *FundsType) GetImmediateAmount() string {
+	if o == nil || o.ImmediateAmount == nil {
+		var ret string
+		return ret
+	}
+	return *o.ImmediateAmount
+}
+
+// GetImmediateAmountOk returns a tuple with the ImmediateAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetImmediateAmountOk() (*string, bool) {
+	if o == nil || o.ImmediateAmount == nil {
+		return nil, false
+	}
+	return o.ImmediateAmount, true
+}
+
+// HasImmediateAmount returns a boolean if a field has been set.
+func (o *FundsType) HasImmediateAmount() bool {
+	if o != nil && o.ImmediateAmount != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetImmediateAmount gets a reference to the given string and assigns it to the ImmediateAmount field.
+func (o *FundsType) SetImmediateAmount(v string) {
+	o.ImmediateAmount = &v
+}
+
+// GetOneDayAmount returns the OneDayAmount field value if set, zero value otherwise.
+func (o *FundsType) GetOneDayAmount() string {
+	if o == nil || o.OneDayAmount == nil {
+		var ret string
+		return ret
+	}
+	return *o.OneDayAmount
+}
+
+// GetOneDayAmountOk returns a tuple with the OneDayAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetOneDayAmountOk() (*string, bool) {
+	if o == nil || o.OneDayAmount == nil {
+		return nil, false
+	}
+	return o.OneDayAmount, true
+}
+
+// HasOneDayAmount returns a boolean if a field has been set.
+func (o *FundsType) HasOneDayAmount() bool {
+	if o != nil && o.OneDayAmount != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetOneDayAmount gets a reference to the given string and assigns it to the OneDayAmount field.
+func (o *FundsType) SetOneDayAmount(v string) {
+	o.OneDayAmount = &v
+}
+
+// GetTwoDayAmount returns the TwoDayAmount field value if set, zero value otherwise.
+func (o *FundsType) GetTwoDayAmount() string {
+	if o == nil || o.TwoDayAmount == nil {
+		var ret string
+		return ret
+	}
+	return *o.TwoDayAmount
+}
+
+// GetTwoDayAmountOk returns a tuple with the TwoDayAmount field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetTwoDayAmountOk() (*string, bool) {
+	if o == nil || o.TwoDayAmount == nil {
+		return nil, false
+	}
+	return o.TwoDayAmount, true
+}
+
+// HasTwoDayAmount returns a boolean if a field has been set.
+func (o *FundsType) HasTwoDayAmount() bool {
+	if o != nil && o.TwoDayAmount != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetTwoDayAmount gets a reference to the given string and assigns it to the TwoDayAmount field.
+func (o *FundsType) SetTwoDayAmount(v string) {
+	o.TwoDayAmount = &v
+}
+
+// GetDistributionNumber returns the DistributionNumber field value if set, zero value otherwise.
+func (o *FundsType) GetDistributionNumber() int32 {
+	if o == nil || o.DistributionNumber == nil {
+		var ret int32
+		return ret
+	}
+	return *o.DistributionNumber
+}
+
+// GetDistributionNumberOk returns a tuple with the DistributionNumber field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetDistributionNumberOk() (*int32, bool) {
+	if o == nil || o.DistributionNumber == nil {
+		return nil, false
+	}
+	return o.DistributionNumber, true
+}
+
+// HasDistributionNumber returns a boolean if a field has been set.
+func (o *FundsType) HasDistributionNumber() bool {
+	if o != nil && o.DistributionNumber != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDistributionNumber gets a reference to the given int32 and assigns it to the DistributionNumber field.
+func (o *FundsType) SetDistributionNumber(v int32) {
+	o.DistributionNumber = &v
+}
+
+// GetDistributions returns the Distributions field value if set, zero value otherwise.
+func (o *FundsType) GetDistributions() []Distribution {
+	if o == nil || o.Distributions == nil {
+		var ret []Distribution
+		return ret
+	}
+	return o.Distributions
+}
+
+// GetDistributionsOk returns a tuple with the Distributions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *FundsType) GetDistributionsOk() ([]Distribution, bool) {
+	if o == nil || o.Distributions == nil {
+		return nil, false
+	}
+	return o.Distributions, true
+}
+
+// HasDistributions returns a boolean if a field has been set.
+func (o *FundsType) HasDistributions() bool {
+	if o != nil && o.Distributions != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetDistributions gets a reference to the given []Distribution and assigns it to the Distributions field.
+func (o *FundsType) SetDistributions(v []Distribution) {
+	o.Distributions = v
+}
+
 func (o FundsType) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.TypeCode != nil {
@@ -108,6 +306,24 @@ func (o FundsType) MarshalJSON() ([]byte, error) {
 	}
 	if o.Date != nil {
 		toSerialize["date"] = o.Date
+	}
+	if o.Time != nil {
+		toSerialize["time"] = o.Time
+	}
+	if o.ImmediateAmount != nil {
+		toSerialize["immediate_amount"] = o.ImmediateAmount
+	}
+	if o.OneDayAmount != nil {
+		toSerialize["one_day_amount"] = o.OneDayAmount
+	}
+	if o.TwoDayAmount != nil {
+		toSerialize["two_day_amount"] = o.TwoDayAmount
+	}
+	if o.DistributionNumber != nil {
+		toSerialize["distribution_number"] = o.DistributionNumber
+	}
+	if o.Distributions != nil {
+		toSerialize["distributions"] = o.Distributions
 	}
 	return json.Marshal(toSerialize)
 }

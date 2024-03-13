@@ -90,6 +90,7 @@ Class | Method | HTTP request | Description
  - [Account](docs/Account.md)
  - [AccountSummary](docs/AccountSummary.md)
  - [Detail](docs/Detail.md)
+ - [Distribution](docs/Distribution.md)
  - [File](docs/File.md)
  - [FundsType](docs/FundsType.md)
  - [Group](docs/Group.md)

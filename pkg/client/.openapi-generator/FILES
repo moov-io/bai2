@@ -10,6 +10,7 @@ docs/Account.md
 docs/AccountSummary.md
 docs/Bai2FilesApi.md
 docs/Detail.md
+docs/Distribution.md
 docs/File.md
 docs/FundsType.md
 docs/Group.md
@@ -19,6 +20,7 @@ go.sum
 model_account.go
 model_account_summary.go
 model_detail.go
+model_distribution.go
 model_file.go
 model_funds_type.go
 model_group.go
