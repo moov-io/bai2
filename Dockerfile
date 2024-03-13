@@ -17,7 +17,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates c
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/bin/bai2 /app/
-COPY /src/configs/ /configs/
+COPY --from=builder /src/configs /configs/
 
 ENV HTTP_PORT=8484
 ENV HEALTH_PORT=9494
