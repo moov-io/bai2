@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 ## Format
 
-> map[string]interface{} Format(ctx).Input(input).Execute()
+> File Format(ctx).Input(input).Execute()
 
 Format bai2 file after parse bin file
 
@@ -41,7 +41,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Format``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `Format`: map[string]interface{}
+    // response from `Format`: File
     fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Format`: %v\n", resp)
 }
 ```
@@ -61,7 +61,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**map[string]interface{}**
+[**File**](File.md)
 
 ### Authorization
 

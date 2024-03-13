@@ -39,7 +39,7 @@ func (r ApiFormatRequest) Input(input *os.File) ApiFormatRequest {
 	return r
 }
 
-func (r ApiFormatRequest) Execute() (map[string]interface{}, *http.Response, error) {
+func (r ApiFormatRequest) Execute() (*File, *http.Response, error) {
 	return r.ApiService.FormatExecute(r)
 }
 
@@ -60,13 +60,13 @@ func (a *Bai2FilesApiService) Format(ctx context.Context) ApiFormatRequest {
 
 // Execute executes the request
 //
-//	@return map[string]interface{}
-func (a *Bai2FilesApiService) FormatExecute(r ApiFormatRequest) (map[string]interface{}, *http.Response, error) {
+//	@return File
+func (a *Bai2FilesApiService) FormatExecute(r ApiFormatRequest) (*File, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue map[string]interface{}
+		localVarReturnValue *File
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesApiService.Format")

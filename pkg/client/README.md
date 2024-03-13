@@ -87,6 +87,12 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [Account](docs/Account.md)
+ - [AccountSummary](docs/AccountSummary.md)
+ - [Detail](docs/Detail.md)
+ - [File](docs/File.md)
+ - [FundsType](docs/FundsType.md)
+ - [Group](docs/Group.md)
 
 
 ## Documentation For Authorization
