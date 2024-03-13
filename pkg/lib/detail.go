@@ -54,6 +54,7 @@ func (r *Detail) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		case util.TransactionDetailCode:
 
 			if find {
+				isBreak = true
 				break
 			}
 

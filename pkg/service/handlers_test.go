@@ -91,6 +91,47 @@ func (suite *HandlersTest) TestPrint() {
 
 	suite.testServer.ServeHTTP(recorder, request)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
+
+	// Verify that the printed file matches the input file.
+	path := filepath.Join("..", "..", "test", "testdata", testFileName)
+	fixture, err := os.ReadFile(path)
+	assert.Equal(suite.T(), nil, err)
+
+	// NB. Account continuations are currently not written to file exactly as they were read.
+	// Because of this behavior, the returned body does NOT strictly match the file data.
+	// This test currently asserts on the shape of the file as created by the current return.
+	// The difference between this output and the sample file is that a subset of data provided on
+	// each account continuation (88) is instead output on the Account record (03).
+	assert.NotEqual(suite.T(), recorder.Body.String(), string(fixture))
+
+	expectedFileBody := `01,0004,12345,060321,0829,001,80,1,2/
+02,12345,0004,1,060317,,CAD,/
+03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,,100,000000000208500/
+88,3,V,060316,,400,000000000208500,8,V,060316,/
+16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     /
+16,409,000000000090000,V,060316,,,,RTN-UNKNOWN         /
+16,409,000000000000500,V,060316,,,,RTD CHQ SERVICE CHRG/
+16,108,000000000203500,V,060316,,,,TFR 1020 0345678    /
+16,108,000000000002500,V,060316,,,,MACLEOD MALL        /
+16,108,000000000002500,V,060316,,,,MASCOUCHE QUE       /
+16,409,000000000020000,V,060316,,,,1000 ISLANDS MALL   /
+16,409,000000000090000,V,060316,,,,PENHORA MALL        /
+16,409,000000000002000,V,060316,,,,CAPILANO MALL       /
+16,409,000000000002500,V,060316,,,,GALERIES LA CAPITALE/
+16,409,000000000001000,V,060316,,,,PLAZA ROCK FOREST   /
+49,+00000000000834000,14/
+03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,,100,000000000111500/
+88,2,V,060317,,400,000000000111500,4,V,060317,/
+16,108,000000000011500,V,060317,,,,TFR 1020 0345678    /
+16,108,000000000100000,V,060317,,,,MONTREAL            /
+16,409,000000000100000,V,060317,,,,GRANDFALL NB        /
+16,409,000000000009000,V,060317,,,,HAMILTON ON         /
+16,409,000000000002000,V,060317,,,,WOODSTOCK NB        /
+16,409,000000000000500,V,060317,,,,GALERIES RICHELIEU  /
+49,+00000000000446000,9/
+98,+00000000001280000,2,25/
+99,+00000000001280000,1,27/`
+	assert.Equal(suite.T(), recorder.Body.String(), expectedFileBody)
 }
 
 func (suite *HandlersTest) TestParse() {
