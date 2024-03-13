@@ -6,7 +6,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y make gcc g++ ca-c
 
 COPY . .
 
-RUN VERSION=${VERSION} make build
+RUN ls -al && VERSION=${VERSION} make build
 
 FROM debian:stable-slim AS runtime
 LABEL maintainer="Moov <oss@moov.io>"
