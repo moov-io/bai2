@@ -8,7 +8,7 @@ client.go
 configuration.go
 docs/Account.md
 docs/AccountSummary.md
-docs/Bai2FilesApi.md
+docs/Bai2FilesAPI.md
 docs/Detail.md
 docs/Distribution.md
 docs/File.md
@@ -25,4 +25,5 @@ model_file.go
 model_funds_type.go
 model_group.go
 response.go
+test/api_bai2_files_test.go
 utils.go

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Distribution type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Distribution{}
+
 // Distribution struct for Distribution
 type Distribution struct {
 	Day    *int32 `json:"day,omitempty"`
@@ -39,7 +42,7 @@ func NewDistributionWithDefaults() *Distribution {
 
 // GetDay returns the Day field value if set, zero value otherwise.
 func (o *Distribution) GetDay() int32 {
-	if o == nil || o.Day == nil {
+	if o == nil || IsNil(o.Day) {
 		var ret int32
 		return ret
 	}
@@ -49,7 +52,7 @@ func (o *Distribution) GetDay() int32 {
 // GetDayOk returns a tuple with the Day field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Distribution) GetDayOk() (*int32, bool) {
-	if o == nil || o.Day == nil {
+	if o == nil || IsNil(o.Day) {
 		return nil, false
 	}
 	return o.Day, true
@@ -57,7 +60,7 @@ func (o *Distribution) GetDayOk() (*int32, bool) {
 
 // HasDay returns a boolean if a field has been set.
 func (o *Distribution) HasDay() bool {
-	if o != nil && o.Day != nil {
+	if o != nil && !IsNil(o.Day) {
 		return true
 	}
 
@@ -71,7 +74,7 @@ func (o *Distribution) SetDay(v int32) {
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
 func (o *Distribution) GetAmount() int32 {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		var ret int32
 		return ret
 	}
@@ -81,7 +84,7 @@ func (o *Distribution) GetAmount() int32 {
 // GetAmountOk returns a tuple with the Amount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Distribution) GetAmountOk() (*int32, bool) {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		return nil, false
 	}
 	return o.Amount, true
@@ -89,7 +92,7 @@ func (o *Distribution) GetAmountOk() (*int32, bool) {
 
 // HasAmount returns a boolean if a field has been set.
 func (o *Distribution) HasAmount() bool {
-	if o != nil && o.Amount != nil {
+	if o != nil && !IsNil(o.Amount) {
 		return true
 	}
 
@@ -102,14 +105,22 @@ func (o *Distribution) SetAmount(v int32) {
 }
 
 func (o Distribution) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Day != nil {
-		toSerialize["day"] = o.Day
-	}
-	if o.Amount != nil {
-		toSerialize["amount"] = o.Amount
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Distribution) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Day) {
+		toSerialize["day"] = o.Day
+	}
+	if !IsNil(o.Amount) {
+		toSerialize["amount"] = o.Amount
+	}
+	return toSerialize, nil
 }
 
 type NullableDistribution struct {

@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the File type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &File{}
+
 // File struct for File
 type File struct {
 	Sender               *string `json:"sender,omitempty"`
@@ -49,7 +52,7 @@ func NewFileWithDefaults() *File {
 
 // GetSender returns the Sender field value if set, zero value otherwise.
 func (o *File) GetSender() string {
-	if o == nil || o.Sender == nil {
+	if o == nil || IsNil(o.Sender) {
 		var ret string
 		return ret
 	}
@@ -59,7 +62,7 @@ func (o *File) GetSender() string {
 // GetSenderOk returns a tuple with the Sender field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetSenderOk() (*string, bool) {
-	if o == nil || o.Sender == nil {
+	if o == nil || IsNil(o.Sender) {
 		return nil, false
 	}
 	return o.Sender, true
@@ -67,7 +70,7 @@ func (o *File) GetSenderOk() (*string, bool) {
 
 // HasSender returns a boolean if a field has been set.
 func (o *File) HasSender() bool {
-	if o != nil && o.Sender != nil {
+	if o != nil && !IsNil(o.Sender) {
 		return true
 	}
 
@@ -81,7 +84,7 @@ func (o *File) SetSender(v string) {
 
 // GetReceiver returns the Receiver field value if set, zero value otherwise.
 func (o *File) GetReceiver() string {
-	if o == nil || o.Receiver == nil {
+	if o == nil || IsNil(o.Receiver) {
 		var ret string
 		return ret
 	}
@@ -91,7 +94,7 @@ func (o *File) GetReceiver() string {
 // GetReceiverOk returns a tuple with the Receiver field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetReceiverOk() (*string, bool) {
-	if o == nil || o.Receiver == nil {
+	if o == nil || IsNil(o.Receiver) {
 		return nil, false
 	}
 	return o.Receiver, true
@@ -99,7 +102,7 @@ func (o *File) GetReceiverOk() (*string, bool) {
 
 // HasReceiver returns a boolean if a field has been set.
 func (o *File) HasReceiver() bool {
-	if o != nil && o.Receiver != nil {
+	if o != nil && !IsNil(o.Receiver) {
 		return true
 	}
 
@@ -113,7 +116,7 @@ func (o *File) SetReceiver(v string) {
 
 // GetFileCreatedDate returns the FileCreatedDate field value if set, zero value otherwise.
 func (o *File) GetFileCreatedDate() string {
-	if o == nil || o.FileCreatedDate == nil {
+	if o == nil || IsNil(o.FileCreatedDate) {
 		var ret string
 		return ret
 	}
@@ -123,7 +126,7 @@ func (o *File) GetFileCreatedDate() string {
 // GetFileCreatedDateOk returns a tuple with the FileCreatedDate field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetFileCreatedDateOk() (*string, bool) {
-	if o == nil || o.FileCreatedDate == nil {
+	if o == nil || IsNil(o.FileCreatedDate) {
 		return nil, false
 	}
 	return o.FileCreatedDate, true
@@ -131,7 +134,7 @@ func (o *File) GetFileCreatedDateOk() (*string, bool) {
 
 // HasFileCreatedDate returns a boolean if a field has been set.
 func (o *File) HasFileCreatedDate() bool {
-	if o != nil && o.FileCreatedDate != nil {
+	if o != nil && !IsNil(o.FileCreatedDate) {
 		return true
 	}
 
@@ -145,7 +148,7 @@ func (o *File) SetFileCreatedDate(v string) {
 
 // GetFileCreatedTime returns the FileCreatedTime field value if set, zero value otherwise.
 func (o *File) GetFileCreatedTime() string {
-	if o == nil || o.FileCreatedTime == nil {
+	if o == nil || IsNil(o.FileCreatedTime) {
 		var ret string
 		return ret
 	}
@@ -155,7 +158,7 @@ func (o *File) GetFileCreatedTime() string {
 // GetFileCreatedTimeOk returns a tuple with the FileCreatedTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetFileCreatedTimeOk() (*string, bool) {
-	if o == nil || o.FileCreatedTime == nil {
+	if o == nil || IsNil(o.FileCreatedTime) {
 		return nil, false
 	}
 	return o.FileCreatedTime, true
@@ -163,7 +166,7 @@ func (o *File) GetFileCreatedTimeOk() (*string, bool) {
 
 // HasFileCreatedTime returns a boolean if a field has been set.
 func (o *File) HasFileCreatedTime() bool {
-	if o != nil && o.FileCreatedTime != nil {
+	if o != nil && !IsNil(o.FileCreatedTime) {
 		return true
 	}
 
@@ -177,7 +180,7 @@ func (o *File) SetFileCreatedTime(v string) {
 
 // GetFileIdNumber returns the FileIdNumber field value if set, zero value otherwise.
 func (o *File) GetFileIdNumber() string {
-	if o == nil || o.FileIdNumber == nil {
+	if o == nil || IsNil(o.FileIdNumber) {
 		var ret string
 		return ret
 	}
@@ -187,7 +190,7 @@ func (o *File) GetFileIdNumber() string {
 // GetFileIdNumberOk returns a tuple with the FileIdNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetFileIdNumberOk() (*string, bool) {
-	if o == nil || o.FileIdNumber == nil {
+	if o == nil || IsNil(o.FileIdNumber) {
 		return nil, false
 	}
 	return o.FileIdNumber, true
@@ -195,7 +198,7 @@ func (o *File) GetFileIdNumberOk() (*string, bool) {
 
 // HasFileIdNumber returns a boolean if a field has been set.
 func (o *File) HasFileIdNumber() bool {
-	if o != nil && o.FileIdNumber != nil {
+	if o != nil && !IsNil(o.FileIdNumber) {
 		return true
 	}
 
@@ -209,7 +212,7 @@ func (o *File) SetFileIdNumber(v string) {
 
 // GetPhysicalRecordLength returns the PhysicalRecordLength field value if set, zero value otherwise.
 func (o *File) GetPhysicalRecordLength() int32 {
-	if o == nil || o.PhysicalRecordLength == nil {
+	if o == nil || IsNil(o.PhysicalRecordLength) {
 		var ret int32
 		return ret
 	}
@@ -219,7 +222,7 @@ func (o *File) GetPhysicalRecordLength() int32 {
 // GetPhysicalRecordLengthOk returns a tuple with the PhysicalRecordLength field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetPhysicalRecordLengthOk() (*int32, bool) {
-	if o == nil || o.PhysicalRecordLength == nil {
+	if o == nil || IsNil(o.PhysicalRecordLength) {
 		return nil, false
 	}
 	return o.PhysicalRecordLength, true
@@ -227,7 +230,7 @@ func (o *File) GetPhysicalRecordLengthOk() (*int32, bool) {
 
 // HasPhysicalRecordLength returns a boolean if a field has been set.
 func (o *File) HasPhysicalRecordLength() bool {
-	if o != nil && o.PhysicalRecordLength != nil {
+	if o != nil && !IsNil(o.PhysicalRecordLength) {
 		return true
 	}
 
@@ -241,7 +244,7 @@ func (o *File) SetPhysicalRecordLength(v int32) {
 
 // GetBlockSize returns the BlockSize field value if set, zero value otherwise.
 func (o *File) GetBlockSize() int32 {
-	if o == nil || o.BlockSize == nil {
+	if o == nil || IsNil(o.BlockSize) {
 		var ret int32
 		return ret
 	}
@@ -251,7 +254,7 @@ func (o *File) GetBlockSize() int32 {
 // GetBlockSizeOk returns a tuple with the BlockSize field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetBlockSizeOk() (*int32, bool) {
-	if o == nil || o.BlockSize == nil {
+	if o == nil || IsNil(o.BlockSize) {
 		return nil, false
 	}
 	return o.BlockSize, true
@@ -259,7 +262,7 @@ func (o *File) GetBlockSizeOk() (*int32, bool) {
 
 // HasBlockSize returns a boolean if a field has been set.
 func (o *File) HasBlockSize() bool {
-	if o != nil && o.BlockSize != nil {
+	if o != nil && !IsNil(o.BlockSize) {
 		return true
 	}
 
@@ -273,7 +276,7 @@ func (o *File) SetBlockSize(v int32) {
 
 // GetVersionNumber returns the VersionNumber field value if set, zero value otherwise.
 func (o *File) GetVersionNumber() int32 {
-	if o == nil || o.VersionNumber == nil {
+	if o == nil || IsNil(o.VersionNumber) {
 		var ret int32
 		return ret
 	}
@@ -283,7 +286,7 @@ func (o *File) GetVersionNumber() int32 {
 // GetVersionNumberOk returns a tuple with the VersionNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetVersionNumberOk() (*int32, bool) {
-	if o == nil || o.VersionNumber == nil {
+	if o == nil || IsNil(o.VersionNumber) {
 		return nil, false
 	}
 	return o.VersionNumber, true
@@ -291,7 +294,7 @@ func (o *File) GetVersionNumberOk() (*int32, bool) {
 
 // HasVersionNumber returns a boolean if a field has been set.
 func (o *File) HasVersionNumber() bool {
-	if o != nil && o.VersionNumber != nil {
+	if o != nil && !IsNil(o.VersionNumber) {
 		return true
 	}
 
@@ -305,7 +308,7 @@ func (o *File) SetVersionNumber(v int32) {
 
 // GetFileControlTotal returns the FileControlTotal field value if set, zero value otherwise.
 func (o *File) GetFileControlTotal() string {
-	if o == nil || o.FileControlTotal == nil {
+	if o == nil || IsNil(o.FileControlTotal) {
 		var ret string
 		return ret
 	}
@@ -315,7 +318,7 @@ func (o *File) GetFileControlTotal() string {
 // GetFileControlTotalOk returns a tuple with the FileControlTotal field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetFileControlTotalOk() (*string, bool) {
-	if o == nil || o.FileControlTotal == nil {
+	if o == nil || IsNil(o.FileControlTotal) {
 		return nil, false
 	}
 	return o.FileControlTotal, true
@@ -323,7 +326,7 @@ func (o *File) GetFileControlTotalOk() (*string, bool) {
 
 // HasFileControlTotal returns a boolean if a field has been set.
 func (o *File) HasFileControlTotal() bool {
-	if o != nil && o.FileControlTotal != nil {
+	if o != nil && !IsNil(o.FileControlTotal) {
 		return true
 	}
 
@@ -337,7 +340,7 @@ func (o *File) SetFileControlTotal(v string) {
 
 // GetNumberOfGroups returns the NumberOfGroups field value if set, zero value otherwise.
 func (o *File) GetNumberOfGroups() int32 {
-	if o == nil || o.NumberOfGroups == nil {
+	if o == nil || IsNil(o.NumberOfGroups) {
 		var ret int32
 		return ret
 	}
@@ -347,7 +350,7 @@ func (o *File) GetNumberOfGroups() int32 {
 // GetNumberOfGroupsOk returns a tuple with the NumberOfGroups field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetNumberOfGroupsOk() (*int32, bool) {
-	if o == nil || o.NumberOfGroups == nil {
+	if o == nil || IsNil(o.NumberOfGroups) {
 		return nil, false
 	}
 	return o.NumberOfGroups, true
@@ -355,7 +358,7 @@ func (o *File) GetNumberOfGroupsOk() (*int32, bool) {
 
 // HasNumberOfGroups returns a boolean if a field has been set.
 func (o *File) HasNumberOfGroups() bool {
-	if o != nil && o.NumberOfGroups != nil {
+	if o != nil && !IsNil(o.NumberOfGroups) {
 		return true
 	}
 
@@ -369,7 +372,7 @@ func (o *File) SetNumberOfGroups(v int32) {
 
 // GetNumberOfRecords returns the NumberOfRecords field value if set, zero value otherwise.
 func (o *File) GetNumberOfRecords() int32 {
-	if o == nil || o.NumberOfRecords == nil {
+	if o == nil || IsNil(o.NumberOfRecords) {
 		var ret int32
 		return ret
 	}
@@ -379,7 +382,7 @@ func (o *File) GetNumberOfRecords() int32 {
 // GetNumberOfRecordsOk returns a tuple with the NumberOfRecords field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetNumberOfRecordsOk() (*int32, bool) {
-	if o == nil || o.NumberOfRecords == nil {
+	if o == nil || IsNil(o.NumberOfRecords) {
 		return nil, false
 	}
 	return o.NumberOfRecords, true
@@ -387,7 +390,7 @@ func (o *File) GetNumberOfRecordsOk() (*int32, bool) {
 
 // HasNumberOfRecords returns a boolean if a field has been set.
 func (o *File) HasNumberOfRecords() bool {
-	if o != nil && o.NumberOfRecords != nil {
+	if o != nil && !IsNil(o.NumberOfRecords) {
 		return true
 	}
 
@@ -401,7 +404,7 @@ func (o *File) SetNumberOfRecords(v int32) {
 
 // GetGroups returns the Groups field value if set, zero value otherwise.
 func (o *File) GetGroups() []Group {
-	if o == nil || o.Groups == nil {
+	if o == nil || IsNil(o.Groups) {
 		var ret []Group
 		return ret
 	}
@@ -411,7 +414,7 @@ func (o *File) GetGroups() []Group {
 // GetGroupsOk returns a tuple with the Groups field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *File) GetGroupsOk() ([]Group, bool) {
-	if o == nil || o.Groups == nil {
+	if o == nil || IsNil(o.Groups) {
 		return nil, false
 	}
 	return o.Groups, true
@@ -419,7 +422,7 @@ func (o *File) GetGroupsOk() ([]Group, bool) {
 
 // HasGroups returns a boolean if a field has been set.
 func (o *File) HasGroups() bool {
-	if o != nil && o.Groups != nil {
+	if o != nil && !IsNil(o.Groups) {
 		return true
 	}
 
@@ -432,44 +435,52 @@ func (o *File) SetGroups(v []Group) {
 }
 
 func (o File) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Sender != nil {
-		toSerialize["sender"] = o.Sender
-	}
-	if o.Receiver != nil {
-		toSerialize["receiver"] = o.Receiver
-	}
-	if o.FileCreatedDate != nil {
-		toSerialize["fileCreatedDate"] = o.FileCreatedDate
-	}
-	if o.FileCreatedTime != nil {
-		toSerialize["fileCreatedTime"] = o.FileCreatedTime
-	}
-	if o.FileIdNumber != nil {
-		toSerialize["fileIdNumber"] = o.FileIdNumber
-	}
-	if o.PhysicalRecordLength != nil {
-		toSerialize["physicalRecordLength"] = o.PhysicalRecordLength
-	}
-	if o.BlockSize != nil {
-		toSerialize["blockSize"] = o.BlockSize
-	}
-	if o.VersionNumber != nil {
-		toSerialize["versionNumber"] = o.VersionNumber
-	}
-	if o.FileControlTotal != nil {
-		toSerialize["fileControlTotal"] = o.FileControlTotal
-	}
-	if o.NumberOfGroups != nil {
-		toSerialize["numberOfGroups"] = o.NumberOfGroups
-	}
-	if o.NumberOfRecords != nil {
-		toSerialize["numberOfRecords"] = o.NumberOfRecords
-	}
-	if o.Groups != nil {
-		toSerialize["Groups"] = o.Groups
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o File) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Sender) {
+		toSerialize["sender"] = o.Sender
+	}
+	if !IsNil(o.Receiver) {
+		toSerialize["receiver"] = o.Receiver
+	}
+	if !IsNil(o.FileCreatedDate) {
+		toSerialize["fileCreatedDate"] = o.FileCreatedDate
+	}
+	if !IsNil(o.FileCreatedTime) {
+		toSerialize["fileCreatedTime"] = o.FileCreatedTime
+	}
+	if !IsNil(o.FileIdNumber) {
+		toSerialize["fileIdNumber"] = o.FileIdNumber
+	}
+	if !IsNil(o.PhysicalRecordLength) {
+		toSerialize["physicalRecordLength"] = o.PhysicalRecordLength
+	}
+	if !IsNil(o.BlockSize) {
+		toSerialize["blockSize"] = o.BlockSize
+	}
+	if !IsNil(o.VersionNumber) {
+		toSerialize["versionNumber"] = o.VersionNumber
+	}
+	if !IsNil(o.FileControlTotal) {
+		toSerialize["fileControlTotal"] = o.FileControlTotal
+	}
+	if !IsNil(o.NumberOfGroups) {
+		toSerialize["numberOfGroups"] = o.NumberOfGroups
+	}
+	if !IsNil(o.NumberOfRecords) {
+		toSerialize["numberOfRecords"] = o.NumberOfRecords
+	}
+	if !IsNil(o.Groups) {
+		toSerialize["Groups"] = o.Groups
+	}
+	return toSerialize, nil
 }
 
 type NullableFile struct {

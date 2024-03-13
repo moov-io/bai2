@@ -1,13 +1,13 @@
-# \Bai2FilesApi
+# \Bai2FilesAPI
 
 All URIs are relative to *http://localhost:8208*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**Format**](Bai2FilesApi.md#Format) | **Post** /format | Format bai2 file after parse bin file
-[**Health**](Bai2FilesApi.md#Health) | **Get** /health | health bai2 service
-[**Parse**](Bai2FilesApi.md#Parse) | **Post** /parse | Parse bai2 file after parse bin file
-[**Print**](Bai2FilesApi.md#Print) | **Post** /print | Print bai2 file after parse bin file
+[**Format**](Bai2FilesAPI.md#Format) | **Post** /format | Format bai2 file after parse bin file
+[**Health**](Bai2FilesAPI.md#Health) | **Get** /health | health bai2 service
+[**Parse**](Bai2FilesAPI.md#Parse) | **Post** /parse | Parse bai2 file after parse bin file
+[**Print**](Bai2FilesAPI.md#Print) | **Post** /print | Print bai2 file after parse bin file
 
 
 
@@ -25,24 +25,24 @@ Format bai2 file after parse bin file
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
 )
 
 func main() {
-    input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
+	input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.Bai2FilesApi.Format(context.Background()).Input(input).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Format``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `Format`: File
-    fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Format`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.Bai2FilesAPI.Format(context.Background()).Input(input).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesAPI.Format``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `Format`: File
+	fmt.Fprintf(os.Stdout, "Response from `Bai2FilesAPI.Format`: %v\n", resp)
 }
 ```
 
@@ -91,23 +91,23 @@ health bai2 service
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
 )
 
 func main() {
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.Bai2FilesApi.Health(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Health``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `Health`: string
-    fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Health`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.Bai2FilesAPI.Health(context.Background()).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesAPI.Health``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `Health`: string
+	fmt.Fprintf(os.Stdout, "Response from `Bai2FilesAPI.Health`: %v\n", resp)
 }
 ```
 
@@ -152,24 +152,24 @@ Parse bai2 file after parse bin file
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
 )
 
 func main() {
-    input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
+	input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.Bai2FilesApi.Parse(context.Background()).Input(input).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Parse``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `Parse`: string
-    fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Parse`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.Bai2FilesAPI.Parse(context.Background()).Input(input).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesAPI.Parse``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `Parse`: string
+	fmt.Fprintf(os.Stdout, "Response from `Bai2FilesAPI.Parse`: %v\n", resp)
 }
 ```
 
@@ -218,24 +218,24 @@ Print bai2 file after parse bin file
 package main
 
 import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
 )
 
 func main() {
-    input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
+	input := os.NewFile(1234, "some_file") // *os.File | bai2 bin file (optional)
 
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.Bai2FilesApi.Print(context.Background()).Input(input).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesApi.Print``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `Print`: string
-    fmt.Fprintf(os.Stdout, "Response from `Bai2FilesApi.Print`: %v\n", resp)
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.Bai2FilesAPI.Print(context.Background()).Input(input).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `Bai2FilesAPI.Print``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `Print`: string
+	fmt.Fprintf(os.Stdout, "Response from `Bai2FilesAPI.Print`: %v\n", resp)
 }
 ```
 

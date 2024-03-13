@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the FundsType type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &FundsType{}
+
 // FundsType struct for FundsType
 type FundsType struct {
 	TypeCode           *string        `json:"type_code,omitempty"`
@@ -45,7 +48,7 @@ func NewFundsTypeWithDefaults() *FundsType {
 
 // GetTypeCode returns the TypeCode field value if set, zero value otherwise.
 func (o *FundsType) GetTypeCode() string {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		var ret string
 		return ret
 	}
@@ -55,7 +58,7 @@ func (o *FundsType) GetTypeCode() string {
 // GetTypeCodeOk returns a tuple with the TypeCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetTypeCodeOk() (*string, bool) {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		return nil, false
 	}
 	return o.TypeCode, true
@@ -63,7 +66,7 @@ func (o *FundsType) GetTypeCodeOk() (*string, bool) {
 
 // HasTypeCode returns a boolean if a field has been set.
 func (o *FundsType) HasTypeCode() bool {
-	if o != nil && o.TypeCode != nil {
+	if o != nil && !IsNil(o.TypeCode) {
 		return true
 	}
 
@@ -77,7 +80,7 @@ func (o *FundsType) SetTypeCode(v string) {
 
 // GetDate returns the Date field value if set, zero value otherwise.
 func (o *FundsType) GetDate() string {
-	if o == nil || o.Date == nil {
+	if o == nil || IsNil(o.Date) {
 		var ret string
 		return ret
 	}
@@ -87,7 +90,7 @@ func (o *FundsType) GetDate() string {
 // GetDateOk returns a tuple with the Date field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetDateOk() (*string, bool) {
-	if o == nil || o.Date == nil {
+	if o == nil || IsNil(o.Date) {
 		return nil, false
 	}
 	return o.Date, true
@@ -95,7 +98,7 @@ func (o *FundsType) GetDateOk() (*string, bool) {
 
 // HasDate returns a boolean if a field has been set.
 func (o *FundsType) HasDate() bool {
-	if o != nil && o.Date != nil {
+	if o != nil && !IsNil(o.Date) {
 		return true
 	}
 
@@ -109,7 +112,7 @@ func (o *FundsType) SetDate(v string) {
 
 // GetTime returns the Time field value if set, zero value otherwise.
 func (o *FundsType) GetTime() string {
-	if o == nil || o.Time == nil {
+	if o == nil || IsNil(o.Time) {
 		var ret string
 		return ret
 	}
@@ -119,7 +122,7 @@ func (o *FundsType) GetTime() string {
 // GetTimeOk returns a tuple with the Time field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetTimeOk() (*string, bool) {
-	if o == nil || o.Time == nil {
+	if o == nil || IsNil(o.Time) {
 		return nil, false
 	}
 	return o.Time, true
@@ -127,7 +130,7 @@ func (o *FundsType) GetTimeOk() (*string, bool) {
 
 // HasTime returns a boolean if a field has been set.
 func (o *FundsType) HasTime() bool {
-	if o != nil && o.Time != nil {
+	if o != nil && !IsNil(o.Time) {
 		return true
 	}
 
@@ -141,7 +144,7 @@ func (o *FundsType) SetTime(v string) {
 
 // GetImmediateAmount returns the ImmediateAmount field value if set, zero value otherwise.
 func (o *FundsType) GetImmediateAmount() string {
-	if o == nil || o.ImmediateAmount == nil {
+	if o == nil || IsNil(o.ImmediateAmount) {
 		var ret string
 		return ret
 	}
@@ -151,7 +154,7 @@ func (o *FundsType) GetImmediateAmount() string {
 // GetImmediateAmountOk returns a tuple with the ImmediateAmount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetImmediateAmountOk() (*string, bool) {
-	if o == nil || o.ImmediateAmount == nil {
+	if o == nil || IsNil(o.ImmediateAmount) {
 		return nil, false
 	}
 	return o.ImmediateAmount, true
@@ -159,7 +162,7 @@ func (o *FundsType) GetImmediateAmountOk() (*string, bool) {
 
 // HasImmediateAmount returns a boolean if a field has been set.
 func (o *FundsType) HasImmediateAmount() bool {
-	if o != nil && o.ImmediateAmount != nil {
+	if o != nil && !IsNil(o.ImmediateAmount) {
 		return true
 	}
 
@@ -173,7 +176,7 @@ func (o *FundsType) SetImmediateAmount(v string) {
 
 // GetOneDayAmount returns the OneDayAmount field value if set, zero value otherwise.
 func (o *FundsType) GetOneDayAmount() string {
-	if o == nil || o.OneDayAmount == nil {
+	if o == nil || IsNil(o.OneDayAmount) {
 		var ret string
 		return ret
 	}
@@ -183,7 +186,7 @@ func (o *FundsType) GetOneDayAmount() string {
 // GetOneDayAmountOk returns a tuple with the OneDayAmount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetOneDayAmountOk() (*string, bool) {
-	if o == nil || o.OneDayAmount == nil {
+	if o == nil || IsNil(o.OneDayAmount) {
 		return nil, false
 	}
 	return o.OneDayAmount, true
@@ -191,7 +194,7 @@ func (o *FundsType) GetOneDayAmountOk() (*string, bool) {
 
 // HasOneDayAmount returns a boolean if a field has been set.
 func (o *FundsType) HasOneDayAmount() bool {
-	if o != nil && o.OneDayAmount != nil {
+	if o != nil && !IsNil(o.OneDayAmount) {
 		return true
 	}
 
@@ -205,7 +208,7 @@ func (o *FundsType) SetOneDayAmount(v string) {
 
 // GetTwoDayAmount returns the TwoDayAmount field value if set, zero value otherwise.
 func (o *FundsType) GetTwoDayAmount() string {
-	if o == nil || o.TwoDayAmount == nil {
+	if o == nil || IsNil(o.TwoDayAmount) {
 		var ret string
 		return ret
 	}
@@ -215,7 +218,7 @@ func (o *FundsType) GetTwoDayAmount() string {
 // GetTwoDayAmountOk returns a tuple with the TwoDayAmount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetTwoDayAmountOk() (*string, bool) {
-	if o == nil || o.TwoDayAmount == nil {
+	if o == nil || IsNil(o.TwoDayAmount) {
 		return nil, false
 	}
 	return o.TwoDayAmount, true
@@ -223,7 +226,7 @@ func (o *FundsType) GetTwoDayAmountOk() (*string, bool) {
 
 // HasTwoDayAmount returns a boolean if a field has been set.
 func (o *FundsType) HasTwoDayAmount() bool {
-	if o != nil && o.TwoDayAmount != nil {
+	if o != nil && !IsNil(o.TwoDayAmount) {
 		return true
 	}
 
@@ -237,7 +240,7 @@ func (o *FundsType) SetTwoDayAmount(v string) {
 
 // GetDistributionNumber returns the DistributionNumber field value if set, zero value otherwise.
 func (o *FundsType) GetDistributionNumber() int32 {
-	if o == nil || o.DistributionNumber == nil {
+	if o == nil || IsNil(o.DistributionNumber) {
 		var ret int32
 		return ret
 	}
@@ -247,7 +250,7 @@ func (o *FundsType) GetDistributionNumber() int32 {
 // GetDistributionNumberOk returns a tuple with the DistributionNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetDistributionNumberOk() (*int32, bool) {
-	if o == nil || o.DistributionNumber == nil {
+	if o == nil || IsNil(o.DistributionNumber) {
 		return nil, false
 	}
 	return o.DistributionNumber, true
@@ -255,7 +258,7 @@ func (o *FundsType) GetDistributionNumberOk() (*int32, bool) {
 
 // HasDistributionNumber returns a boolean if a field has been set.
 func (o *FundsType) HasDistributionNumber() bool {
-	if o != nil && o.DistributionNumber != nil {
+	if o != nil && !IsNil(o.DistributionNumber) {
 		return true
 	}
 
@@ -269,7 +272,7 @@ func (o *FundsType) SetDistributionNumber(v int32) {
 
 // GetDistributions returns the Distributions field value if set, zero value otherwise.
 func (o *FundsType) GetDistributions() []Distribution {
-	if o == nil || o.Distributions == nil {
+	if o == nil || IsNil(o.Distributions) {
 		var ret []Distribution
 		return ret
 	}
@@ -279,7 +282,7 @@ func (o *FundsType) GetDistributions() []Distribution {
 // GetDistributionsOk returns a tuple with the Distributions field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *FundsType) GetDistributionsOk() ([]Distribution, bool) {
-	if o == nil || o.Distributions == nil {
+	if o == nil || IsNil(o.Distributions) {
 		return nil, false
 	}
 	return o.Distributions, true
@@ -287,7 +290,7 @@ func (o *FundsType) GetDistributionsOk() ([]Distribution, bool) {
 
 // HasDistributions returns a boolean if a field has been set.
 func (o *FundsType) HasDistributions() bool {
-	if o != nil && o.Distributions != nil {
+	if o != nil && !IsNil(o.Distributions) {
 		return true
 	}
 
@@ -300,32 +303,40 @@ func (o *FundsType) SetDistributions(v []Distribution) {
 }
 
 func (o FundsType) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TypeCode != nil {
-		toSerialize["type_code"] = o.TypeCode
-	}
-	if o.Date != nil {
-		toSerialize["date"] = o.Date
-	}
-	if o.Time != nil {
-		toSerialize["time"] = o.Time
-	}
-	if o.ImmediateAmount != nil {
-		toSerialize["immediate_amount"] = o.ImmediateAmount
-	}
-	if o.OneDayAmount != nil {
-		toSerialize["one_day_amount"] = o.OneDayAmount
-	}
-	if o.TwoDayAmount != nil {
-		toSerialize["two_day_amount"] = o.TwoDayAmount
-	}
-	if o.DistributionNumber != nil {
-		toSerialize["distribution_number"] = o.DistributionNumber
-	}
-	if o.Distributions != nil {
-		toSerialize["distributions"] = o.Distributions
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o FundsType) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.TypeCode) {
+		toSerialize["type_code"] = o.TypeCode
+	}
+	if !IsNil(o.Date) {
+		toSerialize["date"] = o.Date
+	}
+	if !IsNil(o.Time) {
+		toSerialize["time"] = o.Time
+	}
+	if !IsNil(o.ImmediateAmount) {
+		toSerialize["immediate_amount"] = o.ImmediateAmount
+	}
+	if !IsNil(o.OneDayAmount) {
+		toSerialize["one_day_amount"] = o.OneDayAmount
+	}
+	if !IsNil(o.TwoDayAmount) {
+		toSerialize["two_day_amount"] = o.TwoDayAmount
+	}
+	if !IsNil(o.DistributionNumber) {
+		toSerialize["distribution_number"] = o.DistributionNumber
+	}
+	if !IsNil(o.Distributions) {
+		toSerialize["distributions"] = o.Distributions
+	}
+	return toSerialize, nil
 }
 
 type NullableFundsType struct {

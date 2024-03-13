@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Group type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Group{}
+
 // Group struct for Group
 type Group struct {
 	Receiver          *string   `json:"receiver,omitempty"`
@@ -46,7 +49,7 @@ func NewGroupWithDefaults() *Group {
 
 // GetReceiver returns the Receiver field value if set, zero value otherwise.
 func (o *Group) GetReceiver() string {
-	if o == nil || o.Receiver == nil {
+	if o == nil || IsNil(o.Receiver) {
 		var ret string
 		return ret
 	}
@@ -56,7 +59,7 @@ func (o *Group) GetReceiver() string {
 // GetReceiverOk returns a tuple with the Receiver field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetReceiverOk() (*string, bool) {
-	if o == nil || o.Receiver == nil {
+	if o == nil || IsNil(o.Receiver) {
 		return nil, false
 	}
 	return o.Receiver, true
@@ -64,7 +67,7 @@ func (o *Group) GetReceiverOk() (*string, bool) {
 
 // HasReceiver returns a boolean if a field has been set.
 func (o *Group) HasReceiver() bool {
-	if o != nil && o.Receiver != nil {
+	if o != nil && !IsNil(o.Receiver) {
 		return true
 	}
 
@@ -78,7 +81,7 @@ func (o *Group) SetReceiver(v string) {
 
 // GetOriginator returns the Originator field value if set, zero value otherwise.
 func (o *Group) GetOriginator() string {
-	if o == nil || o.Originator == nil {
+	if o == nil || IsNil(o.Originator) {
 		var ret string
 		return ret
 	}
@@ -88,7 +91,7 @@ func (o *Group) GetOriginator() string {
 // GetOriginatorOk returns a tuple with the Originator field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetOriginatorOk() (*string, bool) {
-	if o == nil || o.Originator == nil {
+	if o == nil || IsNil(o.Originator) {
 		return nil, false
 	}
 	return o.Originator, true
@@ -96,7 +99,7 @@ func (o *Group) GetOriginatorOk() (*string, bool) {
 
 // HasOriginator returns a boolean if a field has been set.
 func (o *Group) HasOriginator() bool {
-	if o != nil && o.Originator != nil {
+	if o != nil && !IsNil(o.Originator) {
 		return true
 	}
 
@@ -110,7 +113,7 @@ func (o *Group) SetOriginator(v string) {
 
 // GetGroupStatus returns the GroupStatus field value if set, zero value otherwise.
 func (o *Group) GetGroupStatus() int32 {
-	if o == nil || o.GroupStatus == nil {
+	if o == nil || IsNil(o.GroupStatus) {
 		var ret int32
 		return ret
 	}
@@ -120,7 +123,7 @@ func (o *Group) GetGroupStatus() int32 {
 // GetGroupStatusOk returns a tuple with the GroupStatus field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetGroupStatusOk() (*int32, bool) {
-	if o == nil || o.GroupStatus == nil {
+	if o == nil || IsNil(o.GroupStatus) {
 		return nil, false
 	}
 	return o.GroupStatus, true
@@ -128,7 +131,7 @@ func (o *Group) GetGroupStatusOk() (*int32, bool) {
 
 // HasGroupStatus returns a boolean if a field has been set.
 func (o *Group) HasGroupStatus() bool {
-	if o != nil && o.GroupStatus != nil {
+	if o != nil && !IsNil(o.GroupStatus) {
 		return true
 	}
 
@@ -142,7 +145,7 @@ func (o *Group) SetGroupStatus(v int32) {
 
 // GetAsOfDate returns the AsOfDate field value if set, zero value otherwise.
 func (o *Group) GetAsOfDate() string {
-	if o == nil || o.AsOfDate == nil {
+	if o == nil || IsNil(o.AsOfDate) {
 		var ret string
 		return ret
 	}
@@ -152,7 +155,7 @@ func (o *Group) GetAsOfDate() string {
 // GetAsOfDateOk returns a tuple with the AsOfDate field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetAsOfDateOk() (*string, bool) {
-	if o == nil || o.AsOfDate == nil {
+	if o == nil || IsNil(o.AsOfDate) {
 		return nil, false
 	}
 	return o.AsOfDate, true
@@ -160,7 +163,7 @@ func (o *Group) GetAsOfDateOk() (*string, bool) {
 
 // HasAsOfDate returns a boolean if a field has been set.
 func (o *Group) HasAsOfDate() bool {
-	if o != nil && o.AsOfDate != nil {
+	if o != nil && !IsNil(o.AsOfDate) {
 		return true
 	}
 
@@ -174,7 +177,7 @@ func (o *Group) SetAsOfDate(v string) {
 
 // GetCurrencyCode returns the CurrencyCode field value if set, zero value otherwise.
 func (o *Group) GetCurrencyCode() string {
-	if o == nil || o.CurrencyCode == nil {
+	if o == nil || IsNil(o.CurrencyCode) {
 		var ret string
 		return ret
 	}
@@ -184,7 +187,7 @@ func (o *Group) GetCurrencyCode() string {
 // GetCurrencyCodeOk returns a tuple with the CurrencyCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetCurrencyCodeOk() (*string, bool) {
-	if o == nil || o.CurrencyCode == nil {
+	if o == nil || IsNil(o.CurrencyCode) {
 		return nil, false
 	}
 	return o.CurrencyCode, true
@@ -192,7 +195,7 @@ func (o *Group) GetCurrencyCodeOk() (*string, bool) {
 
 // HasCurrencyCode returns a boolean if a field has been set.
 func (o *Group) HasCurrencyCode() bool {
-	if o != nil && o.CurrencyCode != nil {
+	if o != nil && !IsNil(o.CurrencyCode) {
 		return true
 	}
 
@@ -206,7 +209,7 @@ func (o *Group) SetCurrencyCode(v string) {
 
 // GetGroupControlTotal returns the GroupControlTotal field value if set, zero value otherwise.
 func (o *Group) GetGroupControlTotal() string {
-	if o == nil || o.GroupControlTotal == nil {
+	if o == nil || IsNil(o.GroupControlTotal) {
 		var ret string
 		return ret
 	}
@@ -216,7 +219,7 @@ func (o *Group) GetGroupControlTotal() string {
 // GetGroupControlTotalOk returns a tuple with the GroupControlTotal field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetGroupControlTotalOk() (*string, bool) {
-	if o == nil || o.GroupControlTotal == nil {
+	if o == nil || IsNil(o.GroupControlTotal) {
 		return nil, false
 	}
 	return o.GroupControlTotal, true
@@ -224,7 +227,7 @@ func (o *Group) GetGroupControlTotalOk() (*string, bool) {
 
 // HasGroupControlTotal returns a boolean if a field has been set.
 func (o *Group) HasGroupControlTotal() bool {
-	if o != nil && o.GroupControlTotal != nil {
+	if o != nil && !IsNil(o.GroupControlTotal) {
 		return true
 	}
 
@@ -238,7 +241,7 @@ func (o *Group) SetGroupControlTotal(v string) {
 
 // GetNumberOfAccounts returns the NumberOfAccounts field value if set, zero value otherwise.
 func (o *Group) GetNumberOfAccounts() int32 {
-	if o == nil || o.NumberOfAccounts == nil {
+	if o == nil || IsNil(o.NumberOfAccounts) {
 		var ret int32
 		return ret
 	}
@@ -248,7 +251,7 @@ func (o *Group) GetNumberOfAccounts() int32 {
 // GetNumberOfAccountsOk returns a tuple with the NumberOfAccounts field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetNumberOfAccountsOk() (*int32, bool) {
-	if o == nil || o.NumberOfAccounts == nil {
+	if o == nil || IsNil(o.NumberOfAccounts) {
 		return nil, false
 	}
 	return o.NumberOfAccounts, true
@@ -256,7 +259,7 @@ func (o *Group) GetNumberOfAccountsOk() (*int32, bool) {
 
 // HasNumberOfAccounts returns a boolean if a field has been set.
 func (o *Group) HasNumberOfAccounts() bool {
-	if o != nil && o.NumberOfAccounts != nil {
+	if o != nil && !IsNil(o.NumberOfAccounts) {
 		return true
 	}
 
@@ -270,7 +273,7 @@ func (o *Group) SetNumberOfAccounts(v int32) {
 
 // GetNumberOfRecords returns the NumberOfRecords field value if set, zero value otherwise.
 func (o *Group) GetNumberOfRecords() int32 {
-	if o == nil || o.NumberOfRecords == nil {
+	if o == nil || IsNil(o.NumberOfRecords) {
 		var ret int32
 		return ret
 	}
@@ -280,7 +283,7 @@ func (o *Group) GetNumberOfRecords() int32 {
 // GetNumberOfRecordsOk returns a tuple with the NumberOfRecords field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetNumberOfRecordsOk() (*int32, bool) {
-	if o == nil || o.NumberOfRecords == nil {
+	if o == nil || IsNil(o.NumberOfRecords) {
 		return nil, false
 	}
 	return o.NumberOfRecords, true
@@ -288,7 +291,7 @@ func (o *Group) GetNumberOfRecordsOk() (*int32, bool) {
 
 // HasNumberOfRecords returns a boolean if a field has been set.
 func (o *Group) HasNumberOfRecords() bool {
-	if o != nil && o.NumberOfRecords != nil {
+	if o != nil && !IsNil(o.NumberOfRecords) {
 		return true
 	}
 
@@ -302,7 +305,7 @@ func (o *Group) SetNumberOfRecords(v int32) {
 
 // GetAccounts returns the Accounts field value if set, zero value otherwise.
 func (o *Group) GetAccounts() []Account {
-	if o == nil || o.Accounts == nil {
+	if o == nil || IsNil(o.Accounts) {
 		var ret []Account
 		return ret
 	}
@@ -312,7 +315,7 @@ func (o *Group) GetAccounts() []Account {
 // GetAccountsOk returns a tuple with the Accounts field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Group) GetAccountsOk() ([]Account, bool) {
-	if o == nil || o.Accounts == nil {
+	if o == nil || IsNil(o.Accounts) {
 		return nil, false
 	}
 	return o.Accounts, true
@@ -320,7 +323,7 @@ func (o *Group) GetAccountsOk() ([]Account, bool) {
 
 // HasAccounts returns a boolean if a field has been set.
 func (o *Group) HasAccounts() bool {
-	if o != nil && o.Accounts != nil {
+	if o != nil && !IsNil(o.Accounts) {
 		return true
 	}
 
@@ -333,35 +336,43 @@ func (o *Group) SetAccounts(v []Account) {
 }
 
 func (o Group) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.Receiver != nil {
-		toSerialize["receiver"] = o.Receiver
-	}
-	if o.Originator != nil {
-		toSerialize["originator"] = o.Originator
-	}
-	if o.GroupStatus != nil {
-		toSerialize["groupStatus"] = o.GroupStatus
-	}
-	if o.AsOfDate != nil {
-		toSerialize["asOfDate"] = o.AsOfDate
-	}
-	if o.CurrencyCode != nil {
-		toSerialize["currencyCode"] = o.CurrencyCode
-	}
-	if o.GroupControlTotal != nil {
-		toSerialize["groupControlTotal"] = o.GroupControlTotal
-	}
-	if o.NumberOfAccounts != nil {
-		toSerialize["numberOfAccounts"] = o.NumberOfAccounts
-	}
-	if o.NumberOfRecords != nil {
-		toSerialize["numberOfRecords"] = o.NumberOfRecords
-	}
-	if o.Accounts != nil {
-		toSerialize["Accounts"] = o.Accounts
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Group) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.Receiver) {
+		toSerialize["receiver"] = o.Receiver
+	}
+	if !IsNil(o.Originator) {
+		toSerialize["originator"] = o.Originator
+	}
+	if !IsNil(o.GroupStatus) {
+		toSerialize["groupStatus"] = o.GroupStatus
+	}
+	if !IsNil(o.AsOfDate) {
+		toSerialize["asOfDate"] = o.AsOfDate
+	}
+	if !IsNil(o.CurrencyCode) {
+		toSerialize["currencyCode"] = o.CurrencyCode
+	}
+	if !IsNil(o.GroupControlTotal) {
+		toSerialize["groupControlTotal"] = o.GroupControlTotal
+	}
+	if !IsNil(o.NumberOfAccounts) {
+		toSerialize["numberOfAccounts"] = o.NumberOfAccounts
+	}
+	if !IsNil(o.NumberOfRecords) {
+		toSerialize["numberOfRecords"] = o.NumberOfRecords
+	}
+	if !IsNil(o.Accounts) {
+		toSerialize["Accounts"] = o.Accounts
+	}
+	return toSerialize, nil
 }
 
 type NullableGroup struct {

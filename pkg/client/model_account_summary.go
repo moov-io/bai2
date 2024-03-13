@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the AccountSummary type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &AccountSummary{}
+
 // AccountSummary struct for AccountSummary
 type AccountSummary struct {
 	TypeCode  *string    `json:"TypeCode,omitempty"`
@@ -41,7 +44,7 @@ func NewAccountSummaryWithDefaults() *AccountSummary {
 
 // GetTypeCode returns the TypeCode field value if set, zero value otherwise.
 func (o *AccountSummary) GetTypeCode() string {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		var ret string
 		return ret
 	}
@@ -51,7 +54,7 @@ func (o *AccountSummary) GetTypeCode() string {
 // GetTypeCodeOk returns a tuple with the TypeCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AccountSummary) GetTypeCodeOk() (*string, bool) {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		return nil, false
 	}
 	return o.TypeCode, true
@@ -59,7 +62,7 @@ func (o *AccountSummary) GetTypeCodeOk() (*string, bool) {
 
 // HasTypeCode returns a boolean if a field has been set.
 func (o *AccountSummary) HasTypeCode() bool {
-	if o != nil && o.TypeCode != nil {
+	if o != nil && !IsNil(o.TypeCode) {
 		return true
 	}
 
@@ -73,7 +76,7 @@ func (o *AccountSummary) SetTypeCode(v string) {
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
 func (o *AccountSummary) GetAmount() string {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		var ret string
 		return ret
 	}
@@ -83,7 +86,7 @@ func (o *AccountSummary) GetAmount() string {
 // GetAmountOk returns a tuple with the Amount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AccountSummary) GetAmountOk() (*string, bool) {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		return nil, false
 	}
 	return o.Amount, true
@@ -91,7 +94,7 @@ func (o *AccountSummary) GetAmountOk() (*string, bool) {
 
 // HasAmount returns a boolean if a field has been set.
 func (o *AccountSummary) HasAmount() bool {
-	if o != nil && o.Amount != nil {
+	if o != nil && !IsNil(o.Amount) {
 		return true
 	}
 
@@ -105,7 +108,7 @@ func (o *AccountSummary) SetAmount(v string) {
 
 // GetItemCount returns the ItemCount field value if set, zero value otherwise.
 func (o *AccountSummary) GetItemCount() int32 {
-	if o == nil || o.ItemCount == nil {
+	if o == nil || IsNil(o.ItemCount) {
 		var ret int32
 		return ret
 	}
@@ -115,7 +118,7 @@ func (o *AccountSummary) GetItemCount() int32 {
 // GetItemCountOk returns a tuple with the ItemCount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AccountSummary) GetItemCountOk() (*int32, bool) {
-	if o == nil || o.ItemCount == nil {
+	if o == nil || IsNil(o.ItemCount) {
 		return nil, false
 	}
 	return o.ItemCount, true
@@ -123,7 +126,7 @@ func (o *AccountSummary) GetItemCountOk() (*int32, bool) {
 
 // HasItemCount returns a boolean if a field has been set.
 func (o *AccountSummary) HasItemCount() bool {
-	if o != nil && o.ItemCount != nil {
+	if o != nil && !IsNil(o.ItemCount) {
 		return true
 	}
 
@@ -137,7 +140,7 @@ func (o *AccountSummary) SetItemCount(v int32) {
 
 // GetFundsType returns the FundsType field value if set, zero value otherwise.
 func (o *AccountSummary) GetFundsType() FundsType {
-	if o == nil || o.FundsType == nil {
+	if o == nil || IsNil(o.FundsType) {
 		var ret FundsType
 		return ret
 	}
@@ -147,7 +150,7 @@ func (o *AccountSummary) GetFundsType() FundsType {
 // GetFundsTypeOk returns a tuple with the FundsType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *AccountSummary) GetFundsTypeOk() (*FundsType, bool) {
-	if o == nil || o.FundsType == nil {
+	if o == nil || IsNil(o.FundsType) {
 		return nil, false
 	}
 	return o.FundsType, true
@@ -155,7 +158,7 @@ func (o *AccountSummary) GetFundsTypeOk() (*FundsType, bool) {
 
 // HasFundsType returns a boolean if a field has been set.
 func (o *AccountSummary) HasFundsType() bool {
-	if o != nil && o.FundsType != nil {
+	if o != nil && !IsNil(o.FundsType) {
 		return true
 	}
 
@@ -168,20 +171,28 @@ func (o *AccountSummary) SetFundsType(v FundsType) {
 }
 
 func (o AccountSummary) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TypeCode != nil {
-		toSerialize["TypeCode"] = o.TypeCode
-	}
-	if o.Amount != nil {
-		toSerialize["Amount"] = o.Amount
-	}
-	if o.ItemCount != nil {
-		toSerialize["ItemCount"] = o.ItemCount
-	}
-	if o.FundsType != nil {
-		toSerialize["FundsType"] = o.FundsType
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o AccountSummary) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.TypeCode) {
+		toSerialize["TypeCode"] = o.TypeCode
+	}
+	if !IsNil(o.Amount) {
+		toSerialize["Amount"] = o.Amount
+	}
+	if !IsNil(o.ItemCount) {
+		toSerialize["ItemCount"] = o.ItemCount
+	}
+	if !IsNil(o.FundsType) {
+		toSerialize["FundsType"] = o.FundsType
+	}
+	return toSerialize, nil
 }
 
 type NullableAccountSummary struct {

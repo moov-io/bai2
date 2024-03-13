@@ -14,6 +14,9 @@ import (
 	"encoding/json"
 )
 
+// checks if the Detail type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Detail{}
+
 // Detail struct for Detail
 type Detail struct {
 	TypeCode                *string    `json:"TypeCode,omitempty"`
@@ -43,7 +46,7 @@ func NewDetailWithDefaults() *Detail {
 
 // GetTypeCode returns the TypeCode field value if set, zero value otherwise.
 func (o *Detail) GetTypeCode() string {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		var ret string
 		return ret
 	}
@@ -53,7 +56,7 @@ func (o *Detail) GetTypeCode() string {
 // GetTypeCodeOk returns a tuple with the TypeCode field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetTypeCodeOk() (*string, bool) {
-	if o == nil || o.TypeCode == nil {
+	if o == nil || IsNil(o.TypeCode) {
 		return nil, false
 	}
 	return o.TypeCode, true
@@ -61,7 +64,7 @@ func (o *Detail) GetTypeCodeOk() (*string, bool) {
 
 // HasTypeCode returns a boolean if a field has been set.
 func (o *Detail) HasTypeCode() bool {
-	if o != nil && o.TypeCode != nil {
+	if o != nil && !IsNil(o.TypeCode) {
 		return true
 	}
 
@@ -75,7 +78,7 @@ func (o *Detail) SetTypeCode(v string) {
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
 func (o *Detail) GetAmount() string {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		var ret string
 		return ret
 	}
@@ -85,7 +88,7 @@ func (o *Detail) GetAmount() string {
 // GetAmountOk returns a tuple with the Amount field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetAmountOk() (*string, bool) {
-	if o == nil || o.Amount == nil {
+	if o == nil || IsNil(o.Amount) {
 		return nil, false
 	}
 	return o.Amount, true
@@ -93,7 +96,7 @@ func (o *Detail) GetAmountOk() (*string, bool) {
 
 // HasAmount returns a boolean if a field has been set.
 func (o *Detail) HasAmount() bool {
-	if o != nil && o.Amount != nil {
+	if o != nil && !IsNil(o.Amount) {
 		return true
 	}
 
@@ -107,7 +110,7 @@ func (o *Detail) SetAmount(v string) {
 
 // GetFundsType returns the FundsType field value if set, zero value otherwise.
 func (o *Detail) GetFundsType() FundsType {
-	if o == nil || o.FundsType == nil {
+	if o == nil || IsNil(o.FundsType) {
 		var ret FundsType
 		return ret
 	}
@@ -117,7 +120,7 @@ func (o *Detail) GetFundsType() FundsType {
 // GetFundsTypeOk returns a tuple with the FundsType field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetFundsTypeOk() (*FundsType, bool) {
-	if o == nil || o.FundsType == nil {
+	if o == nil || IsNil(o.FundsType) {
 		return nil, false
 	}
 	return o.FundsType, true
@@ -125,7 +128,7 @@ func (o *Detail) GetFundsTypeOk() (*FundsType, bool) {
 
 // HasFundsType returns a boolean if a field has been set.
 func (o *Detail) HasFundsType() bool {
-	if o != nil && o.FundsType != nil {
+	if o != nil && !IsNil(o.FundsType) {
 		return true
 	}
 
@@ -139,7 +142,7 @@ func (o *Detail) SetFundsType(v FundsType) {
 
 // GetBankReferenceNumber returns the BankReferenceNumber field value if set, zero value otherwise.
 func (o *Detail) GetBankReferenceNumber() string {
-	if o == nil || o.BankReferenceNumber == nil {
+	if o == nil || IsNil(o.BankReferenceNumber) {
 		var ret string
 		return ret
 	}
@@ -149,7 +152,7 @@ func (o *Detail) GetBankReferenceNumber() string {
 // GetBankReferenceNumberOk returns a tuple with the BankReferenceNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetBankReferenceNumberOk() (*string, bool) {
-	if o == nil || o.BankReferenceNumber == nil {
+	if o == nil || IsNil(o.BankReferenceNumber) {
 		return nil, false
 	}
 	return o.BankReferenceNumber, true
@@ -157,7 +160,7 @@ func (o *Detail) GetBankReferenceNumberOk() (*string, bool) {
 
 // HasBankReferenceNumber returns a boolean if a field has been set.
 func (o *Detail) HasBankReferenceNumber() bool {
-	if o != nil && o.BankReferenceNumber != nil {
+	if o != nil && !IsNil(o.BankReferenceNumber) {
 		return true
 	}
 
@@ -171,7 +174,7 @@ func (o *Detail) SetBankReferenceNumber(v string) {
 
 // GetCustomerReferenceNumber returns the CustomerReferenceNumber field value if set, zero value otherwise.
 func (o *Detail) GetCustomerReferenceNumber() string {
-	if o == nil || o.CustomerReferenceNumber == nil {
+	if o == nil || IsNil(o.CustomerReferenceNumber) {
 		var ret string
 		return ret
 	}
@@ -181,7 +184,7 @@ func (o *Detail) GetCustomerReferenceNumber() string {
 // GetCustomerReferenceNumberOk returns a tuple with the CustomerReferenceNumber field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetCustomerReferenceNumberOk() (*string, bool) {
-	if o == nil || o.CustomerReferenceNumber == nil {
+	if o == nil || IsNil(o.CustomerReferenceNumber) {
 		return nil, false
 	}
 	return o.CustomerReferenceNumber, true
@@ -189,7 +192,7 @@ func (o *Detail) GetCustomerReferenceNumberOk() (*string, bool) {
 
 // HasCustomerReferenceNumber returns a boolean if a field has been set.
 func (o *Detail) HasCustomerReferenceNumber() bool {
-	if o != nil && o.CustomerReferenceNumber != nil {
+	if o != nil && !IsNil(o.CustomerReferenceNumber) {
 		return true
 	}
 
@@ -203,7 +206,7 @@ func (o *Detail) SetCustomerReferenceNumber(v string) {
 
 // GetText returns the Text field value if set, zero value otherwise.
 func (o *Detail) GetText() string {
-	if o == nil || o.Text == nil {
+	if o == nil || IsNil(o.Text) {
 		var ret string
 		return ret
 	}
@@ -213,7 +216,7 @@ func (o *Detail) GetText() string {
 // GetTextOk returns a tuple with the Text field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Detail) GetTextOk() (*string, bool) {
-	if o == nil || o.Text == nil {
+	if o == nil || IsNil(o.Text) {
 		return nil, false
 	}
 	return o.Text, true
@@ -221,7 +224,7 @@ func (o *Detail) GetTextOk() (*string, bool) {
 
 // HasText returns a boolean if a field has been set.
 func (o *Detail) HasText() bool {
-	if o != nil && o.Text != nil {
+	if o != nil && !IsNil(o.Text) {
 		return true
 	}
 
@@ -234,26 +237,34 @@ func (o *Detail) SetText(v string) {
 }
 
 func (o Detail) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if o.TypeCode != nil {
-		toSerialize["TypeCode"] = o.TypeCode
-	}
-	if o.Amount != nil {
-		toSerialize["Amount"] = o.Amount
-	}
-	if o.FundsType != nil {
-		toSerialize["FundsType"] = o.FundsType
-	}
-	if o.BankReferenceNumber != nil {
-		toSerialize["BankReferenceNumber"] = o.BankReferenceNumber
-	}
-	if o.CustomerReferenceNumber != nil {
-		toSerialize["CustomerReferenceNumber"] = o.CustomerReferenceNumber
-	}
-	if o.Text != nil {
-		toSerialize["Text"] = o.Text
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o Detail) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.TypeCode) {
+		toSerialize["TypeCode"] = o.TypeCode
+	}
+	if !IsNil(o.Amount) {
+		toSerialize["Amount"] = o.Amount
+	}
+	if !IsNil(o.FundsType) {
+		toSerialize["FundsType"] = o.FundsType
+	}
+	if !IsNil(o.BankReferenceNumber) {
+		toSerialize["BankReferenceNumber"] = o.BankReferenceNumber
+	}
+	if !IsNil(o.CustomerReferenceNumber) {
+		toSerialize["CustomerReferenceNumber"] = o.CustomerReferenceNumber
+	}
+	if !IsNil(o.Text) {
+		toSerialize["Text"] = o.Text
+	}
+	return toSerialize, nil
 }
 
 type NullableDetail struct {
