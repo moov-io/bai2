@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	testFileName = "sample1.txt"
+	testFileName       = "sample1.txt"
 	parseErrorFileName = "sample-parseError.txt"
 )
 
