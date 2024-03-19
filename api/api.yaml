@@ -49,9 +49,6 @@ paths:
                   type: string
                   description: bai2 bin file
                   format: binary
-            encoding:
-              file:
-                contentType: text/plain
       responses:
         '200':
           description: successful operation
@@ -135,9 +132,6 @@ paths:
                   type: string
                   description: bai2 bin file
                   format: binary
-            encoding:
-              file:
-                contentType: text/plain
       responses:
         '200':
           description: successful operation
@@ -153,3 +147,187 @@ paths:
               schema:
                 type: string
                 example: invalid file format
+
+  /format:
+    post:
+      tags: ['Bai2 Files']
+      summary: Format bai2 file after parse bin file
+      description: format bai2 file.
+      operationId: format
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                input:
+                  type: string
+                  description: bai2 bin file
+                  format: binary
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '400':
+          description: request
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: invalid file format
+
+components:
+  schemas:
+    Account:
+      properties:
+        accountNumber:
+          type: string
+          example: "10200123456"
+        currencyCode:
+          type: string
+          example: "CAD"
+        summaries:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSummary'
+        accountControlTotal:
+          type: string
+          example: "+00000000000834000"
+        numberOfRecords:
+          type: integer
+          example: 14
+        Details:
+          type: array
+          items:
+            $ref: '#/components/schemas/Detail'
+    AccountSummary:
+      properties:
+        TypeCode:
+          type: string
+          example: "040"
+        Amount:
+          type: string
+          example: "+000000000000"
+        ItemCount:
+          type: integer
+          example: 0
+        FundsType:
+          $ref: '#/components/schemas/FundsType'
+    Detail:
+      properties:
+        TypeCode:
+          type: string
+          example: "409"
+        Amount:
+          type: string
+          example: "000000000002500"
+        FundsType:
+          $ref: '#/components/schemas/FundsType'
+        BankReferenceNumber:
+          type: string
+          example: ""
+        CustomerReferenceNumber:
+          type: string
+          example: ""
+        Text:
+          type: string
+          example: "TFR 1020 0345678    "
+    Distribution:
+      properties:
+        day:
+          type: integer
+        amount:
+          type: integer
+    File:
+      properties:
+        sender:
+          type: string
+          example: "0004"
+        receiver:
+          type: string
+          example: "12345"
+        fileCreatedDate:
+          type: string
+          example: "060321"
+        fileCreatedTime:
+          type: string
+          example: "0829"
+        fileIdNumber:
+          type: string
+          example: "001"
+        physicalRecordLength:
+          type: integer
+          example: 80
+        blockSize:
+          type: integer
+          example: 1
+        versionNumber:
+          type: integer
+          example: 2
+        fileControlTotal:
+          type: string
+          example: "+00000000001280000"
+        numberOfGroups:
+          type: integer
+          example: 1
+        numberOfRecords:
+          type: integer
+          example: 27
+        Groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+    FundsType:
+      properties:
+        type_code:
+          type: string
+          example: "V"
+        date:
+          type: string
+          example: "060316"
+        time:
+          type: string
+        immediate_amount:
+          type: string
+        one_day_amount:
+          type: string
+        two_day_amount:
+          type: string
+        distribution_number:
+          type: integer
+        distributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Distribution'
+    Group:
+      properties:
+        receiver:
+          type: string
+          example: "12345"
+        originator:
+          type: string
+          example: "0004"
+        groupStatus:
+          type: integer
+          example: 1
+        asOfDate:
+          type: string
+          example: "060317"
+        currencyCode:
+          type: string
+          example: "CAD"
+        groupControlTotal:
+          type: string
+          example: "+00000000001280000"
+        numberOfAccounts:
+          type: integer
+          example: 2
+        numberOfRecords:
+          type: integer
+          example: 25
+        Accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'

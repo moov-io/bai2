@@ -56,3 +56,10 @@ func TestParse(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 }
+
+func TestFormat(t *testing.T) {
+	_, err := executeCommand(rootCmd, "format", "--input", testFileName)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}

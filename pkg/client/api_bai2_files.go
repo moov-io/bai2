@@ -13,23 +13,150 @@ package client
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
 )
 
-// Linger please
-var (
-	_ context.Context
-)
+// Bai2FilesAPIService Bai2FilesAPI service
+type Bai2FilesAPIService service
 
-// Bai2FilesApiService Bai2FilesApi service
-type Bai2FilesApiService service
+type ApiFormatRequest struct {
+	ctx        context.Context
+	ApiService *Bai2FilesAPIService
+	input      *os.File
+}
+
+// bai2 bin file
+func (r ApiFormatRequest) Input(input *os.File) ApiFormatRequest {
+	r.input = input
+	return r
+}
+
+func (r ApiFormatRequest) Execute() (*File, *http.Response, error) {
+	return r.ApiService.FormatExecute(r)
+}
+
+/*
+Format Format bai2 file after parse bin file
+
+format bai2 file.
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiFormatRequest
+*/
+func (a *Bai2FilesAPIService) Format(ctx context.Context) ApiFormatRequest {
+	return ApiFormatRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return File
+func (a *Bai2FilesAPIService) FormatExecute(r ApiFormatRequest) (*File, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *File
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesAPIService.Format")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/format"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"multipart/form-data"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "text/plain"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	var inputLocalVarFormFileName string
+	var inputLocalVarFileName string
+	var inputLocalVarFileBytes []byte
+
+	inputLocalVarFormFileName = "input"
+	inputLocalVarFile := r.input
+
+	if inputLocalVarFile != nil {
+		fbs, _ := io.ReadAll(inputLocalVarFile)
+
+		inputLocalVarFileBytes = fbs
+		inputLocalVarFileName = inputLocalVarFile.Name()
+		inputLocalVarFile.Close()
+		formFiles = append(formFiles, formFile{fileBytes: inputLocalVarFileBytes, fileName: inputLocalVarFileName, formFileName: inputLocalVarFormFileName})
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v string
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
 
 type ApiHealthRequest struct {
 	ctx        context.Context
-	ApiService *Bai2FilesApiService
+	ApiService *Bai2FilesAPIService
 }
 
 func (r ApiHealthRequest) Execute() (string, *http.Response, error) {
@@ -41,10 +168,10 @@ Health health bai2 service
 
 Check the bai2 service to check if running
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiHealthRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiHealthRequest
 */
-func (a *Bai2FilesApiService) Health(ctx context.Context) ApiHealthRequest {
+func (a *Bai2FilesAPIService) Health(ctx context.Context) ApiHealthRequest {
 	return ApiHealthRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -52,8 +179,9 @@ func (a *Bai2FilesApiService) Health(ctx context.Context) ApiHealthRequest {
 }
 
 // Execute executes the request
-//  @return string
-func (a *Bai2FilesApiService) HealthExecute(r ApiHealthRequest) (string, *http.Response, error) {
+//
+//	@return string
+func (a *Bai2FilesAPIService) HealthExecute(r ApiHealthRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
@@ -61,7 +189,7 @@ func (a *Bai2FilesApiService) HealthExecute(r ApiHealthRequest) (string, *http.R
 		localVarReturnValue string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesApiService.Health")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesAPIService.Health")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -99,9 +227,9 @@ func (a *Bai2FilesApiService) HealthExecute(r ApiHealthRequest) (string, *http.R
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -128,13 +256,13 @@ func (a *Bai2FilesApiService) HealthExecute(r ApiHealthRequest) (string, *http.R
 
 type ApiParseRequest struct {
 	ctx        context.Context
-	ApiService *Bai2FilesApiService
-	input      **os.File
+	ApiService *Bai2FilesAPIService
+	input      *os.File
 }
 
 // bai2 bin file
 func (r ApiParseRequest) Input(input *os.File) ApiParseRequest {
-	r.input = &input
+	r.input = input
 	return r
 }
 
@@ -147,10 +275,10 @@ Parse Parse bai2 file after parse bin file
 
 parse bai2 file.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiParseRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiParseRequest
 */
-func (a *Bai2FilesApiService) Parse(ctx context.Context) ApiParseRequest {
+func (a *Bai2FilesAPIService) Parse(ctx context.Context) ApiParseRequest {
 	return ApiParseRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -158,8 +286,9 @@ func (a *Bai2FilesApiService) Parse(ctx context.Context) ApiParseRequest {
 }
 
 // Execute executes the request
-//  @return string
-func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Response, error) {
+//
+//	@return string
+func (a *Bai2FilesAPIService) ParseExecute(r ApiParseRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -167,7 +296,7 @@ func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Res
 		localVarReturnValue string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesApiService.Parse")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesAPIService.Parse")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -200,18 +329,16 @@ func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Res
 	var inputLocalVarFileBytes []byte
 
 	inputLocalVarFormFileName = "input"
+	inputLocalVarFile := r.input
 
-	var inputLocalVarFile *os.File
-	if r.input != nil {
-		inputLocalVarFile = *r.input
-	}
 	if inputLocalVarFile != nil {
-		fbs, _ := ioutil.ReadAll(inputLocalVarFile)
+		fbs, _ := io.ReadAll(inputLocalVarFile)
+
 		inputLocalVarFileBytes = fbs
 		inputLocalVarFileName = inputLocalVarFile.Name()
 		inputLocalVarFile.Close()
+		formFiles = append(formFiles, formFile{fileBytes: inputLocalVarFileBytes, fileName: inputLocalVarFileName, formFileName: inputLocalVarFormFileName})
 	}
-	formFiles = append(formFiles, formFile{fileBytes: inputLocalVarFileBytes, fileName: inputLocalVarFileName, formFileName: inputLocalVarFormFileName})
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -222,9 +349,9 @@ func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Res
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -241,6 +368,7 @@ func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
@@ -260,13 +388,13 @@ func (a *Bai2FilesApiService) ParseExecute(r ApiParseRequest) (string, *http.Res
 
 type ApiPrintRequest struct {
 	ctx        context.Context
-	ApiService *Bai2FilesApiService
-	input      **os.File
+	ApiService *Bai2FilesAPIService
+	input      *os.File
 }
 
 // bai2 bin file
 func (r ApiPrintRequest) Input(input *os.File) ApiPrintRequest {
-	r.input = &input
+	r.input = input
 	return r
 }
 
@@ -279,10 +407,10 @@ Print Print bai2 file after parse bin file
 
 Print bai2 file.
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiPrintRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiPrintRequest
 */
-func (a *Bai2FilesApiService) Print(ctx context.Context) ApiPrintRequest {
+func (a *Bai2FilesAPIService) Print(ctx context.Context) ApiPrintRequest {
 	return ApiPrintRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -290,8 +418,9 @@ func (a *Bai2FilesApiService) Print(ctx context.Context) ApiPrintRequest {
 }
 
 // Execute executes the request
-//  @return string
-func (a *Bai2FilesApiService) PrintExecute(r ApiPrintRequest) (string, *http.Response, error) {
+//
+//	@return string
+func (a *Bai2FilesAPIService) PrintExecute(r ApiPrintRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
@@ -299,7 +428,7 @@ func (a *Bai2FilesApiService) PrintExecute(r ApiPrintRequest) (string, *http.Res
 		localVarReturnValue string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesApiService.Print")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "Bai2FilesAPIService.Print")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -332,18 +461,16 @@ func (a *Bai2FilesApiService) PrintExecute(r ApiPrintRequest) (string, *http.Res
 	var inputLocalVarFileBytes []byte
 
 	inputLocalVarFormFileName = "input"
+	inputLocalVarFile := r.input
 
-	var inputLocalVarFile *os.File
-	if r.input != nil {
-		inputLocalVarFile = *r.input
-	}
 	if inputLocalVarFile != nil {
-		fbs, _ := ioutil.ReadAll(inputLocalVarFile)
+		fbs, _ := io.ReadAll(inputLocalVarFile)
+
 		inputLocalVarFileBytes = fbs
 		inputLocalVarFileName = inputLocalVarFile.Name()
 		inputLocalVarFile.Close()
+		formFiles = append(formFiles, formFile{fileBytes: inputLocalVarFileBytes, fileName: inputLocalVarFileName, formFileName: inputLocalVarFormFileName})
 	}
-	formFiles = append(formFiles, formFile{fileBytes: inputLocalVarFileBytes, fileName: inputLocalVarFileName, formFileName: inputLocalVarFormFileName})
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -354,9 +481,9 @@ func (a *Bai2FilesApiService) PrintExecute(r ApiPrintRequest) (string, *http.Res
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -373,6 +500,7 @@ func (a *Bai2FilesApiService) PrintExecute(r ApiPrintRequest) (string, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
