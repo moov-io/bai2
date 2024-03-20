@@ -90,6 +90,12 @@ func print(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = f.Validate()
+	if err != nil {
+		outputError(w, http.StatusNotImplemented, err)
+		return
+	}
+
 	outputBufferToWriter(w, f)
 }
 
@@ -98,6 +104,12 @@ func format(w http.ResponseWriter, r *http.Request) {
 	f, err := parseInputFromRequest(r)
 	if err != nil {
 		outputError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = f.Validate()
+	if err != nil {
+		outputError(w, http.StatusNotImplemented, err)
 		return
 	}
 

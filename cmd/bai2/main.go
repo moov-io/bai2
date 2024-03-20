@@ -92,6 +92,11 @@ var Print = &cobra.Command{
 			return err
 		}
 
+		err = f.Validate()
+		if err != nil {
+			return err
+		}
+
 		fmt.Println(f.String())
 		return nil
 	},
@@ -108,6 +113,11 @@ var Format = &cobra.Command{
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
 		f := lib.NewBai2()
 		err = f.Read(&scan)
+		if err != nil {
+			return err
+		}
+
+		err = f.Validate()
 		if err != nil {
 			return err
 		}

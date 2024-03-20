@@ -10,10 +10,13 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
-	testFileName = filepath.Join("..", "..", "test", "testdata", "sample1.txt")
+	testFileName       = filepath.Join("..", "..", "test", "testdata", "sample1.txt")
+	parseErrorFileName = filepath.Join("..", "..", "test", "testdata", "sample-parseError.txt")
 )
 
 func TestMain(m *testing.M) {
@@ -62,4 +65,19 @@ func TestFormat(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+}
+
+func TestPrint_ParseError(t *testing.T) {
+	_, err := executeCommand(rootCmd, "print", "--input", parseErrorFileName)
+	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
+}
+
+func TestParse_ParseError(t *testing.T) {
+	_, err := executeCommand(rootCmd, "parse", "--input", parseErrorFileName)
+	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
+}
+
+func TestFormat_ParseError(t *testing.T) {
+	_, err := executeCommand(rootCmd, "format", "--input", parseErrorFileName)
+	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
 }
