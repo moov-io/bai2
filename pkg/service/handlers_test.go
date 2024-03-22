@@ -176,7 +176,7 @@ func (suite *HandlersTest) TestPrint_Bai2FileWithNewlineDelimitedContinuations()
 	suite.testServer.ServeHTTP(recorder, request)
 	assert.Equal(suite.T(), http.StatusOK, recorder.Code)
 
-		expectedFileBody := `01,GSBI,cont001,210706,1249,1,,,2/
+	expectedFileBody := `01,GSBI,cont001,210706,1249,1,,,2/
 02,cont001,026015079,1,230906,2000,,/
 03,107049924,USD,,,,,060,13053325440,,,100,000,,,400,000,,/
 49,13053325440,2/
@@ -290,7 +290,7 @@ func (suite *HandlersTest) TestPrint_Bai2FileWithNewlineDelimitedContinuations()
 49,000,2/
 98,13060195162,4,16/
 99,13060195162,1,18/`
-		assert.Equal(suite.T(), recorder.Body.String(), expectedFileBody)
+	assert.Equal(suite.T(), recorder.Body.String(), expectedFileBody)
 }
 
 func (suite *HandlersTest) TestFormat_Bai2FileWithNewlineDelimitedContinuations() {

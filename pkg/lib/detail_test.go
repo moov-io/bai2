@@ -42,7 +42,7 @@ func TestDetail(t *testing.T) {
  * Outlines the behavior of a Detail record when the Detail and Continuations for the detail are terminated
  * by a newline character ("\n") rather than a slash ("/").
  */
- func TestDetail_ContinuationRecordWithNewlineDelimiter(t *testing.T) {
+func TestDetail_ContinuationRecordWithNewlineDelimiter(t *testing.T) {
 	data := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-
 88,CREF: 20210706MMQFMPU8000001
 88,EREF: 20210706MMQFMPU8000001

@@ -120,7 +120,7 @@ func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
  * Note: continuation parsing is implemented in `detail.go`, which is why this particular test doesn't parse
  * all of the continuation lines.
  */
- func TestTransactionDetailOutput_ContinuationRecordWithNewlineDelimiter(t *testing.T) {
+func TestTransactionDetailOutput_ContinuationRecordWithNewlineDelimiter(t *testing.T) {
 	data := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-
 88,CREF: 20210706MMQFMPU8000001
 88,EREF: 20210706MMQFMPU8000001
