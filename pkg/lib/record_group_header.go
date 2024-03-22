@@ -35,7 +35,7 @@ func (h *groupHeader) validate() error {
 	}
 	if h.AsOfDate == "" {
 		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfDate"))
-	} else if !util.ValidateData(h.AsOfDate) {
+	} else if !util.ValidateDate(h.AsOfDate) {
 		return fmt.Errorf(fmt.Sprintf(ghValidateErrorFmt, "AsOfDate"))
 	}
 	if h.AsOfTime != "" && !util.ValidateTime(h.AsOfTime) {

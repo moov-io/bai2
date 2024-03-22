@@ -115,7 +115,7 @@ func TestFileHeaderWithInvalidSample2(t *testing.T) {
 	record := accountIdentifier{}
 
 	size, err := record.parse(sample)
-	require.Equal(t, "AccountIdentifier: unable to parse record", err.Error())
+	require.Equal(t, "AccountIdentifier: unable to parse RecordCode", err.Error())
 	require.Equal(t, 0, size)
 
 	sample = "01,2,12345/"

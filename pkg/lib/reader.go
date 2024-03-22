@@ -28,7 +28,7 @@ func (b *Bai2Scanner) GetLineIndex() int {
 }
 
 func (b *Bai2Scanner) GetLine() string {
-	return strings.TrimSpace(strings.ReplaceAll(b.scan.Text(), "\n", ""))
+	return strings.TrimSpace(b.scan.Text())
 }
 
 // ScanLine returns a line from the underlying reader

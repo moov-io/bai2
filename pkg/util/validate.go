@@ -12,7 +12,7 @@ var singedNumber = regexp.MustCompile(`^(-|\+|)?[0-9]\d*$`)
 var currencyCodeRegex = regexp.MustCompile(`^[a-zA-Z]{3}$`)
 var typeCodeRegex = regexp.MustCompile(`^[0-9]{3}$`)
 
-func ValidateData(input string) bool {
+func ValidateDate(input string) bool {
 	return dateYYMMDDTypeRegex.MatchString(input)
 }
 

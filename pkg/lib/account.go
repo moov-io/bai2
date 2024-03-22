@@ -125,7 +125,6 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 
 	var rawData string
 	find := false
-	isBreak := false
 
 	for line := scan.ScanLine(useCurrentLine); line != ""; line = scan.ScanLine(useCurrentLine) {
 		// find record code
@@ -137,7 +136,6 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		switch line[:2] {
 		case util.AccountIdentifierCode:
 			if find {
-				isBreak = true
 				break
 			}
 
@@ -181,10 +179,6 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		default:
 			return fmt.Errorf("ERROR parsing account on line %d (unable to read record type %s)", scan.GetLineIndex(), line[0:2])
 
-		}
-
-		if isBreak {
-			break
 		}
 	}
 
