@@ -36,7 +36,7 @@ func (h *fileHeader) validate() error {
 	}
 	if h.FileCreatedDate == "" {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
-	} else if !util.ValidateData(h.FileCreatedDate) {
+	} else if !util.ValidateDate(h.FileCreatedDate) {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
 	}
 	if h.FileCreatedTime == "" {

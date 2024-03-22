@@ -38,8 +38,8 @@ func TestContinuationRecordWithSample2(t *testing.T) {
 	record := continuationRecord{}
 
 	size, err := record.parse(sample)
-	require.Equal(t, "Continuation: unable to parse record", err.Error())
-	require.Equal(t, 0, size)
-	require.Equal(t, "88/", record.string())
+	require.NoError(t, err)
+	require.Equal(t, 23, size)
+	require.Equal(t, "88,100,000000000208500/", record.string())
 
 }

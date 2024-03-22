@@ -38,7 +38,7 @@ func TestAccountTrailerWithSample2(t *testing.T) {
 	record := accountTrailer{}
 
 	size, err := record.parse(sample)
-	require.Equal(t, "AccountTrailer: unable to parse record", err.Error())
+	require.Equal(t, "AccountTrailer: unable to parse NumberRecords", err.Error())
 	require.Equal(t, 0, size)
 
 	sample = "49,+00000000000446000/"

@@ -18,6 +18,7 @@ func TestFileWithSampleData(t *testing.T) {
 		"sample1.txt",
 		"sample2.txt",
 		"sample3.txt",
+		"sample4-continuations-newline-delimited.txt",
 	}
 
 	for _, path := range paths {

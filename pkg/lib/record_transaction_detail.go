@@ -94,7 +94,8 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	}
 
 	// Text
-	if r.Text, size, err = util.ReadField(line, read); err != nil {
+	read_remainder_of_line := true
+	if r.Text, size, err = util.ReadField(line, read, read_remainder_of_line); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Text"))
 	} else {
 		read += size

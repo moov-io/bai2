@@ -51,7 +51,7 @@ func (f *FundsType) Validate() error {
 	}
 
 	if strings.ToUpper(string(f.TypeCode)) == FundsTypeV {
-		if f.Date != "" && !util.ValidateData(f.Date) {
+		if f.Date != "" && !util.ValidateDate(f.Date) {
 			return errors.New("invalid date of fund type V (" + f.Date + ")")
 		}
 		if f.Time != "" && !util.ValidateTime(f.Time) {

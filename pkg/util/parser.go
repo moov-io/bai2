@@ -10,23 +10,44 @@ import (
 	"strings"
 )
 
-func getIndex(input string) int {
+func getIndex(input string, opts ...bool) int {
+	index_comma := strings.Index(input, ",")
+	index_slash := strings.Index(input, "/")
+	index_newline := strings.Index(input, "\n")
+	// NB. `opts[0]`: if true, returns the index of the last character of the line. this will lead the parser to read the
+	// remainder of the line. note, if line is terminated with a `/` character, we will read up to that index insted of
+	// reading `len(input)`
+	read_remainder_of_line := len(opts) > 0 && opts[0]
 
-	idx1 := strings.Index(input, ",")
-	idx2 := strings.Index(input, "/")
-
-	if idx1 == -1 {
-		return idx2
+	// If there is no `,` separator in the input, return either the index of the next explicit terminating character (`/`)
+	// or the index of the next newline character, if no terminating character is present.
+	if read_remainder_of_line || index_comma == -1 {
+		if index_slash != -1 {
+			return index_slash
+		}
+		if index_newline != -1 {
+			return index_newline
+		}
+		return len(input)
 	}
 
-	if idx2 > -1 && idx2 < idx1 {
-		return idx2
+	// If a line is terminated with a `/` character and the terminator is BEFORE the next `,` character, return
+	// the index of the `/` character.
+	if index_slash > -1 && index_slash < index_comma {
+		return index_slash
 	}
 
-	return idx1
+	// If a line is terminated with a `\n` character (and is NOT terminated with a / character) and the terminator is
+	// BEFORE the next `,` character, return the index of the `\n` character.
+	if index_slash < 0 && index_newline > -1 && index_newline < index_comma {
+		return index_newline
+	}
+
+	// Otherwise, return the index of the next `,` character. Value will not be `-1` due to earlier function logic.
+	return index_comma
 }
 
-func ReadField(input string, start int) (string, int, error) {
+func ReadField(input string, start int, opts ...bool) (string, int, error) {
 
 	data := ""
 
@@ -38,7 +59,7 @@ func ReadField(input string, start int) (string, int, error) {
 		return "", 0, fmt.Errorf("doesn't enough input string")
 	}
 
-	idx := getIndex(data)
+	idx := getIndex(data, opts...)
 	if idx == -1 {
 		return "", 0, fmt.Errorf("doesn't have valid delimiter")
 	}
@@ -82,5 +103,10 @@ func GetSize(line string) int64 {
 		return int64(size + 1)
 	}
 
-	return int64(size)
+	size = strings.Index(line, "\n")
+	if size >= 0 {
+		return int64(size + 1)
+	}
+
+	return int64(len(line))
 }

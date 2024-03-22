@@ -112,3 +112,38 @@ func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
 	require.Equal(t, len(expectResult), len(result))
 
 }
+
+/**
+ * Outlines the behavior of a Detail record when the Detail and Continuations for the detail are terminated
+ * by a newline character ("\n") rather than a slash ("/").
+ *
+ * Note: continuation parsing is implemented in `detail.go`, which is why this particular test doesn't parse
+ * all of the continuation lines.
+ */
+ func TestTransactionDetailOutput_ContinuationRecordWithNewlineDelimiter(t *testing.T) {
+	data := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-
+88,CREF: 20210706MMQFMPU8000001
+88,EREF: 20210706MMQFMPU8000001
+88,DBIC: GSCRUS33
+88,CRNM: ABC Company
+88,DBNM: SAMPLE INC.`
+
+	record := transactionDetail{}
+
+	size, err := record.parse(data)
+	require.NoError(t, err)
+
+	require.Equal(t, "266", record.TypeCode)
+	require.Equal(t, "1912", record.Amount)
+	require.Equal(t, "", string(record.FundsType.TypeCode))
+	require.Equal(t, "", record.FundsType.Date)
+	require.Equal(t, "", record.FundsType.Time)
+	require.Equal(t, "GI2118700002010", record.BankReferenceNumber)
+	require.Equal(t, "20210706MMQFMPU8000001", record.CustomerReferenceNumber)
+	require.Equal(t, "Outgoing Wire Return,-", record.Text)
+	require.Equal(t, 75, size)
+
+	result := record.string()
+	expectResult := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-/`
+	require.Equal(t, expectResult, result)
+}
