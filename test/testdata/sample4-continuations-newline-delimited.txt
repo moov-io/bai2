@@ -60,7 +60,7 @@
 88,DBNM: Company1
 88,DABA: 028000024
 16,255,931,,SC2134800001999,,Check Return,Return From: Test2 Customer, Check Serial Number: 0009000000, Return Reason: "Payee does not exist", Client Ref ID: 74564762445, GS ID: SC213480000120999
-88:EREF: 07370568132
+88,EREF: 07370568132
 88,CRNM: Test Inc.
 88,DBNM: Test2 Customer
 88,CABA: 12345
