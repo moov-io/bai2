@@ -23,7 +23,7 @@ import (
 )
 
 var (
-	parseErrorFileName                = "sample-parseError.txt"
+	parseErrorFileName                = "errors/sample-parseError.txt"
 	testFileName                      = "sample1.txt"
 	testDetailsWithNewlineTermination = "sample4-continuations-newline-delimited.txt"
 )

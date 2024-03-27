@@ -16,7 +16,7 @@ import (
 
 var (
 	testFileName       = filepath.Join("..", "..", "test", "testdata", "sample1.txt")
-	parseErrorFileName = filepath.Join("..", "..", "test", "testdata", "sample-parseError.txt")
+	parseErrorFileName = filepath.Join("..", "..", "test", "testdata", "errors", "sample-parseError.txt")
 )
 
 func TestMain(m *testing.M) {
