@@ -48,6 +48,8 @@ func populateCorpus(f *testing.F, errorFiles bool) {
 	f.Helper()
 
 	err := filepath.Walk(filepath.Join("..", "testdata"), func(path string, info fs.FileInfo, _ error) error {
+		path = filepath.ToSlash(path)
+
 		// Skip directories and some files
 		if info.IsDir() {
 			return nil
