@@ -73,6 +73,9 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	}
 
 	// FundsType
+	if len(line) < read {
+		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType") + " too short")
+	}
 	if size, err = r.FundsType.parse(line[read:]); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType"))
 	} else {

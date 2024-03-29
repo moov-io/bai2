@@ -143,7 +143,9 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			find = true
 
 		case util.ContinuationCode:
-			rawData = rawData[:len(rawData)-1] + "," + line[3:]
+			if len(rawData) > 0 {
+				rawData = rawData[:len(rawData)-1] + "," + line[3:]
+			}
 
 		case util.AccountTrailerCode:
 			if err := parseAccountIdentifier(rawData); err != nil {
