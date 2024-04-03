@@ -36,10 +36,7 @@ Bai2 implements a reader, writer, and validator for the [Cash Management Balance
 
 - [Project status](#project-status)
 - [Usage](#usage)
-  - As an API
-    - [Docker](#docker)
-    - [Google Cloud](#google-cloud-run)
-    - [Data persistence](#data-persistence)
+  - (As an API](#docker)
   - [As a Go module](#go-library)
   - [As a command line tool](#command-line)
 - [Learn about Bai 2](#learn-about-bai-2)
@@ -111,12 +108,310 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/print
 
 Format to JSON after parse:
 ```
-curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format
+curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq . 
 ```
-{"sender":"0004","receiver":"12345","fileCreatedDate":"060321","fileCreatedTime":"0829","fileIdNumber":"001","physicalRecordLength":80,"blockSize":1,"versionNumber":2,"fileControlTotal":"+00000000001280000","numberOfGroups":1,"numberOfRecords":27,"Groups":[{"receiver":"12345","originator":"0004","groupStatus":1,"asOfDate":"060317","currencyCode":"CAD","groupControlTotal":"+00000000001280000","numberOfAccounts":2,"numberOfRecords":25,"Accounts":[{"accountNumber":"10200123456","currencyCode":"CAD","summaries":[{"TypeCode":"040","Amount":"+000000000000","ItemCount":0,"FundsType":{}},{"TypeCode":"045","Amount":"+000000000000","ItemCount":0,"FundsType":{}},{"TypeCode":"100","Amount":"000000000208500","ItemCount":3,"FundsType":{"type_code":"V","date":"060316"}},{"TypeCode":"400","Amount":"000000000208500","ItemCount":8,"FundsType":{"type_code":"V","date":"060316"}}],"accountControlTotal":"+00000000000834000","numberRecords":14,"Details":[{"TypeCode":"409","Amount":"000000000002500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"RETURNED CHEQUE     "},{"TypeCode":"409","Amount":"000000000090000","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"RTN-UNKNOWN         "},{"TypeCode":"409","Amount":"000000000000500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"RTD CHQ SERVICE CHRG"},{"TypeCode":"108","Amount":"000000000203500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"TFR 1020 0345678    "},{"TypeCode":"108","Amount":"000000000002500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"MACLEOD MALL        "},{"TypeCode":"108","Amount":"000000000002500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"MASCOUCHE QUE       "},{"TypeCode":"409","Amount":"000000000020000","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"1000 ISLANDS MALL   "},{"TypeCode":"409","Amount":"000000000090000","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"PENHORA MALL        "},{"TypeCode":"409","Amount":"000000000002000","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"CAPILANO MALL       "},{"TypeCode":"409","Amount":"000000000002500","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"GALERIES LA CAPITALE"},{"TypeCode":"409","Amount":"000000000001000","FundsType":{"type_code":"V","date":"060316"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"PLAZA ROCK FOREST   "}]},{"accountNumber":"10200123456","currencyCode":"CAD","summaries":[{"TypeCode":"040","Amount":"+000000000000","ItemCount":0,"FundsType":{}},{"TypeCode":"045","Amount":"+000000000000","ItemCount":0,"FundsType":{}},{"TypeCode":"100","Amount":"000000000111500","ItemCount":2,"FundsType":{"type_code":"V","date":"060317"}},{"TypeCode":"400","Amount":"000000000111500","ItemCount":4,"FundsType":{"type_code":"V","date":"060317"}}],"accountControlTotal":"+00000000000446000","numberRecords":9,"Details":[{"TypeCode":"108","Amount":"000000000011500","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"TFR 1020 0345678    "},{"TypeCode":"108","Amount":"000000000100000","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"MONTREAL            "},{"TypeCode":"409","Amount":"000000000100000","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"GRANDFALL NB        "},{"TypeCode":"409","Amount":"000000000009000","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"HAMILTON ON         "},{"TypeCode":"409","Amount":"000000000002000","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"WOODSTOCK NB        "},{"TypeCode":"409","Amount":"000000000000500","FundsType":{"type_code":"V","date":"060317"},"BankReferenceNumber":"","CustomerReferenceNumber":"","Text":"GALERIES RICHELIEU  "}]}]}]}
-```
+<details>
+<summary>JSON Response</summary>
 
-### Data persistence
+```json
+{
+  "sender": "0004",
+  "receiver": "12345",
+  "fileCreatedDate": "060321",
+  "fileCreatedTime": "0829",
+  "fileIdNumber": "001",
+  "physicalRecordLength": 80,
+  "blockSize": 1,
+  "versionNumber": 2,
+  "fileControlTotal": "+00000000001280000",
+  "numberOfGroups": 1,
+  "numberOfRecords": 27,
+  "Groups": [
+    {
+      "receiver": "12345",
+      "originator": "0004",
+      "groupStatus": 1,
+      "asOfDate": "060317",
+      "currencyCode": "CAD",
+      "groupControlTotal": "+00000000001280000",
+      "numberOfAccounts": 2,
+      "numberOfRecords": 25,
+      "Accounts": [
+        {
+          "accountNumber": "10200123456",
+          "currencyCode": "CAD",
+          "summaries": [
+            {
+              "TypeCode": "040",
+              "Amount": "+000000000000",
+              "ItemCount": 0,
+              "FundsType": {}
+            },
+            {
+              "TypeCode": "045",
+              "Amount": "+000000000000",
+              "ItemCount": 0,
+              "FundsType": {}
+            },
+            {
+              "TypeCode": "100",
+              "Amount": "000000000208500",
+              "ItemCount": 3,
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              }
+            },
+            {
+              "TypeCode": "400",
+              "Amount": "000000000208500",
+              "ItemCount": 8,
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              }
+            }
+          ],
+          "accountControlTotal": "+00000000000834000",
+          "numberRecords": 14,
+          "Details": [
+            {
+              "TypeCode": "409",
+              "Amount": "000000000002500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "RETURNED CHEQUE     "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000090000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "RTN-UNKNOWN         "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000000500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "RTD CHQ SERVICE CHRG"
+            },
+            {
+              "TypeCode": "108",
+              "Amount": "000000000203500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "TFR 1020 0345678    "
+            },
+            {
+              "TypeCode": "108",
+              "Amount": "000000000002500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "MACLEOD MALL        "
+            },
+            {
+              "TypeCode": "108",
+              "Amount": "000000000002500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "MASCOUCHE QUE       "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000020000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "1000 ISLANDS MALL   "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000090000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "PENHORA MALL        "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000002000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "CAPILANO MALL       "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000002500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "GALERIES LA CAPITALE"
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000001000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060316"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "PLAZA ROCK FOREST   "
+            }
+          ]
+        },
+        {
+          "accountNumber": "10200123456",
+          "currencyCode": "CAD",
+          "summaries": [
+            {
+              "TypeCode": "040",
+              "Amount": "+000000000000",
+              "ItemCount": 0,
+              "FundsType": {}
+            },
+            {
+              "TypeCode": "045",
+              "Amount": "+000000000000",
+              "ItemCount": 0,
+              "FundsType": {}
+            },
+            {
+              "TypeCode": "100",
+              "Amount": "000000000111500",
+              "ItemCount": 2,
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              }
+            },
+            {
+              "TypeCode": "400",
+              "Amount": "000000000111500",
+              "ItemCount": 4,
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              }
+            }
+          ],
+          "accountControlTotal": "+00000000000446000",
+          "numberRecords": 9,
+          "Details": [
+            {
+              "TypeCode": "108",
+              "Amount": "000000000011500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "TFR 1020 0345678    "
+            },
+            {
+              "TypeCode": "108",
+              "Amount": "000000000100000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "MONTREAL            "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000100000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "GRANDFALL NB        "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000009000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "HAMILTON ON         "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000002000",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "WOODSTOCK NB        "
+            },
+            {
+              "TypeCode": "409",
+              "Amount": "000000000000500",
+              "FundsType": {
+                "type_code": "V",
+                "date": "060317"
+              },
+              "BankReferenceNumber": "",
+              "CustomerReferenceNumber": "",
+              "Text": "GALERIES RICHELIEU  "
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+</details>
+
+#### Data persistence
 By design, Bai2  **does not persist** (save) any data about the files or entry details created. The only storage occurs in memory of the process and upon restart Bai2 will have no files or data saved. Also, no in-memory encryption of the data is performed.
 
 ### Go library
