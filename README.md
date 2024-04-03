@@ -36,7 +36,7 @@ Bai2 implements a reader, writer, and validator for the [Cash Management Balance
 
 - [Project status](#project-status)
 - [Usage](#usage)
-  - (As an API](#docker)
+  - [As an API](#docker)
   - [As a Go module](#go-library)
   - [As a command line tool](#command-line)
 - [Learn about Bai 2](#learn-about-bai-2)
@@ -108,7 +108,7 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/print
 
 Format to JSON after parse:
 ```
-curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq . 
+curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq .
 ```
 <details>
 <summary>JSON Response</summary>
