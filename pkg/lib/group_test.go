@@ -79,7 +79,7 @@ func TestSumNumberOfAccounts(t *testing.T) {
 		{NumberRecords: 3},
 		{NumberRecords: 4},
 	}
-	require.Equal(t, 3, group.SumNumberOfAccounts())
+	require.Equal(t, int64(3), group.SumNumberOfAccounts())
 }
 
 func TestSumAccountControlTotals(t *testing.T) {
