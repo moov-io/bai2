@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -78,6 +79,34 @@ func (r *Group) copyRecords() {
 		NumberOfRecords:   r.NumberOfRecords,
 	}
 
+}
+
+func (g *Group) SumRecords() int64 {
+	var sum int64
+	for _, account := range g.Accounts {
+		sum += account.NumberRecords
+	}
+	// Add two for the group header and trailer records
+	return sum + 2
+}
+
+func (g *Group) SumNumberOfAccounts() int {
+	return len(g.Accounts)
+}
+
+func (a *Group) SumAccountControlTotals() (string, error) {
+	if err := a.Validate(); err != nil {
+		return "0", err
+	}
+	var sum int64
+	for _, account := range a.Accounts {
+		amt, err := strconv.ParseInt(account.AccountControlTotal, 10, 64)
+		if err != nil {
+			return "0", err
+		}
+		sum += amt
+	}
+	return fmt.Sprint(sum), nil
 }
 
 func (r *Group) String(opts ...int64) string {

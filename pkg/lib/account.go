@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -63,6 +65,37 @@ func (r *Account) copyRecords() {
 		NumberRecords:       r.NumberRecords,
 	}
 
+}
+
+var accountIdentifierCountExpression = regexp.MustCompile(`(?m:^(?:(?:03)|(?:16)||(?:49)(?:88)))`)
+
+func (a *Account) SumRecords(opts ...int64) int64 {
+	acctString := a.String(opts...)
+	result := accountIdentifierCountExpression.FindAllStringSubmatch(acctString, 10000)
+	return int64(len(result))
+}
+
+func (a *Account) SumDetailAmounts() (string, error) {
+	if err := a.Validate(); err != nil {
+		return "0", err
+	}
+	var sum int64
+	for _, detail := range a.Details {
+		amt, err := strconv.ParseInt(detail.Amount, 10, 64)
+		if err != nil {
+			return "0", err
+		}
+		switch string(detail.TypeCode[0]) {
+		case "1","2","3":
+			sum += amt
+
+		case "4","5","6":
+			sum -= amt
+		default:
+			return "0", fmt.Errorf("TypeCode %v is invalid for transaction detail", detail.TypeCode)
+		}
+	}
+	return fmt.Sprint(sum/100), nil
 }
 
 func (r *Account) String(opts ...int64) string {
