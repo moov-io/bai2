@@ -6,6 +6,7 @@ package lib
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -97,64 +98,6 @@ func TestScannedFileTrailerRecordCount(t *testing.T) {
 	require.Equal(t, int64(10), file.SumRecords())
 }
 
-func TestManualFileTrailerRecordCount(t *testing.T) {
-
-	recordLength := int64(80)
-
-	details := []Detail{}
-	for i := 0; i < 10; i++ {
-		detail := NewDetail()
-		detail.TypeCode = "409"
-		detail.Amount = "274006"
-		detail.BankReferenceNumber = "1234567"
-		detail.Text = "TV Purchase"
-		details = append(details, *detail)
-	}
-
-	account := Account{}
-	account.AccountNumber = "1234567"
-	account.CurrencyCode = "USD"
-	account.Details = details
-	account.Summaries = []AccountSummary{
-		{TypeCode: "040", Amount: "+000000000000"},
-		{TypeCode: "045", Amount: "+000000000000"},
-		{TypeCode: "046", Amount: "+000000000000"},
-		{TypeCode: "047", Amount: "+000000000000"},
-		{TypeCode: "048", Amount: "+000000000000"},
-		{TypeCode: "049", Amount: "+000000000000"},
-		{TypeCode: "050", Amount: "+000000000000"},
-		{TypeCode: "051", Amount: "+000000000000"},
-		{TypeCode: "052", Amount: "+000000000000"},
-		{TypeCode: "053", Amount: "+000000000000"},
-	}
-	account.NumberRecords = account.SumRecords(recordLength)
-
-	group := Group{}
-	group.Receiver = "121000358"
-	group.Originator = "121000358"
-	group.GroupStatus = 1
-	group.AsOfDate = time.Now().Format("060102")
-	group.AsOfTime = time.Now().Format("1504")
-	group.AsOfDateModifier = 2
-	group.Accounts = append(group.Accounts, account)
-	group.NumberOfRecords = group.SumRecords()
-
-	file := NewBai2()
-	file.Sender = "121000358"
-	file.Receiver = "121000358"
-	file.FileCreatedDate = time.Now().Format("060102")
-	file.FileCreatedTime = time.Now().Format("1504")
-	file.FileIdNumber = "01"
-	file.PhysicalRecordLength = recordLength
-	file.BlockSize = 1
-	file.VersionNumber = 2
-	file.Groups = append(file.Groups, group)
-	file.NumberOfRecords = file.SumRecords()
-
-	require.Equal(t, int64(18), file.NumberOfRecords)
-
-}
-
 func TestSumNumberOfGroups(t *testing.T) {
 	file := Bai2{}
 	file.Groups = []Group{
@@ -162,7 +105,7 @@ func TestSumNumberOfGroups(t *testing.T) {
 		{NumberOfRecords: 27},
 		{NumberOfRecords: 27},
 	}
-	require.Equal(t, 3, file.SumNumberOfGroups())
+	require.Equal(t, int64(3), file.SumNumberOfGroups())
 }
 
 func TestSumGroupControlTotals(t *testing.T) {
@@ -190,4 +133,82 @@ func TestSumGroupControlTotals(t *testing.T) {
 	total, err := file.SumGroupControlTotals()
 	require.NoError(t, err)
 	require.Equal(t, "200", total)
+}
+
+func TestBuildFileAggregates(t *testing.T) {
+
+	recordLength := int64(80)
+
+	details := []Detail{}
+	for i := 0; i < 10; i++ {
+		detail := NewDetail()
+		detail.TypeCode = "409"
+		detail.Amount = "274006"
+		detail.BankReferenceNumber = "1234567"
+		detail.Text = "TV Purchase"
+		details = append(details, *detail)
+	}
+
+	account1 := Account{}
+	account1.AccountNumber = "1234567"
+	account1.CurrencyCode = "USD"
+	account1.Details  = append(account1.Details, details...)
+	account1.Summaries = []AccountSummary{
+		{TypeCode: "040", Amount: "+000000000000"},
+		{TypeCode: "045", Amount: "+000000000000"},
+		{TypeCode: "046", Amount: "+000000000000"},
+		{TypeCode: "047", Amount: "+000000000000"},
+		{TypeCode: "048", Amount: "+000000000000"},
+		{TypeCode: "049", Amount: "+000000000000"},
+		{TypeCode: "050", Amount: "+000000000000"},
+		{TypeCode: "051", Amount: "+000000000000"},
+		{TypeCode: "052", Amount: "+000000000000"},
+		{TypeCode: "053", Amount: "+000000000000"},
+	}
+	controlTotal, _ := account1.SumDetailAmounts()
+	account1.AccountControlTotal = controlTotal
+	account1.NumberRecords = account1.SumRecords(recordLength)
+
+	account2 := Account{}
+	account2.AccountNumber = "1234567"
+	account2.CurrencyCode = "USD"
+	account2.Details  = append(account2.Details, details...)
+	controlTotal, _ = account2.SumDetailAmounts()
+	account2.AccountControlTotal = controlTotal
+	account2.NumberRecords = account2.SumRecords(recordLength)
+
+	group := Group{}
+	group.Receiver = "121000358"
+	group.Originator = "121000358"
+	group.GroupStatus = 1
+	group.AsOfDate = time.Now().Format("060102")
+	group.AsOfTime = time.Now().Format("1504")
+	group.AsOfDateModifier = 2
+	group.Accounts = append(group.Accounts, account1, account2)
+	controlTotal, _ = group.SumAccountControlTotals()
+	group.GroupControlTotal = controlTotal
+	group.NumberOfAccounts = group.SumNumberOfAccounts()
+	group.NumberOfRecords = group.SumRecords()
+
+	file := NewBai2()
+	file.Sender = "121000358"
+	file.Receiver = "121000358"
+	file.FileCreatedDate = time.Now().Format("060102")
+	file.FileCreatedTime = time.Now().Format("1504")
+	file.FileIdNumber = "01"
+	file.PhysicalRecordLength = recordLength
+	file.BlockSize = 1
+	file.VersionNumber = 2
+	file.Groups = append(file.Groups, group)
+	controlTotal, _ = file.SumGroupControlTotals()
+	file.FileControlTotal = controlTotal
+	file.NumberOfGroups = file.SumNumberOfGroups()
+	file.NumberOfRecords = file.SumRecords()
+
+	require.Equal(t, "-5480120", file.FileControlTotal)
+	require.Equal(t, int64(1), file.NumberOfGroups)
+	require.Equal(t, int64(30), file.NumberOfRecords)
+
+	fmt.Print(file.String())
+
 }

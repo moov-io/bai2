@@ -90,8 +90,8 @@ func (g *Group) SumRecords() int64 {
 	return sum + 2
 }
 
-func (g *Group) SumNumberOfAccounts() int {
-	return len(g.Accounts)
+func (g *Group) SumNumberOfAccounts() int64 {
+	return int64(len(g.Accounts))
 }
 
 func (a *Group) SumAccountControlTotals() (string, error) {

@@ -95,7 +95,7 @@ func (a *Account) SumDetailAmounts() (string, error) {
 			return "0", fmt.Errorf("TypeCode %v is invalid for transaction detail", detail.TypeCode)
 		}
 	}
-	return fmt.Sprint(sum/100), nil
+	return fmt.Sprint(sum), nil
 }
 
 func (r *Account) String(opts ...int64) string {

@@ -118,8 +118,8 @@ func (f *Bai2) SumRecords() int64 {
 	return sum + 2
 }
 
-func (g *Bai2) SumNumberOfGroups() int {
-	return len(g.Groups)
+func (g *Bai2) SumNumberOfGroups() int64 {
+	return int64(len(g.Groups))
 }
 
 func (a *Bai2) SumGroupControlTotals() (string, error) {
