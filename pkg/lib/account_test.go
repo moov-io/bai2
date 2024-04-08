@@ -113,7 +113,7 @@ func TestSumAccountRecords(t *testing.T) {
 
 func TestSumAccountTotal(t *testing.T) {
 	details := []Detail{}
-	for i := 100; i <= 399; i++ {
+	for i := 101; i <= 399; i++ {
 		detail := NewDetail()
 		detail.TypeCode = strconv.Itoa(i)
 		detail.Amount = "27406"
@@ -123,13 +123,17 @@ func TestSumAccountTotal(t *testing.T) {
 	}
 	account := Account{}
 	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "100",
+		Amount: "20000",
+	})
 	account.Details = details
 	sum, err := account.SumDetailAmounts()
 	require.NoError(t, err)
-	require.Equal(t, "82218", sum)
+	require.Equal(t, "8214394", sum)
 
 	details = []Detail{}
-	for i := 400; i <= 699; i++ {
+	for i := 401; i <= 699; i++ {
 		detail := NewDetail()
 		detail.TypeCode = strconv.Itoa(i)
 		detail.Amount = "27406"
@@ -139,13 +143,18 @@ func TestSumAccountTotal(t *testing.T) {
 	}
 	account = Account{}
 	account.AccountNumber = "9876543210"
+	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "400",
+		Amount: "-20000",
+	})
 	account.Details = details
 	sum, err = account.SumDetailAmounts()
 	require.NoError(t, err)
-	require.Equal(t, "-82218", sum)
+	require.Equal(t, "-8214394", sum)
 
 	details = []Detail{}
-	for i := 100; i <= 699; i++ {
+	for i := 101; i <= 699; i++ {
 		detail := NewDetail()
 		detail.TypeCode = strconv.Itoa(i)
 		detail.Amount = "27406"
@@ -155,6 +164,10 @@ func TestSumAccountTotal(t *testing.T) {
 	}
 	account = Account{}
 	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "100",
+		Amount: "27406",
+	})
 	account.Details = details
 	sum, err = account.SumDetailAmounts()
 	require.NoError(t, err)

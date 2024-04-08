@@ -67,7 +67,7 @@ func (r *Account) copyRecords() {
 
 }
 
-var accountIdentifierCountExpression = regexp.MustCompile(`(?m:^(?:(?:03)|(?:16)||(?:49)(?:88)))`)
+var accountIdentifierCountExpression = regexp.MustCompile(`(?m:^(?:(?:03)|(?:16)|(?:49)|(?:88)))`)
 
 func (a *Account) SumRecords(opts ...int64) int64 {
 	acctString := a.String(opts...)
@@ -94,6 +94,13 @@ func (a *Account) SumDetailAmounts() (string, error) {
 		default:
 			return "0", fmt.Errorf("TypeCode %v is invalid for transaction detail", detail.TypeCode)
 		}
+	}
+	for _, summary := range a.Summaries {
+		amt, err := strconv.ParseInt(summary.Amount, 10, 64)
+		if err != nil {
+			return "0", err
+		}
+		sum += amt
 	}
 	return fmt.Sprint(sum), nil
 }

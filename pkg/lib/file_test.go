@@ -6,7 +6,6 @@ package lib
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,9 +41,9 @@ func TestFileWithContinuationRecord(t *testing.T) {
 
 	raw := `01,0004,12345,060321,0829,001,80,1,2/
 02,12345,0004,1,060317,,CAD,/
-03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/
-88,046,+000000000000,,,047,+000000000000,,,048,+000000000000,,,049,+000000000000,,/
-88,050,+000000000000,,,051,+000000000000,,,052,+000000000000,,,053,+000000000000,,/
+03,10200123456,CAD,040,2000,,,045,2000,,/
+88,046,2000,,,047,2000,,,048,2000,,,049,2000,,/
+88,050,2000,,,051,2000,,,052,2000,,,053,2000,,/
 16,409,000000000002500,V,060316,1300,,,RETURNED CHEQUE     /
 16,409,000000000090000,V,060316,1300,,,RTN-UNKNOWN         /
 49,+00000000000834000,14/
@@ -59,9 +58,9 @@ func TestFileWithContinuationRecord(t *testing.T) {
 
 	expected := `01,0004,12345,060321,0829,001,80,1,2/
 02,12345,0004,1,060317,,CAD,/
-03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,,046,+000000000000,,/
-88,047,+000000000000,,,048,+000000000000,,,049,+000000000000,,,050/
-88,+000000000000,,,051,+000000000000,,,052,+000000000000,,,053,+000000000000,,/
+03,10200123456,CAD,040,2000,,,045,2000,,,046,2000,,/
+88,047,2000,,,048,2000,,,049,2000,,,050/
+88,2000,,,051,2000,,,052,2000,,,053,2000,,/
 16,409,000000000002500,V,060316,1300,,,RETURNED CHEQUE     /
 16,409,000000000090000,V,060316,1300,,,RTN-UNKNOWN         /
 49,+00000000000834000,14/
@@ -82,9 +81,9 @@ func TestScannedFileTrailerRecordCount(t *testing.T) {
 
 	raw := `01,0004,12345,060321,0829,001,80,1,2/
 02,12345,0004,1,060317,,CAD,/
-03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/
-88,046,+000000000000,,,047,+000000000000,,,048,+000000000000,,,049,+000000000000,,/
-88,050,+000000000000,,,051,+000000000000,,,052,+000000000000,,,053,+000000000000,,/
+03,10200123456,CAD,040,2000,,,045,2000,,/
+88,046,2000,,,047,2000,,,048,2000,,,049,2000,,/
+88,050,2000,,,051,2000,,,052,2000,,,053,2000,,/
 16,409,000000000002500,V,060316,1300,,,RETURNED CHEQUE     /
 16,409,000000000090000,V,060316,1300,,,RTN-UNKNOWN         /
 49,+00000000000834000,6/
@@ -154,16 +153,16 @@ func TestBuildFileAggregates(t *testing.T) {
 	account1.CurrencyCode = "USD"
 	account1.Details  = append(account1.Details, details...)
 	account1.Summaries = []AccountSummary{
-		{TypeCode: "040", Amount: "+000000000000"},
-		{TypeCode: "045", Amount: "+000000000000"},
-		{TypeCode: "046", Amount: "+000000000000"},
-		{TypeCode: "047", Amount: "+000000000000"},
-		{TypeCode: "048", Amount: "+000000000000"},
-		{TypeCode: "049", Amount: "+000000000000"},
-		{TypeCode: "050", Amount: "+000000000000"},
-		{TypeCode: "051", Amount: "+000000000000"},
-		{TypeCode: "052", Amount: "+000000000000"},
-		{TypeCode: "053", Amount: "+000000000000"},
+		{TypeCode: "040", Amount: "2000"},
+		{TypeCode: "045", Amount: "2000"},
+		{TypeCode: "046", Amount: "2000"},
+		{TypeCode: "047", Amount: "2000"},
+		{TypeCode: "048", Amount: "2000"},
+		{TypeCode: "049", Amount: "2000"},
+		{TypeCode: "050", Amount: "2000"},
+		{TypeCode: "051", Amount: "2000"},
+		{TypeCode: "052", Amount: "2000"},
+		{TypeCode: "053", Amount: "2000"},
 	}
 	controlTotal, _ := account1.SumDetailAmounts()
 	account1.AccountControlTotal = controlTotal
@@ -205,10 +204,8 @@ func TestBuildFileAggregates(t *testing.T) {
 	file.NumberOfGroups = file.SumNumberOfGroups()
 	file.NumberOfRecords = file.SumRecords()
 
-	require.Equal(t, "-5480120", file.FileControlTotal)
+	require.Equal(t, "-5460120", file.FileControlTotal)
 	require.Equal(t, int64(1), file.NumberOfGroups)
-	require.Equal(t, int64(30), file.NumberOfRecords)
-
-	fmt.Print(file.String())
+	require.Equal(t, int64(29), file.NumberOfRecords)
 
 }
