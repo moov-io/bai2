@@ -125,7 +125,7 @@ func TestSumAccountTotal(t *testing.T) {
 	account.AccountNumber = "9876543210"
 	account.Summaries = append(account.Summaries, AccountSummary{
 		TypeCode: "100",
-		Amount: "20000",
+		Amount:   "20000",
 	})
 	account.Details = details
 	sum, err := account.SumDetailAmounts()
@@ -146,7 +146,7 @@ func TestSumAccountTotal(t *testing.T) {
 	account.AccountNumber = "9876543210"
 	account.Summaries = append(account.Summaries, AccountSummary{
 		TypeCode: "400",
-		Amount: "-20000",
+		Amount:   "-20000",
 	})
 	account.Details = details
 	sum, err = account.SumDetailAmounts()
@@ -166,7 +166,7 @@ func TestSumAccountTotal(t *testing.T) {
 	account.AccountNumber = "9876543210"
 	account.Summaries = append(account.Summaries, AccountSummary{
 		TypeCode: "100",
-		Amount: "27406",
+		Amount:   "27406",
 	})
 	account.Details = details
 	sum, err = account.SumDetailAmounts()

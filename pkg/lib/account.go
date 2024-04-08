@@ -86,10 +86,10 @@ func (a *Account) SumDetailAmounts() (string, error) {
 			return "0", err
 		}
 		switch string(detail.TypeCode[0]) {
-		case "1","2","3":
+		case "1", "2", "3":
 			sum += amt
 
-		case "4","5","6":
+		case "4", "5", "6":
 			sum -= amt
 		default:
 			return "0", fmt.Errorf("TypeCode %v is invalid for transaction detail", detail.TypeCode)
