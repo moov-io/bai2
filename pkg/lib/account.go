@@ -69,12 +69,14 @@ func (r *Account) copyRecords() {
 
 var accountIdentifierCountExpression = regexp.MustCompile(`(?m:^(?:(?:03)|(?:16)|(?:49)|(?:88)))`)
 
+// Sums the number of 03,16,88,49 records in the account. Maps to the NumberRecords field
 func (a *Account) SumRecords(opts ...int64) int64 {
 	acctString := a.String(opts...)
 	result := accountIdentifierCountExpression.FindAllStringSubmatch(acctString, 10000)
 	return int64(len(result))
 }
 
+// Sums the Amount fields from all 03 and 16 records. Maps to the AccountControlTotal field
 func (a *Account) SumDetailAmounts() (string, error) {
 	if err := a.Validate(); err != nil {
 		return "0", err

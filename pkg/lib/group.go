@@ -81,6 +81,7 @@ func (r *Group) copyRecords() {
 
 }
 
+// Sums the number of 02,03,16,88,49,98 records in the group. Maps to the NumberOfRecords field
 func (g *Group) SumRecords() int64 {
 	var sum int64
 	for _, account := range g.Accounts {
@@ -90,10 +91,12 @@ func (g *Group) SumRecords() int64 {
 	return sum + 2
 }
 
+// Sums the number of accounts in the group. Maps to the NumberOfAccounts field
 func (g *Group) SumNumberOfAccounts() int64 {
 	return int64(len(g.Accounts))
 }
 
+// Sums the account control totals in the group. Maps to the GroupControlTotal field
 func (a *Group) SumAccountControlTotals() (string, error) {
 	if err := a.Validate(); err != nil {
 		return "0", err

@@ -109,6 +109,7 @@ func (r *Bai2) copyRecords() {
 
 }
 
+// Sums the groups NumberOfRecords plus file header and trailer. Maps to the NumberOfRecords field.
 func (f *Bai2) SumRecords() int64 {
 	var sum int64
 	for _, group := range f.Groups {
@@ -118,10 +119,12 @@ func (f *Bai2) SumRecords() int64 {
 	return sum + 2
 }
 
+// Sums the number of groups. Maps to the NumberOfGroups field.
 func (g *Bai2) SumNumberOfGroups() int64 {
 	return int64(len(g.Groups))
 }
 
+// Sums the Group Control Totals. Maps to the FileControlTotal field.
 func (a *Bai2) SumGroupControlTotals() (string, error) {
 	if err := a.Validate(); err != nil {
 		return "0", err
