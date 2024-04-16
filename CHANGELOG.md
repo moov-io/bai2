@@ -1,3 +1,25 @@
+## v0.3.0 (Released 2024-04-16)
+
+IMPROVEMENTS
+
+- feat: Implement aggregate functions to support setting trailer record fields programatically
+- feat: return all Details for an Account
+- fix: normalize file paths for windows machines to fix failing test
+- fix: read BAI2 rune by rune
+- fix: separate fuzzing of valid BAI2 files from error files
+- fix: validate BAI2 file after parsing
+- fuzz: setup runner and scheduled job
+- schema: OpenAPI models for Files, Groups, Accounts, and related objects
+
+BUILD
+
+- chore(deps): update golang docker tag to v1.22
+- fix(deps): update module github.com/gorilla/mux to v1.8.1
+- fix(deps): update module github.com/moov-io/base to v0.48.5
+- fix(deps): update module github.com/spf13/cobra to v1.8.0
+- fix(deps): update module github.com/stretchr/testify to v1.9.0
+- fix(deps): update module golang.org/x/oauth2 to v0.18.0
+
 ## v0.2.0 (Released 2023-02-03)
 
 IMPROVEMENTS
