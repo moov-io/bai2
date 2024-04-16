@@ -6,6 +6,7 @@ package lib
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -84,4 +85,91 @@ func TestAccountOutputWithContinuationRecord(t *testing.T) {
 49,4000000,5/`
 	require.Equal(t, expectedResult, result)
 
+}
+
+func TestSumAccountRecords(t *testing.T) {
+
+	raw := `
+03,9876543210,,010,-500000,,,100,1000000,,,400,2000000,,,190/
+88,500000,,,110,1000000,,,072,500000,,,074,500000,,,040/
+88,-1500000,,/
+16,115,500000,S,,200000,300000,,,LOCK BOX NO.68751/
+49,4000000,5/
+`
+
+	scan := NewBai2Scanner(bytes.NewReader([]byte(raw)))
+	account := Account{}
+	err := account.Read(&scan, false)
+	require.NoError(t, err)
+	require.Equal(t, int64(3), account.SumRecords())
+
+	scan = NewBai2Scanner(bytes.NewReader([]byte(raw)))
+	account = Account{}
+	err = account.Read(&scan, false)
+	require.NoError(t, err)
+	require.Equal(t, int64(6), account.SumRecords(50))
+
+}
+
+func TestSumAccountTotal(t *testing.T) {
+	details := []Detail{}
+	for i := 101; i <= 399; i++ {
+		detail := NewDetail()
+		detail.TypeCode = strconv.Itoa(i)
+		detail.Amount = "27406"
+		detail.BankReferenceNumber = "1234567"
+		detail.Text = "TV Purchase"
+		details = append(details, *detail)
+	}
+	account := Account{}
+	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "100",
+		Amount:   "20000",
+	})
+	account.Details = details
+	sum, err := account.SumDetailAmounts()
+	require.NoError(t, err)
+	require.Equal(t, "8214394", sum)
+
+	details = []Detail{}
+	for i := 401; i <= 699; i++ {
+		detail := NewDetail()
+		detail.TypeCode = strconv.Itoa(i)
+		detail.Amount = "27406"
+		detail.BankReferenceNumber = "1234567"
+		detail.Text = "TV Purchase"
+		details = append(details, *detail)
+	}
+	account = Account{}
+	account.AccountNumber = "9876543210"
+	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "400",
+		Amount:   "-20000",
+	})
+	account.Details = details
+	sum, err = account.SumDetailAmounts()
+	require.NoError(t, err)
+	require.Equal(t, "-8214394", sum)
+
+	details = []Detail{}
+	for i := 101; i <= 699; i++ {
+		detail := NewDetail()
+		detail.TypeCode = strconv.Itoa(i)
+		detail.Amount = "27406"
+		detail.BankReferenceNumber = "1234567"
+		detail.Text = "TV Purchase"
+		details = append(details, *detail)
+	}
+	account = Account{}
+	account.AccountNumber = "9876543210"
+	account.Summaries = append(account.Summaries, AccountSummary{
+		TypeCode: "100",
+		Amount:   "27406",
+	})
+	account.Details = details
+	sum, err = account.SumDetailAmounts()
+	require.NoError(t, err)
+	require.Equal(t, "0", sum)
 }

@@ -6,8 +6,10 @@ package lib
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestGroupWithSampleData1(t *testing.T) {
@@ -58,4 +60,42 @@ func TestGroupWithSampleData2(t *testing.T) {
 	require.NoError(t, group.Validate())
 	require.Equal(t, 10, scan.GetLineIndex())
 	require.Equal(t, "98,+00000000001280000,2,25/", scan.GetLine())
+}
+
+func TestSumGroupRecords(t *testing.T) {
+	group := Group{}
+	group.Accounts = []Account{
+		{NumberRecords: 2},
+		{NumberRecords: 3},
+		{NumberRecords: 4},
+	}
+	require.Equal(t, int64(11), group.SumRecords())
+}
+
+func TestSumNumberOfAccounts(t *testing.T) {
+	group := Group{}
+	group.Accounts = []Account{
+		{NumberRecords: 2},
+		{NumberRecords: 3},
+		{NumberRecords: 4},
+	}
+	require.Equal(t, int64(3), group.SumNumberOfAccounts())
+}
+
+func TestSumAccountControlTotals(t *testing.T) {
+	group := Group{}
+	group.Receiver = "121000358"
+	group.Originator = "121000358"
+	group.GroupStatus = 1
+	group.AsOfDate = time.Now().Format("060102")
+	group.AsOfTime = time.Now().Format("1504")
+	group.AsOfDateModifier = 2
+	group.Accounts = []Account{
+		{AccountControlTotal: "100", AccountNumber: "9876543210"},
+		{AccountControlTotal: "-100", AccountNumber: "9876543210"},
+		{AccountControlTotal: "200", AccountNumber: "9876543210"},
+	}
+	total, err := group.SumAccountControlTotals()
+	require.NoError(t, err)
+	require.Equal(t, "200", total)
 }
