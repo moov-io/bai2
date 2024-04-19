@@ -293,8 +293,8 @@ func parseAccountTrailer(line string) (AccountTrailer, error) {
 	if strings.HasPrefix(controlTotalStr, "-") {
 		signMultiplier = -1.0
 		controlTotalStr = controlTotalStr[1:]
-	} else if strings.HasPrefix(controlTotalStr, "+") {
-		controlTotalStr = controlTotalStr[1:]
+	} else {
+		controlTotalStr = strings.TrimPrefix(controlTotalStr, "+")
 	}
 
 	controlTotal, err := strconv.ParseFloat(controlTotalStr, 64)
@@ -379,8 +379,8 @@ func parseFileTrailer(line string) (FileTrailer, error) {
 		if strings.HasPrefix(controlTotal, "-") {
 			sign = -1.0
 			controlTotal = controlTotal[1:]
-		} else if strings.HasPrefix(controlTotal, "+") {
-			controlTotal = controlTotal[1:]
+		} else {
+			controlTotal = strings.TrimPrefix(controlTotal, "+")
 		}
 		value, err := strconv.ParseFloat(controlTotal, 64)
 		if err != nil {
