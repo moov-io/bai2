@@ -2,8 +2,10 @@ package v2
 
 import (
 	"bufio"
+	"cmp"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -16,17 +18,26 @@ var (
 	ErrIntegrityCheckFailed = errors.New("file integrity check failed")
 )
 
-// LoadFromFile processes each line of the file to correctly structure the balance report.
-func LoadFromFile(filename string) (*BalanceReport, error) {
-	file, err := os.Open(filename)
+func ReadFilepath(path string) (*BalanceReport, error) {
+	fd, err := os.Open(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err)
+		return nil, fmt.Errorf("opening %s failed: %v", path, err)
 	}
-	defer file.Close()
+	defer fd.Close()
 
-	scanner := bufio.NewScanner(file)
-	var currentGroup *GroupHeader
+	return FromReader(fd)
+}
+
+func FromReader(r io.ReadCloser) (*BalanceReport, error) {
+	if r == nil {
+		return nil, errors.New("nil Reader")
+	}
+	defer r.Close()
+
+	scanner := bufio.NewScanner(r)
+	var currentGroup *Group
 	br := &BalanceReport{}
+	var err error
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -36,16 +47,17 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 		case RecordTypeFileHeader:
 			br.FileHeader, err = parseFileHeader(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing file header: %w", err)
 			}
 
 		case RecordTypeGroupHeader:
-			group, err := parseGroupHeader(line)
+			groupHeader, err := parseGroupHeader(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing group header: %w", err)
 			}
-			br.Groups = append(br.Groups, group)
-			currentGroup = &br.Groups[len(br.Groups)-1]
+			currentGroup = &Group{
+				Header: groupHeader,
+			}
 
 		case RecordTypeAccountIdentifier:
 			if currentGroup == nil {
@@ -53,7 +65,7 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 			}
 			ai, err := parseAccountIdentifier(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing account identifier: %w", err)
 			}
 			currentGroup.AccountIdentifiers = append(currentGroup.AccountIdentifiers, ai)
 
@@ -63,7 +75,7 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 			}
 			td, err := parseTransactionDetail(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing transaction detail: %w", err)
 			}
 			currentGroup.TransactionDetails = append(currentGroup.TransactionDetails, td)
 
@@ -73,7 +85,7 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 			}
 			cr, err := parseContinuationRecord(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing continuation record: %w", err)
 			}
 			currentGroup.ContinuationRecords = append(currentGroup.ContinuationRecords, cr)
 
@@ -83,14 +95,25 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 			}
 			at, err := parseAccountTrailer(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing account trailer: %w", err)
 			}
 			currentGroup.AccountTrailers = append(currentGroup.AccountTrailers, at)
+
+		case RecordTypeGroupTrailer:
+			if currentGroup == nil {
+				return nil, errors.New("group trailer found outside of a group")
+			}
+			currentGroup.Trailer, err = parseGroupTrailer(line)
+			if err != nil {
+				return nil, fmt.Errorf("parsing group trailer: %w", err)
+			}
+			br.Groups = append(br.Groups, *currentGroup)
+			currentGroup = nil
 
 		case RecordTypeFileTrailer:
 			br.FileTrailer, err = parseFileTrailer(line)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("parsing file trailer: %w", err)
 			}
 
 		default:
@@ -103,82 +126,110 @@ func LoadFromFile(filename string) (*BalanceReport, error) {
 	}
 
 	return br, nil
+
 }
 
-// parseFileHeader parses file header line into the FileHeader struct while validating the data
 func parseFileHeader(line string) (FileHeader, error) {
-	if len(line) < 65 { // Considering the expected minimal length
-		return FileHeader{}, ErrInvalidDataFormat
+	parts := strings.Split(line, ",")
+	if len(parts) < 6 {
+		return FileHeader{}, ErrInvalidDataFormat // Ensure there are at least 6 parts.
 	}
 
 	return FileHeader{
-		RecordCode:       line[:2],
-		SenderName:       strings.TrimSpace(line[2:37]),
-		SenderID:         strings.TrimSpace(line[37:52]),
-		FileCreationDate: line[52:60],
-		FileCreationTime: line[60:64],
-		FileIDModifier:   line[64:65],
+		RecordCode:       strings.TrimSpace(parts[0]),
+		SenderID:         strings.TrimSpace(parts[2]),
+		SenderName:       strings.TrimSpace(parts[1]),
+		FileCreationDate: strings.TrimSpace(parts[3]),
+		FileCreationTime: strings.TrimSpace(parts[4]),
+		FileIDModifier:   strings.TrimSpace(parts[5]),
 	}, nil
 }
 
-// Parse for GroupHeader with enhanced handling for optional fields
 func parseGroupHeader(line string) (GroupHeader, error) {
-	fields := strings.Split(line, ",")
+	line = strings.TrimSuffix(line, "/")
+
+	parts := strings.Split(line, ",")
+
+	// Ensure there are at least the minimum required fields.
+	if len(parts) < 5 {
+		return GroupHeader{}, ErrInvalidDataFormat
+	}
+
+	// Trim each part to remove unnecessary whitespaces.
+	for i, part := range parts {
+		parts[i] = strings.TrimSpace(part)
+	}
 
 	gh := GroupHeader{
-		RecordCode:   fields[0],
-		OriginatorID: fields[1],
-		GroupStatus:  fields[2],
-		AsOfDate:     fields[3],
+		RecordCode:         parts[0],
+		UltimateReceiverID: parts[1],
+		OriginatorID:       parts[2],
+		GroupStatus:        parts[3],
+		AsOfDate:           parts[4],
 	}
 
 	// Handle optional fields
-	if len(fields) > 4 && fields[4] != "/" {
-		gh.AsOfTime = fields[4]
+	if len(parts) > 5 && parts[5] != "/" {
+		gh.AsOfTime = parts[5]
 	}
-	if len(fields) > 5 && fields[5] != "/" {
-		gh.CurrencyCode = fields[5]
+
+	if len(parts) > 6 && parts[6] != "/" {
+		gh.CurrencyCode = parts[6]
 	}
-	if len(fields) > 6 && fields[6] != "/" {
-		gh.AsOfDateModifier = fields[6]
+	gh.CurrencyCode = cmp.Or(gh.CurrencyCode, "USD")
+
+	if len(parts) > 7 && parts[7] != "/" {
+		gh.AsOfDateModifier = parts[7]
 	}
+
 	return gh, nil
 }
 
 func parseAccountIdentifier(line string) (AccountIdentifier, error) {
-	fields := strings.Split(line, ",")
-
-	if len(fields) < 4 {
-		return AccountIdentifier{}, fmt.Errorf("not enough fields in account identifier record: received %d, require at least 4", len(fields))
+	// Split and trim the line.
+	parts := strings.Split(line, ",")
+	if len(parts) < 5 { // Minimum parts to form a valid record
+		return AccountIdentifier{}, ErrInvalidDataFormat
 	}
 
-	// Extract fields and handle potential empty optional fields with default values or similar logic.
-	ai := AccountIdentifier{
-		RecordCode:            strings.TrimSpace(fields[0]),
-		CustomerAccountNumber: strings.TrimSpace(fields[1]),
+	// Convert and assign each parts to struct fields, handling optional values.
+	asum := AccountIdentifier{
+		RecordCode:            strings.TrimSpace(parts[0]),
+		CustomerAccountNumber: strings.TrimSpace(parts[1]),
+		CurrencyCode:          strings.TrimSpace(parts[2]),
+		TypeCode:              strings.TrimSpace(parts[3]),
 	}
+	asum.CurrencyCode = cmp.Or(asum.CurrencyCode, "USD")
 
-	// Example Handle optional third field for currency code in a typical specification
-	if len(fields) > 2 && fields[2] != "" {
-		ai.CurrencyCode = strings.TrimSpace(fields[2])
-	} else {
-		// Set default or handle the absence of optional fields if necessary
-		ai.CurrencyCode = "USD" // Default currency, or could remain empty if that's acceptable
-	}
+	var err error
 
-	// Handle the NumberOfItems with default and unknown cases
-	itemsField := fields[3]
-	if itemsField == ",," || itemsField == "" {
-		ai.NumberOfItems = 0 // Assuming 0 denotes an unknown or not applicable count
-	} else {
-		var err error
-		ai.NumberOfItems, err = strconv.Atoi(itemsField)
+	// Parse amount which is a float64.
+	parts[4] = strings.TrimSpace(parts[4])
+	if parts[4] != "" {
+		asum.Amount, err = strconv.ParseFloat(parts[4], 64)
 		if err != nil {
-			return AccountIdentifier{}, fmt.Errorf("error parsing number of items: %v", err)
+			return AccountIdentifier{}, err // Handle amount conversion error.
 		}
 	}
 
-	return ai, nil
+	// Item Count, where applicable (check if part exists).
+	if len(parts) > 5 && parts[5] != "/" {
+		if parts[5] != "" {
+			asum.ItemCount, err = strconv.Atoi(strings.TrimSpace(parts[5]))
+			if err != nil {
+				return AccountIdentifier{}, err // Handle item count conversion error.
+			}
+		}
+	}
+
+	// Funds Type, optional last part.
+	if len(parts) > 6 && parts[6] != "/" {
+		if parts[6] != "" {
+			asum.FundsType = strings.TrimSpace(parts[6])
+		}
+	}
+
+	return asum, nil
 }
 
 func parseTransactionDetail(line string) (TransactionDetail, error) {
@@ -265,32 +316,59 @@ func parseAccountTrailer(line string) (AccountTrailer, error) {
 	return at, nil
 }
 
-// ParseGroupTrailer translates group trailer section
-func parseGroupTrailer(line string) GroupTrailer {
-	groupControlTotal, _ := strconv.ParseFloat(line[2:20], 64)
-	numAccounts, _ := strconv.Atoi(line[20:29])
-	numRecords, _ := strconv.Atoi(line[29:38])
+func parseGroupTrailer(line string) (GroupTrailer, error) {
+	// Trim the last delimiter if it exists.
+	line = strings.TrimSuffix(line, "/")
+
+	parts := strings.Split(line, ",")
+	if len(parts) < 4 {
+		return GroupTrailer{}, ErrInvalidDataFormat // Ensure there are at least 4 parts.
+	}
+
+	// Parse group control total.
+	groupControlTotal, errControlTotal := strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
+	if errControlTotal != nil {
+		return GroupTrailer{}, errControlTotal
+	}
+
+	// Parse number of accounts.
+	numAccounts, errNumAccounts := strconv.Atoi(strings.TrimSpace(parts[2]))
+	if errNumAccounts != nil {
+		return GroupTrailer{}, errNumAccounts
+	}
+
+	// Parse number of records, remove any trailing non-numeric characters.
+	numRecords, errNumRecords := strconv.Atoi(strings.TrimSpace(parts[3]))
+	if errNumRecords != nil {
+		return GroupTrailer{}, errNumRecords
+	}
 
 	return GroupTrailer{
-		RecordCode:        line[:2],
+		RecordCode:        strings.TrimSpace(parts[0]),
 		GroupControlTotal: groupControlTotal,
 		NumberOfAccounts:  numAccounts,
 		NumberOfRecords:   numRecords,
-	}
+	}, nil
 }
 
 // parseFileTrailer translates the file trailer line while validating the number of records and control total
 func parseFileTrailer(line string) (FileTrailer, error) {
 	fields := strings.Split(line, ",")
+	if len(fields) < 4 {
+		return FileTrailer{}, ErrInvalidDataFormat
+	}
+
 	ft := FileTrailer{
 		RecordCode: fields[0],
-		NumberOfRecords: func(s string) int {
+		NumberOfGroups: func(s string) int {
 			if val, err := strconv.Atoi(s); err == nil {
 				return val
 			}
 			return 0
 		}(fields[2]), // TODO(adam): why so complex?
 	}
+
+	var err error
 
 	// Handle possible sign in the number
 	controlTotal := fields[1]
@@ -310,5 +388,16 @@ func parseFileTrailer(line string) (FileTrailer, error) {
 		}
 		ft.ControlTotal = value * sign
 	}
+
+	var recordCount int64
+	fields[3] = strings.TrimSuffix(fields[3], "/")
+	if fields[3] != "" {
+		recordCount, err = strconv.ParseInt(fields[3], 10, 32)
+		if err != nil {
+			return FileTrailer{}, fmt.Errorf("number of records: %w", err)
+		}
+		ft.NumberOfRecords = int(recordCount)
+	}
+
 	return ft, nil
 }

@@ -26,7 +26,7 @@ var (
 // including groups that contain their relevant transactions.
 type BalanceReport struct {
 	FileHeader  FileHeader
-	Groups      []GroupHeader
+	Groups      []Group
 	FileTrailer FileTrailer
 }
 
@@ -57,6 +57,17 @@ func (fh FileHeader) Serialize() string {
 		fh.FileIDModifier)
 }
 
+type Group struct {
+	Header GroupHeader
+
+	AccountIdentifiers  []AccountIdentifier
+	TransactionDetails  []TransactionDetail
+	ContinuationRecords []ContinuationRecord
+	AccountTrailers     []AccountTrailer
+
+	Trailer GroupTrailer
+}
+
 // GroupHeader represents the grouping of multiple account transactions
 type GroupHeader struct {
 	RecordCode         string
@@ -67,11 +78,6 @@ type GroupHeader struct {
 	AsOfTime           string // Optional
 	CurrencyCode       string // Optional
 	AsOfDateModifier   string // Optional
-
-	AccountIdentifiers  []AccountIdentifier
-	TransactionDetails  []TransactionDetail
-	ContinuationRecords []ContinuationRecord
-	AccountTrailers     []AccountTrailer
 }
 
 func (gh GroupHeader) Validate() error {
@@ -93,12 +99,14 @@ func (gh GroupHeader) Serialize() string {
 		gh.AsOfDateModifier)
 }
 
-// AccountIdentifier represents account details
 type AccountIdentifier struct {
 	RecordCode            string
 	CustomerAccountNumber string
 	CurrencyCode          string
-	NumberOfItems         int // Field to reflect the number of items in an activity summary.
+	TypeCode              string
+	Amount                float64
+	ItemCount             int
+	FundsType             string
 }
 
 func (ai AccountIdentifier) Validate() error {
@@ -243,6 +251,7 @@ func (gt GroupTrailer) Serialize() string {
 type FileTrailer struct {
 	RecordCode      string
 	ControlTotal    float64
+	NumberOfGroups  int
 	NumberOfRecords int
 }
 
@@ -254,8 +263,9 @@ func (ft FileTrailer) Validate() error {
 }
 
 func (ft FileTrailer) Serialize() string {
-	return fmt.Sprintf("%2s%-18.2f%-6d",
+	return fmt.Sprintf("%2s%-18.2f%-6d%-6d",
 		ft.RecordCode,
 		ft.ControlTotal,
+		ft.NumberOfGroups,
 		ft.NumberOfRecords)
 }

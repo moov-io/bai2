@@ -1,50 +1,151 @@
 package v2
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
+func TestReader(t *testing.T) {
+	report, err := ReadFilepath(filepath.Join("testdata", "example.txt"))
+	require.NoError(t, err)
+	require.NotNil(t, report)
+
+	fh := FileHeader{
+		RecordCode:       "01",
+		SenderName:       "122099999",
+		SenderID:         "123456789",
+		FileCreationDate: "040621",
+		FileCreationTime: "0200",
+		FileIDModifier:   "1",
+	}
+	require.Equal(t, fh, report.FileHeader)
+
+	require.Len(t, report.Groups, 1)
+	g := report.Groups[0]
+
+	require.Len(t, g.AccountIdentifiers, 1)
+	require.Len(t, g.TransactionDetails, 2)
+	require.Len(t, g.ContinuationRecords, 2)
+	require.Len(t, g.AccountTrailers, 1)
+
+	gh := GroupHeader{
+		RecordCode:         "02",
+		UltimateReceiverID: "031001234",
+		OriginatorID:       "122099999",
+		GroupStatus:        "1",
+		AsOfDate:           "040620",
+		AsOfTime:           "2359",
+		CurrencyCode:       "USD",
+		AsOfDateModifier:   "2",
+	}
+	require.Equal(t, gh, g.Header)
+
+	// AccountIdentifier
+	ai := AccountIdentifier{
+		RecordCode:            "03",
+		CustomerAccountNumber: "0975312468",
+		CurrencyCode:          "USD",
+		TypeCode:              "010",
+		Amount:                500000,
+		ItemCount:             0,
+		FundsType:             "",
+	}
+	require.Equal(t, ai, g.AccountIdentifiers[0])
+
+	// TODO(adam):
+	// Data in this record are for the sending bank’s account number (0975312468). The leading
+	// zero in the account number is significant and must be included in the data. The optional
+	// currency code is defaulted to the group currency code. The amount for type code (010) is
+	// $5,000.00 (500000). The Item Count and Funds Type fields are defaulted to “unknown” as
+	// indicated by adjacent delimiters (,,,). The amount for type code (190) is $700,000.00
+	// (70000000). The item count for this amount is four (4) and the availability is immediate (0).
+
+	// TransactionDetails
+	td1 := TransactionDetail{RecordCode: "16", TypeCode: "165", Amount: 1500000, FundsType: "1", DetailText: "DD1620"}
+	require.Equal(t, td1, g.TransactionDetails[0])
+
+	// TODO(adam):
+	// This is a Detail Record (16). The amount for type code 165 is $15,000.00 (1500000) and has
+	// one-day (1) deferred availability (1). The bank reference number is (DD1620). There is no
+	// customer reference number (,,). The text is (DEALER PAYMENTS). The remainder of the
+	// field is blank filled if fixed length records are used, and the text field is delimited by the fact
+	// that the next record is not “88”.
+
+	td2 := TransactionDetail{RecordCode: "16", TypeCode: "115", Amount: 1e+07, FundsType: "S", DetailText: "5000000"}
+	require.Equal(t, td2, g.TransactionDetails[1])
+
+	// ContinuationRecords
+	// TODO(adam): need to parse into previous TransactionDetail record
+	cr1 := ContinuationRecord{RecordCode: "88", ContinuationText: "AX13612,B096132,AMALGAMATED CORP. LOCKBOX"}
+	require.Equal(t, cr1, g.ContinuationRecords[0])
+	// TODO(adam):
+	cr2 := ContinuationRecord{RecordCode: "88", ContinuationText: "DEPOSIT-MISC. RECEIVABLES"}
+	require.Equal(t, cr2, g.ContinuationRecords[1])
+
+	// AccountTrailers
+	at := AccountTrailer{RecordCode: "49", ControlTotal: 18650000, NumberOfRecords: 3}
+	require.Equal(t, at, g.AccountTrailers[0])
+
+	// GroupTrailer
+	gt := GroupTrailer{
+		RecordCode:        "98",
+		GroupControlTotal: 11800000,
+		NumberOfAccounts:  2,
+		NumberOfRecords:   6,
+	}
+	require.Equal(t, gt, g.Trailer)
+
+	ft := FileTrailer{
+		RecordCode:      "99",
+		ControlTotal:    1215450000,
+		NumberOfGroups:  4,
+		NumberOfRecords: 36,
+	}
+	require.Equal(t, ft, report.FileTrailer)
+}
+
 func TestParseAccountIdentifier(t *testing.T) {
-	tests := []struct {
-		name        string
-		line        string
-		want        AccountIdentifier
-		expectError bool
+	// Define test cases in a slice of structs.
+	testCases := []struct {
+		name    string
+		line    string
+		want    AccountIdentifier
+		wantErr bool
 	}{
 		{
-			name: "Valid data with explicit number of items",
-			line: "03,12345,USD,10",
-			want: AccountIdentifier{
-				RecordCode: "03", CustomerAccountNumber: "12345", CurrencyCode: "USD", NumberOfItems: 10,
-			},
-			expectError: false,
+			name:    "Valid complete data",
+			line:    "03,100123456789,USD,11,1200.50,25,A",
+			want:    AccountIdentifier{"03", "100123456789", "USD", "11", 1200.50, 25, "A"},
+			wantErr: false,
 		},
 		{
-			name: "Data with default number of items",
-			line: "03,12345,USD,,",
-			want: AccountIdentifier{
-				RecordCode: "03", CustomerAccountNumber: "12345", CurrencyCode: "USD", NumberOfItems: 0,
-			},
-			expectError: false,
+			name:    "Valid data with optional fields missing",
+			line:    "03,100123456790,GBP,22,500.00,/,/",
+			want:    AccountIdentifier{"03", "100123456790", "GBP", "22", 500.00, 0, ""},
+			wantErr: false,
 		},
 		{
-			name:        "Insufficient data fields",
-			line:        "03,12345,USD",
-			expectError: true,
+			name:    "Invalid data with missing fields",
+			line:    "03,100123456791",
+			want:    AccountIdentifier{},
+			wantErr: true,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseAccountIdentifier(tt.line)
-			if (err != nil) != tt.expectError {
-				t.Errorf("parseAccountIdentifier() error = %v, expectError %v", err, tt.expectError)
+	// Iterate through each test case.
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := parseAccountIdentifier(tc.line)
+			// Check for error expectation.
+			if (err != nil) != tc.wantErr {
+				t.Errorf("parseAccountIdentifier() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			if !tt.expectError && got != tt.want {
-				t.Errorf("parseAccountIdentifier() got = %v, want %v", got, tt.want)
+			// Compare the result struct only if no error is expected.
+			if !tc.wantErr && got != tc.want {
+				t.Errorf("parseAccountIdentifier() got = %v, want %v", got, tc.want)
 			}
 		})
 	}
@@ -178,14 +279,14 @@ func TestParseFileTrailer(t *testing.T) {
 	}{
 		{
 			name:        "Positive Control Total",
-			line:        "99,+12345.67,100",
-			expected:    FileTrailer{"99", 12345.67, 100},
+			line:        "99,+12345.67,100,10",
+			expected:    FileTrailer{"99", 12345.67, 100, 10},
 			expectError: false,
 		},
 		{
 			name:        "Negative Control Total",
-			line:        "99,-12345.67,100",
-			expected:    FileTrailer{"99", -12345.67, 100},
+			line:        "99,-12345.67,100,10",
+			expected:    FileTrailer{"99", -12345.67, 100, 10},
 			expectError: false,
 		},
 	}
