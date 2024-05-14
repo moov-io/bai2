@@ -32,7 +32,7 @@ func TestTransactionDetailWithSample(t *testing.T) {
 
 	size, err := record.parse(sample)
 	require.NoError(t, err)
-	require.Equal(t, 56, size)
+	require.Equal(t, 57, size)
 
 	require.Equal(t, "409", record.TypeCode)
 	require.Equal(t, "000000000002500", record.Amount)
@@ -41,7 +41,7 @@ func TestTransactionDetailWithSample(t *testing.T) {
 	require.Equal(t, "", record.FundsType.Time)
 	require.Equal(t, "", record.BankReferenceNumber)
 	require.Equal(t, "", record.CustomerReferenceNumber)
-	require.Equal(t, "RETURNED CHEQUE     ", record.Text)
+	require.Equal(t, "RETURNED CHEQUE     /", record.Text)
 
 	require.Equal(t, sample, record.string())
 }

@@ -14,15 +14,26 @@ func getIndex(input string, opts ...bool) int {
 	index_comma := strings.Index(input, ",")
 	index_slash := strings.Index(input, "/")
 	index_newline := strings.Index(input, "\n")
-	// NB. `opts[0]`: if true, returns the index of the last character of the line. this will lead the parser to read the
-	// remainder of the line. note, if line is terminated with a `/` character, we will read up to that index insted of
-	// reading `len(input)`
-	read_remainder_of_line := len(opts) > 0 && opts[0]
+
+	// NB. `opts[0]`: if true, slash character is allowed in text and does not signify a line termination. this is the
+	// case for Transaction Detail and Continuation records.
+	// `opts[1]`: if true, returns the index of the first newline, or the full length of the input if no newline exists.
+	allow_slash_as_character := len(opts) > 0 && opts[0]
+	read_remainder_of_line := len(opts) > 1 && opts[1]
+
+	if read_remainder_of_line {
+		if index_newline != -1 {
+			return index_newline
+		}
+		return len(input)
+	}
 
 	// If there is no `,` separator in the input, return either the index of the next explicit terminating character (`/`)
 	// or the index of the next newline character, if no terminating character is present.
-	if read_remainder_of_line || index_comma == -1 {
-		if index_slash != -1 {
+	//
+	// If slash is allowed as a non-terminating character, only newlines are respected here.
+	if index_comma == -1 {
+		if !allow_slash_as_character && index_slash != -1 {
 			return index_slash
 		}
 		if index_newline != -1 {
@@ -33,13 +44,15 @@ func getIndex(input string, opts ...bool) int {
 
 	// If a line is terminated with a `/` character and the terminator is BEFORE the next `,` character, return
 	// the index of the `/` character.
-	if index_slash > -1 && index_slash < index_comma {
+	//
+	// If slash is allowed as a non-terminating character, this check is skipped.
+	if !allow_slash_as_character && index_slash > -1 && index_slash < index_comma {
 		return index_slash
 	}
 
-	// If a line is terminated with a `\n` character (and is NOT terminated with a / character) and the terminator is
-	// BEFORE the next `,` character, return the index of the `\n` character.
-	if index_slash < 0 && index_newline > -1 && index_newline < index_comma {
+	// If a line is terminated with a `\n` character (and is NOT terminated with a `/` character, or if `/` is an allowed character)
+	// and the `\n` is BEFORE the next `,` character, return the index of the `\n` character.
+	if (index_slash < 0 || allow_slash_as_character) && index_newline > -1 && index_newline < index_comma {
 		return index_newline
 	}
 
@@ -96,10 +109,15 @@ func ReadFieldAsInt(input string, start int) (int64, int, error) {
 	return value, idx + 1, nil
 }
 
-func GetSize(line string) int64 {
+func GetSize(line string, opts ...bool) int64 {
+	allow_slash_as_character := len(opts) > 0 && opts[0]
+	read_remainder_of_line := len(opts) > 1 && opts[1]
+	if read_remainder_of_line {
+		return int64(len(line))
+	}
 
 	size := strings.Index(line, "/")
-	if size >= 0 {
+	if !allow_slash_as_character && size >= 0 {
 		return int64(size + 1)
 	}
 

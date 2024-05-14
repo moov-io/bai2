@@ -7,8 +7,8 @@ package lib
 import (
 	"bytes"
 	"fmt"
-
 	"github.com/moov-io/bai2/pkg/util"
+	"strings"
 )
 
 const (
@@ -45,7 +45,8 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	var err error
 	var size, read int
 
-	length := util.GetSize(data)
+	allow_slash_as_character := true
+	length := util.GetSize(data, allow_slash_as_character)
 	if length < 3 {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "record"))
 	} else {
@@ -83,14 +84,14 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	}
 
 	// BankReferenceNumber
-	if r.BankReferenceNumber, size, err = util.ReadField(line, read); err != nil {
+	if r.BankReferenceNumber, size, err = util.ReadField(line, read, allow_slash_as_character); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "BankReferenceNumber"))
 	} else {
 		read += size
 	}
 
 	// CustomerReferenceNumber
-	if r.CustomerReferenceNumber, size, err = util.ReadField(line, read); err != nil {
+	if r.CustomerReferenceNumber, size, err = util.ReadField(line, read, allow_slash_as_character); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "CustomerReferenceNumber"))
 	} else {
 		read += size
@@ -98,7 +99,7 @@ func (r *transactionDetail) parse(data string) (int, error) {
 
 	// Text
 	read_remainder_of_line := true
-	if r.Text, size, err = util.ReadField(line, read, read_remainder_of_line); err != nil {
+	if r.Text, size, err = util.ReadField(line, read, allow_slash_as_character, read_remainder_of_line); err != nil {
 		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Text"))
 	} else {
 		read += size
@@ -134,7 +135,9 @@ func (r *transactionDetail) string(opts ...int64) string {
 	buf.WriteString(",")
 
 	util.WriteBuffer(&total, &buf, r.Text, maxLen)
-	buf.WriteString("/")
+	if !strings.HasSuffix(r.Text, "/") {
+		buf.WriteString("/")
+	}
 
 	total.WriteString(buf.String())
 

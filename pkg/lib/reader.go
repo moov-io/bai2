@@ -66,9 +66,15 @@ func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 		switch char {
 		case "/":
 			// Add `/` to line if it exists. Parsers use this to help internally represent the delineation
-			// between records. On observing a `/` character, check to see if we have a full record available
-			// for processing.
+			// between records.
 			b.currentLine.WriteString(char)
+			// On observing a `/` character, check to see if we have a full record available
+			// for processing -- with exception for transaction or continuation records. For those records,
+			// the record is terminated by a newline followed by record code.
+			line := strings.TrimSpace(b.currentLine.String())
+			if strings.HasPrefix(line, util.TransactionDetailCode) || strings.HasPrefix(line, util.ContinuationCode) {
+				continue
+			}
 			goto fullLine
 		case "\n", "\r":
 			// On observing a newline character, check to see if we have a full record available for processing.
