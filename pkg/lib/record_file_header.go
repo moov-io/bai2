@@ -47,7 +47,7 @@ func (h *fileHeader) validate() error {
 	if h.FileIdNumber == "" {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileIdNumber"))
 	}
-	if h.VersionNumber != 2 {
+	if h.VersionNumber != 2 && h.VersionNumber != 3 {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "VersionNumber"))
 	}
 
