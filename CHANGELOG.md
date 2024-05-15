@@ -1,3 +1,14 @@
+## v0.3.1 (Released 2024-05-15)
+
+IMPROVEMENTS
+
+- feat: remove unused continuation struct
+- fix: allow some records to include `/` character (#113)
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.49.3
+
 ## v0.3.0 (Released 2024-04-16)
 
 IMPROVEMENTS
