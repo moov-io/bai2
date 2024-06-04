@@ -31,10 +31,10 @@ func TestFileWithSampleData(t *testing.T) {
 
 		scan := NewBai2Scanner(fd)
 		f := NewBai2()
-		err = f.Read(&scan)
+		err = f.Read(&scan, false)
 
 		require.NoError(t, err)
-		require.NoError(t, f.Validate())
+		require.NoError(t, f.Validate(false))
 	}
 }
 
@@ -53,9 +53,9 @@ func TestFileWithContinuationRecord(t *testing.T) {
 
 	scan := NewBai2Scanner(strings.NewReader(raw))
 	f := NewBai2()
-	err := f.Read(&scan)
+	err := f.Read(&scan, false)
 	require.NoError(t, err)
-	require.NoError(t, f.Validate())
+	require.NoError(t, f.Validate(false))
 
 	expected := `01,0004,12345,060321,0829,001,80,1,2/
 02,12345,0004,1,060317,,CAD,/
@@ -93,7 +93,7 @@ func TestScannedFileTrailerRecordCount(t *testing.T) {
 
 	scan := NewBai2Scanner(bytes.NewReader([]byte(raw)))
 	file := NewBai2()
-	err := file.Read(&scan)
+	err := file.Read(&scan, false)
 	require.NoError(t, err)
 	require.Equal(t, int64(10), file.SumRecords())
 }
@@ -130,7 +130,7 @@ func TestSumGroupControlTotals(t *testing.T) {
 	file.Groups = append(file.Groups, group)
 	file.NumberOfRecords = file.SumRecords()
 
-	total, err := file.SumGroupControlTotals()
+	total, err := file.SumGroupControlTotals(false)
 	require.NoError(t, err)
 	require.Equal(t, "200", total)
 }
@@ -200,7 +200,7 @@ func TestBuildFileAggregates(t *testing.T) {
 	file.BlockSize = 1
 	file.VersionNumber = 2
 	file.Groups = append(file.Groups, group)
-	controlTotal, _ = file.SumGroupControlTotals()
+	controlTotal, _ = file.SumGroupControlTotals(false)
 	file.FileControlTotal = controlTotal
 	file.NumberOfGroups = file.SumNumberOfGroups()
 	file.NumberOfRecords = file.SumRecords()

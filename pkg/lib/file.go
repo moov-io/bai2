@@ -125,8 +125,8 @@ func (g *Bai2) SumNumberOfGroups() int64 {
 }
 
 // Sums the Group Control Totals. Maps to the FileControlTotal field.
-func (a *Bai2) SumGroupControlTotals() (string, error) {
-	if err := a.Validate(); err != nil {
+func (a *Bai2) SumGroupControlTotals(ignoreVersion bool) (string, error) {
+	if err := a.Validate(ignoreVersion); err != nil {
 		return "0", err
 	}
 	var sum int64
@@ -154,11 +154,11 @@ func (r *Bai2) String() string {
 	return buf.String()
 }
 
-func (r *Bai2) Validate() error {
+func (r *Bai2) Validate(ignoreVersion bool) error {
 
 	r.copyRecords()
 
-	if err := r.header.validate(); err != nil {
+	if err := r.header.validate(ignoreVersion); err != nil {
 		return err
 	}
 
@@ -175,7 +175,7 @@ func (r *Bai2) Validate() error {
 	return nil
 }
 
-func (r *Bai2) Read(scan *Bai2Scanner) error {
+func (r *Bai2) Read(scan *Bai2Scanner, ignoreVersion bool) error {
 
 	if scan == nil {
 		return errors.New("invalid bai2 scanner")
@@ -193,7 +193,7 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 		case util.FileHeaderCode:
 
 			newRecord := fileHeader{}
-			_, err = newRecord.parse(line)
+			_, err = newRecord.parse(line, ignoreVersion)
 			if err != nil {
 				return fmt.Errorf("ERROR parsing file header on line %d (%v)", scan.GetLineIndex(), err)
 			}

@@ -27,7 +27,7 @@ type fileHeader struct {
 	VersionNumber        int64
 }
 
-func (h *fileHeader) validate() error {
+func (h *fileHeader) validate(ignoreVersion bool) error {
 	if h.Sender == "" {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Sender"))
 	}
@@ -47,14 +47,14 @@ func (h *fileHeader) validate() error {
 	if h.FileIdNumber == "" {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileIdNumber"))
 	}
-	if h.VersionNumber != 2 {
+	if h.VersionNumber != 2 && !ignoreVersion {
 		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "VersionNumber"))
 	}
 
 	return nil
 }
 
-func (h *fileHeader) parse(data string) (int, error) {
+func (h *fileHeader) parse(data string, ignoreVersion bool) (int, error) {
 
 	var line string
 	var err error
@@ -128,7 +128,7 @@ func (h *fileHeader) parse(data string) (int, error) {
 		read += size
 	}
 
-	if err = h.validate(); err != nil {
+	if err = h.validate(ignoreVersion); err != nil {
 		return 0, err
 	}
 
