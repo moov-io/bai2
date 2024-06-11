@@ -182,7 +182,7 @@ func initRootCmd() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.PersistentFlags().StringVar(&documentFileName, "input", "", "bai2 report file")
-	rootCmd.PersistentFlags().BoolVar(&ignoreVersion, "ignoreVersion",false, "set to ignore bai file version in the header")
+	rootCmd.PersistentFlags().BoolVar(&ignoreVersion, "ignoreVersion", false, "set to ignore bai file version in the header")
 	rootCmd.AddCommand(WebCmd)
 	rootCmd.AddCommand(Print)
 	rootCmd.AddCommand(Parse)
