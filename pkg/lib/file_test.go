@@ -18,6 +18,7 @@ import (
 func TestFileWithSampleData(t *testing.T) {
 	paths := []string{
 		"sample1.txt",
+		"sample1-btrs.txt",
 		"sample2.txt",
 		"sample3.txt",
 		"sample4-continuations-newline-delimited.txt",

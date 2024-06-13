@@ -32,6 +32,10 @@ Moov's mission is to give developers an easy way to create and integrate bank pr
 
 Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) developed by [Bank Administration Institute](https://www.bai.org) (BAI). This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`.
 
+BTRS (BTR3/BAI3) is also supported in this library. Behavior changes are made when the BTRS Version 3 header is detected.
+
+Specifications for [bai2](docs/specifications/Cash Management Balance Reporting Specifications Version 2.pdf) and [BTRS / BTR3](docs/specifications/ANSI-X9-121201-BTRS-Format-Guide-Version-3.pdf) are included in the repository.
+
 ## Table of contents
 
 - [Project status](#project-status)
