@@ -61,13 +61,15 @@ var Parse = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
-		err = f.Read(&scan, ignoreVersion)
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
+		err = f.Read(&scan)
 		if err != nil {
 			return err
 		}
 
-		err = f.Validate(ignoreVersion)
+		err = f.Validate()
 		if err != nil {
 			return errors.New("Parsing report was successful, but not valid")
 		}
@@ -87,13 +89,15 @@ var Print = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
-		err = f.Read(&scan, ignoreVersion)
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
+		err = f.Read(&scan)
 		if err != nil {
 			return err
 		}
 
-		err = f.Validate(ignoreVersion)
+		err = f.Validate()
 		if err != nil {
 			return err
 		}
@@ -112,13 +116,15 @@ var Format = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
-		err = f.Read(&scan, ignoreVersion)
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
+		err = f.Read(&scan)
 		if err != nil {
 			return err
 		}
 
-		err = f.Validate(ignoreVersion)
+		err = f.Validate()
 		if err != nil {
 			return err
 		}

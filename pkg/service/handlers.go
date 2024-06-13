@@ -45,7 +45,8 @@ func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 	// convert byte slice to io.Reader
 	scan := lib.NewBai2Scanner(bytes.NewReader(input.Bytes()))
 	f := lib.NewBai2()
-	err = f.Read(&scan, false)
+
+	err = f.Read(&scan)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func parse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = f.Validate(false)
+	err = f.Validate()
 	if err != nil {
 		outputError(w, http.StatusNotImplemented, err)
 		return
@@ -90,7 +91,7 @@ func print(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = f.Validate(false)
+	err = f.Validate()
 	if err != nil {
 		outputError(w, http.StatusNotImplemented, err)
 		return
@@ -107,7 +108,7 @@ func format(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = f.Validate(false)
+	err = f.Validate()
 	if err != nil {
 		outputError(w, http.StatusNotImplemented, err)
 		return
