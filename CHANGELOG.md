@@ -1,3 +1,14 @@
+## v0.4.0 (Released 2024-06-17)
+
+IMPROVEMENTS
+
+- feat: allow to ignore version check with `Options` struct
+
+BUILD
+
+- fix(deps): update module github.com/moov-io/base to v0.49.4
+- fix(deps): update module github.com/spf13/cobra to v1.8.1
+
 ## v0.3.1 (Released 2024-05-15)
 
 IMPROVEMENTS
