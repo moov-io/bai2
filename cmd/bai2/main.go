@@ -22,6 +22,7 @@ import (
 
 var (
 	documentFileName string
+	ignoreVersion    bool
 	documentBuffer   []byte
 )
 
@@ -60,7 +61,9 @@ var Parse = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
 		err = f.Read(&scan)
 		if err != nil {
 			return err
@@ -86,7 +89,9 @@ var Print = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
 		err = f.Read(&scan)
 		if err != nil {
 			return err
@@ -111,7 +116,9 @@ var Format = &cobra.Command{
 		var err error
 
 		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2()
+		f := lib.NewBai2With(lib.Options{
+			IgnoreVersion: ignoreVersion,
+		})
 		err = f.Read(&scan)
 		if err != nil {
 			return err
@@ -181,6 +188,7 @@ func initRootCmd() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.PersistentFlags().StringVar(&documentFileName, "input", "", "bai2 report file")
+	rootCmd.PersistentFlags().BoolVar(&ignoreVersion, "ignoreVersion", false, "set to ignore bai file version in the header")
 	rootCmd.AddCommand(WebCmd)
 	rootCmd.AddCommand(Print)
 	rootCmd.AddCommand(Parse)

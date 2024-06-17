@@ -45,6 +45,7 @@ func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 	// convert byte slice to io.Reader
 	scan := lib.NewBai2Scanner(bytes.NewReader(input.Bytes()))
 	f := lib.NewBai2()
+
 	err = f.Read(&scan)
 	if err != nil {
 		return nil, err

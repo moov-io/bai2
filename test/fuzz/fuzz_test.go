@@ -22,6 +22,7 @@ func FuzzReaderWriter_ValidFiles(f *testing.F) {
 	f.Fuzz(func(t *testing.T, contents string) {
 		scan := lib.NewBai2Scanner(strings.NewReader(contents))
 		file := lib.NewBai2()
+
 		require.NotPanics(t, func() { file.Read(&scan) })
 		require.NotPanics(t, func() { file.Validate() })
 
@@ -36,6 +37,7 @@ func FuzzReaderWriter_ErrorFiles(f *testing.F) {
 	f.Fuzz(func(t *testing.T, contents string) {
 		scan := lib.NewBai2Scanner(strings.NewReader(contents))
 		file := lib.NewBai2()
+
 		require.NotPanics(t, func() { file.Read(&scan) })
 		require.NotPanics(t, func() { file.Validate() })
 

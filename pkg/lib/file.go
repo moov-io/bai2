@@ -59,9 +59,14 @@ included one account. Only the first account of the first group included transac
 
 */
 
-// Creating new file object
+// NewBai2With returns a BAI2 file with the default options
 func NewBai2() *Bai2 {
 	return &Bai2{}
+}
+
+// NewBai2With returns a BAI2 file with the specified options
+func NewBai2With(options Options) *Bai2 {
+	return &Bai2{options: options}
 }
 
 // FILE with BAI Format
@@ -86,10 +91,19 @@ type Bai2 struct {
 
 	header  fileHeader
 	trailer fileTrailer
+
+	options Options
+}
+
+type Options struct {
+	IgnoreVersion bool
+}
+
+func (r *Bai2) SetOptions(options Options) {
+	r.options = options
 }
 
 func (r *Bai2) copyRecords() {
-
 	r.header = fileHeader{
 		Sender:               r.Sender,
 		Receiver:             r.Receiver,
@@ -106,7 +120,6 @@ func (r *Bai2) copyRecords() {
 		NumberOfGroups:   r.NumberOfGroups,
 		NumberOfRecords:  r.NumberOfRecords,
 	}
-
 }
 
 // Sums the groups NumberOfRecords plus file header and trailer. Maps to the NumberOfRecords field.
@@ -141,7 +154,6 @@ func (a *Bai2) SumGroupControlTotals() (string, error) {
 }
 
 func (r *Bai2) String() string {
-
 	r.copyRecords()
 
 	var buf bytes.Buffer
@@ -155,10 +167,9 @@ func (r *Bai2) String() string {
 }
 
 func (r *Bai2) Validate() error {
-
 	r.copyRecords()
 
-	if err := r.header.validate(); err != nil {
+	if err := r.header.validate(r.options); err != nil {
 		return err
 	}
 
@@ -176,7 +187,6 @@ func (r *Bai2) Validate() error {
 }
 
 func (r *Bai2) Read(scan *Bai2Scanner) error {
-
 	if scan == nil {
 		return errors.New("invalid bai2 scanner")
 	}
@@ -193,7 +203,7 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 		case util.FileHeaderCode:
 
 			newRecord := fileHeader{}
-			_, err = newRecord.parse(line)
+			_, err = newRecord.parse(line, r.options)
 			if err != nil {
 				return fmt.Errorf("ERROR parsing file header on line %d (%v)", scan.GetLineIndex(), err)
 			}
