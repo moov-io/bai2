@@ -2,7 +2,7 @@ module github.com/moov-io/bai2
 
 go 1.23.0
 
-toolchain go1.24.1
+toolchain go1.24.2
 
 require (
 	github.com/go-kit/log v0.2.1
