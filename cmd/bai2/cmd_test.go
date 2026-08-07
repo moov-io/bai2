@@ -42,28 +42,28 @@ func executeCommand(root *cobra.Command, args ...string) (output string, err err
 func TestWebTest(t *testing.T) {
 	_, err := executeCommand(rootCmd, "web", "--test=true")
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("%s", err.Error())
 	}
 }
 
 func TestPrint(t *testing.T) {
 	_, err := executeCommand(rootCmd, "print", "--input", testFileName)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("%s", err.Error())
 	}
 }
 
 func TestParse(t *testing.T) {
 	_, err := executeCommand(rootCmd, "parse", "--input", testFileName)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("%s", err.Error())
 	}
 }
 
 func TestFormat(t *testing.T) {
 	_, err := executeCommand(rootCmd, "format", "--input", testFileName)
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Errorf("%s", err.Error())
 	}
 }
 

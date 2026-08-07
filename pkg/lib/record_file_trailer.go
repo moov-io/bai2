@@ -24,7 +24,7 @@ type fileTrailer struct {
 
 func (h *fileTrailer) validate() error {
 	if h.FileControlTotal != "" && !util.ValidateAmount(h.FileControlTotal) {
-		return fmt.Errorf(fmt.Sprintf(ftValidateErrorFmt, "FileControlTotal"))
+		return fmt.Errorf(ftValidateErrorFmt, "FileControlTotal")
 	}
 
 	return nil
@@ -37,34 +37,34 @@ func (h *fileTrailer) parse(data string) (int, error) {
 	var size, read int
 
 	if length := util.GetSize(data); length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "record"))
+		return 0, fmt.Errorf(ftParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.FileTrailerCode != line[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// GroupControlTotal
 	if h.FileControlTotal, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "GroupControlTotal"))
+		return 0, fmt.Errorf(ftParseErrorFmt, "GroupControlTotal")
 	} else {
 		read += size
 	}
 
 	// NumberOfGroups
 	if h.NumberOfGroups, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfGroups"))
+		return 0, fmt.Errorf(ftParseErrorFmt, "NumberOfGroups")
 	} else {
 		read += size
 	}
 
 	// NumberOfRecords
 	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(ftParseErrorFmt, "NumberOfRecords"))
+		return 0, fmt.Errorf(ftParseErrorFmt, "NumberOfRecords")
 	} else {
 		read += size
 	}
