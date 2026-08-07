@@ -23,7 +23,7 @@ type accountTrailer struct {
 
 func (h *accountTrailer) validate() error {
 	if h.AccountControlTotal != "" && !util.ValidateAmount(h.AccountControlTotal) {
-		return fmt.Errorf(fmt.Sprintf(atValidateErrorFmt, "Amount"))
+		return fmt.Errorf(atValidateErrorFmt, "Amount")
 	}
 
 	return nil
@@ -37,27 +37,27 @@ func (h *accountTrailer) parse(data string) (int, error) {
 
 	length := util.GetSize(data)
 	if length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "record"))
+		return 0, fmt.Errorf(atParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.AccountTrailerCode != data[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// AccountControlTotal
 	if h.AccountControlTotal, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "AccountControlTotal"))
+		return 0, fmt.Errorf(atParseErrorFmt, "AccountControlTotal")
 	} else {
 		read += size
 	}
 
 	// NumberRecords
 	if h.NumberRecords, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(atParseErrorFmt, "NumberRecords"))
+		return 0, fmt.Errorf(atParseErrorFmt, "NumberRecords")
 	} else {
 		read += size
 	}

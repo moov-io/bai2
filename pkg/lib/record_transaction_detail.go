@@ -27,13 +27,13 @@ type transactionDetail struct {
 
 func (r *transactionDetail) validate() error {
 	if r.TypeCode != "" && !util.ValidateTypeCode(r.TypeCode) {
-		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "TypeCode"))
+		return fmt.Errorf(tdValidateErrorFmt, "TypeCode")
 	}
 	if r.Amount != "" && !util.ValidateAmount(r.Amount) {
-		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "Amount"))
+		return fmt.Errorf(tdValidateErrorFmt, "Amount")
 	}
 	if r.FundsType.Validate() != nil {
-		return fmt.Errorf(fmt.Sprintf(tdValidateErrorFmt, "FundsType"))
+		return fmt.Errorf(tdValidateErrorFmt, "FundsType")
 	}
 
 	return nil
@@ -48,51 +48,51 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	allow_slash_as_character := true
 	length := util.GetSize(data, allow_slash_as_character)
 	if length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "record"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.TransactionDetailCode != data[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// TypeCode
 	if r.TypeCode, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "TypeCode"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "TypeCode")
 	} else {
 		read += size
 	}
 
 	// Amount
 	if r.Amount, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Amount"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "Amount")
 	} else {
 		read += size
 	}
 
 	// FundsType
 	if len(line) < read {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType") + " too short")
+		return 0, fmt.Errorf(tdParseErrorFmt+" too short", "FundsType")
 	}
 	if size, err = r.FundsType.parse(line[read:]); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "FundsType"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "FundsType")
 	} else {
 		read += size
 	}
 
 	// BankReferenceNumber
 	if r.BankReferenceNumber, size, err = util.ReadField(line, read, allow_slash_as_character); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "BankReferenceNumber"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "BankReferenceNumber")
 	} else {
 		read += size
 	}
 
 	// CustomerReferenceNumber
 	if r.CustomerReferenceNumber, size, err = util.ReadField(line, read, allow_slash_as_character); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "CustomerReferenceNumber"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "CustomerReferenceNumber")
 	} else {
 		read += size
 	}
@@ -100,7 +100,7 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	// Text
 	read_remainder_of_line := true
 	if r.Text, size, err = util.ReadField(line, read, allow_slash_as_character, read_remainder_of_line); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(tdParseErrorFmt, "Text"))
+		return 0, fmt.Errorf(tdParseErrorFmt, "Text")
 	} else {
 		read += size
 	}

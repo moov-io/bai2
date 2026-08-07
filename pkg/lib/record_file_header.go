@@ -29,26 +29,26 @@ type fileHeader struct {
 
 func (h *fileHeader) validate(options Options) error {
 	if h.Sender == "" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Sender"))
+		return fmt.Errorf(fhValidateErrorFmt, "Sender")
 	}
 	if h.Receiver == "" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "Receiver"))
+		return fmt.Errorf(fhValidateErrorFmt, "Receiver")
 	}
 	if h.FileCreatedDate == "" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
+		return fmt.Errorf(fhValidateErrorFmt, "FileCreatedDate")
 	} else if !util.ValidateDate(h.FileCreatedDate) {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedDate"))
+		return fmt.Errorf(fhValidateErrorFmt, "FileCreatedDate")
 	}
 	if h.FileCreatedTime == "" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedTime"))
+		return fmt.Errorf(fhValidateErrorFmt, "FileCreatedTime")
 	} else if !util.ValidateTime(h.FileCreatedTime) {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileCreatedTime"))
+		return fmt.Errorf(fhValidateErrorFmt, "FileCreatedTime")
 	}
 	if h.FileIdNumber == "" {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "FileIdNumber"))
+		return fmt.Errorf(fhValidateErrorFmt, "FileIdNumber")
 	}
 	if h.VersionNumber != 2 && !options.IgnoreVersion {
-		return fmt.Errorf(fmt.Sprintf(fhValidateErrorFmt, "VersionNumber"))
+		return fmt.Errorf(fhValidateErrorFmt, "VersionNumber")
 	}
 
 	return nil
@@ -61,69 +61,69 @@ func (h *fileHeader) parse(data string, options Options) (int, error) {
 	var size, read int
 
 	if length := util.GetSize(data); length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "record"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.FileHeaderCode != line[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// Sender
 	if h.Sender, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Sender"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "Sender")
 	} else {
 		read += size
 	}
 
 	// Receiver
 	if h.Receiver, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "Receiver"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "Receiver")
 	} else {
 		read += size
 	}
 
 	// FileCreatedDate
 	if h.FileCreatedDate, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedDate"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "FileCreatedDate")
 	} else {
 		read += size
 	}
 
 	// FileCreatedTime
 	if h.FileCreatedTime, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileCreatedTime"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "FileCreatedTime")
 	} else {
 		read += size
 	}
 
 	// FileIdNumber
 	if h.FileIdNumber, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "FileIdNumber"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "FileIdNumber")
 	} else {
 		read += size
 	}
 
 	// PhysicalRecordLength
 	if h.PhysicalRecordLength, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "PhysicalRecordLength"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "PhysicalRecordLength")
 	} else {
 		read += size
 	}
 
 	// BlockSize
 	if h.BlockSize, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "BlockSize"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "BlockSize")
 	} else {
 		read += size
 	}
 
 	// VersionNumber
 	if h.VersionNumber, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "VersionNumber"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "VersionNumber")
 	} else {
 		read += size
 	}

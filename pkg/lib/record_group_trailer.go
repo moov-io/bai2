@@ -24,7 +24,7 @@ type groupTrailer struct {
 
 func (h *groupTrailer) validate() error {
 	if h.GroupControlTotal != "" && !util.ValidateAmount(h.GroupControlTotal) {
-		return fmt.Errorf(fmt.Sprintf(gtValidateErrorFmt, "GroupControlTotal"))
+		return fmt.Errorf(gtValidateErrorFmt, "GroupControlTotal")
 	}
 
 	return nil
@@ -37,34 +37,34 @@ func (h *groupTrailer) parse(data string) (int, error) {
 	var size, read int
 
 	if length := util.GetSize(data); length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "record"))
+		return 0, fmt.Errorf(gtParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.GroupTrailerCode != data[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(fhParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// GroupControlTotal
 	if h.GroupControlTotal, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "GroupControlTotal"))
+		return 0, fmt.Errorf(gtParseErrorFmt, "GroupControlTotal")
 	} else {
 		read += size
 	}
 
 	// NumberOfAccounts
 	if h.NumberOfAccounts, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfAccounts"))
+		return 0, fmt.Errorf(gtParseErrorFmt, "NumberOfAccounts")
 	} else {
 		read += size
 	}
 
 	// NumberOfRecords
 	if h.NumberOfRecords, size, err = util.ReadFieldAsInt(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(gtParseErrorFmt, "NumberOfRecords"))
+		return 0, fmt.Errorf(gtParseErrorFmt, "NumberOfRecords")
 	} else {
 		read += size
 	}

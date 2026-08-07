@@ -33,22 +33,22 @@ type accountIdentifier struct {
 func (r *accountIdentifier) validate() error {
 
 	if r.AccountNumber == "" {
-		return fmt.Errorf(fmt.Sprintf(aiValidateErrorFmt, "AccountNumber"))
+		return fmt.Errorf(aiValidateErrorFmt, "AccountNumber")
 	}
 
 	if r.CurrencyCode != "" && !util.ValidateCurrencyCode(r.CurrencyCode) {
-		return fmt.Errorf(fmt.Sprintf(aiValidateErrorFmt, "CurrencyCode"))
+		return fmt.Errorf(aiValidateErrorFmt, "CurrencyCode")
 	}
 
 	for _, summary := range r.Summaries {
 		if summary.Amount != "" && !util.ValidateAmount(summary.Amount) {
-			return fmt.Errorf(fmt.Sprintf(aiValidateErrorFmt, "Amount"))
+			return fmt.Errorf(aiValidateErrorFmt, "Amount")
 		}
 		if summary.TypeCode != "" && !util.ValidateTypeCode(summary.TypeCode) {
-			return fmt.Errorf(fmt.Sprintf(aiValidateErrorFmt, "TypeCode"))
+			return fmt.Errorf(aiValidateErrorFmt, "TypeCode")
 		}
 		if summary.FundsType.Validate() != nil {
-			return fmt.Errorf(fmt.Sprintf(aiValidateErrorFmt, "FundsType"))
+			return fmt.Errorf(aiValidateErrorFmt, "FundsType")
 		}
 	}
 
@@ -63,27 +63,27 @@ func (r *accountIdentifier) parse(data string) (int, error) {
 
 	length := util.GetSize(data)
 	if length < 3 {
-		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "record"))
+		return 0, fmt.Errorf(aiParseErrorFmt, "record")
 	} else {
 		line = data[:length]
 	}
 
 	// RecordCode
 	if util.AccountIdentifierCode != data[:2] {
-		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "RecordCode"))
+		return 0, fmt.Errorf(aiParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// AccountNumber
 	if r.AccountNumber, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "AccountNumber"))
+		return 0, fmt.Errorf(aiParseErrorFmt, "AccountNumber")
 	} else {
 		read += size
 	}
 
 	// CurrencyCode
 	if r.CurrencyCode, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "CurrencyCode"))
+		return 0, fmt.Errorf(aiParseErrorFmt, "CurrencyCode")
 	} else {
 		read += size
 	}
@@ -94,27 +94,27 @@ func (r *accountIdentifier) parse(data string) (int, error) {
 
 		// TypeCode
 		if summary.TypeCode, size, err = util.ReadField(line, read); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "TypeCode"))
+			return 0, fmt.Errorf(aiParseErrorFmt, "TypeCode")
 		} else {
 			read += size
 		}
 
 		// Amount
 		if summary.Amount, size, err = util.ReadField(line, read); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "Amount"))
+			return 0, fmt.Errorf(aiParseErrorFmt, "Amount")
 		} else {
 			read += size
 		}
 
 		// ItemCount
 		if summary.ItemCount, size, err = util.ReadFieldAsInt(line, read); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "ItemCount"))
+			return 0, fmt.Errorf(aiParseErrorFmt, "ItemCount")
 		} else {
 			read += size
 		}
 
 		if size, err = summary.FundsType.parse(line[read:]); err != nil {
-			return 0, fmt.Errorf(fmt.Sprintf(aiParseErrorFmt, "FundsType"))
+			return 0, fmt.Errorf(aiParseErrorFmt, "FundsType")
 		} else {
 			read += size
 		}
