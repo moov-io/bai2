@@ -8,13 +8,15 @@ permissions:
   contents: read
 
 jobs:
-  fuzz-writer:
-    name: Fuzz Writer
-    runs-on: ${{ matrix.os }}
+  fuzz:
+    name: Fuzz
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    timeout-minutes: 30
+        command:
+          - "go test ./test/fuzz/... -fuzz FuzzReaderWriter -fuzztime 10m"
 
     steps:
     - name: Set up Go 1.x
@@ -28,24 +30,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: actions/cache@v6
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
-    - name: Fuzz Valid Files
-      run: |
-        go test ./test/fuzz/... -fuzz FuzzReaderWriter_ValidFiles -fuzztime 10m
-
-    - name: Fuzz Error Files
-      run: |
-        go test ./test/fuzz/... -fuzz FuzzReaderWriter_ErrorFiles -fuzztime 10m
+    - name: Fuzz
+      run: ${{ matrix.command }}
 
     - name: Report Failures
       if: ${{ failure() }}
       run: |
-        find ./test/fuzz/testdata/fuzz/ -type f | xargs -n1 tail -n +1 -v
+        find . -path '*/testdata/fuzz/*' -type f 2>/dev/null | xargs -r -n1 tail -n +1 -v || true

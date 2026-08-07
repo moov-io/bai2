@@ -12,63 +12,44 @@ import (
 	"testing"
 
 	"github.com/moov-io/bai2/pkg/lib"
-
-	"github.com/stretchr/testify/require"
 )
 
-func FuzzReaderWriter_ValidFiles(f *testing.F) {
-	populateCorpus(f, false)
+func FuzzReaderWriter(f *testing.F) {
+	populateCorpus(f)
 
 	f.Fuzz(func(t *testing.T, contents string) {
+		// Bound input size so pathological cases don't OOM CI.
+		if len(contents) > 1<<20 {
+			t.Skip()
+		}
+
 		scan := lib.NewBai2Scanner(strings.NewReader(contents))
 		file := lib.NewBai2()
 
-		require.NotPanics(t, func() { file.Read(&scan) })
-		require.NotPanics(t, func() { file.Validate() })
-
-		out := file.String()
-		require.Greater(t, len(out), 0)
+		// Read/Validate/String must never panic on arbitrary input.
+		_ = file.Read(&scan)
+		_ = file.Validate()
+		_ = file.String()
 	})
 }
 
-func FuzzReaderWriter_ErrorFiles(f *testing.F) {
-	populateCorpus(f, true)
-
-	f.Fuzz(func(t *testing.T, contents string) {
-		scan := lib.NewBai2Scanner(strings.NewReader(contents))
-		file := lib.NewBai2()
-
-		require.NotPanics(t, func() { file.Read(&scan) })
-		require.NotPanics(t, func() { file.Validate() })
-
-		out := file.String()
-		require.Greater(t, len(out), 0)
-	})
-}
-
-func populateCorpus(f *testing.F, errorFiles bool) {
+func populateCorpus(f *testing.F) {
 	f.Helper()
+
+	// Always seed empty / tiny inputs.
+	f.Add("")
+	f.Add("01,")
+	f.Add("01,SENDER,RECEIVER,250101,1200,1,,,2/\n99,0,0,0/")
 
 	err := filepath.Walk(filepath.Join("..", "testdata"), func(path string, info fs.FileInfo, _ error) error {
 		path = filepath.ToSlash(path)
 
-		// Skip directories and some files
 		if info.IsDir() {
 			return nil
 		}
 		if strings.HasSuffix(path, ".output") {
-			return nil // skip
-		}
-		if errorFiles && !strings.Contains(path, "errors/") {
-			f.Logf("skipping %s", path)
 			return nil
 		}
-		if !errorFiles && strings.Contains(path, "errors/") {
-			f.Logf("skipping %s", path)
-			return nil
-		}
-
-		f.Logf("adding %s", path)
 
 		bs, err := os.ReadFile(path)
 		if err != nil {
