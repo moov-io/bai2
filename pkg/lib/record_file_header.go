@@ -47,7 +47,10 @@ func (h *fileHeader) validate(options Options) error {
 	if h.FileIdNumber == "" {
 		return fmt.Errorf(fhValidateErrorFmt, "FileIdNumber")
 	}
-	if h.VersionNumber != 2 && !options.IgnoreVersion {
+	if h.VersionNumber != VersionBAI2 && !options.IgnoreVersion {
+		if h.VersionNumber == VersionBTR3 {
+			return fmt.Errorf("FileHeader: version 3 (BTR3) is not supported by the BAI2 reader; set Options.IgnoreVersion for BAI2 files stamped with version 3")
+		}
 		return fmt.Errorf(fhValidateErrorFmt, "VersionNumber")
 	}
 

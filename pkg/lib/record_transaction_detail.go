@@ -105,6 +105,11 @@ func (r *transactionDetail) parse(data string) (int, error) {
 		read += size
 	}
 
+	// Banks often terminate type 16 records with `/` even though the spec says
+	// text records are delimited by the next non-88 record. Strip a single trailing
+	// record delimiter; slashes inside the text are kept.
+	r.Text = strings.TrimSuffix(r.Text, "/")
+
 	if err = r.validate(); err != nil {
 		return 0, err
 	}
@@ -135,7 +140,8 @@ func (r *transactionDetail) string(opts ...int64) string {
 	buf.WriteString(",")
 
 	util.WriteBuffer(&total, &buf, r.Text, maxLen)
-	if !strings.HasSuffix(r.Text, "/") {
+	if r.Text == "" {
+		// Defaulted text field: adjacent delimiters `,/`
 		buf.WriteString("/")
 	}
 

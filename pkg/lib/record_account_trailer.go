@@ -44,7 +44,7 @@ func (h *accountTrailer) parse(data string) (int, error) {
 
 	// RecordCode
 	if util.AccountTrailerCode != data[:2] {
-		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
+		return 0, fmt.Errorf(atParseErrorFmt, "RecordCode")
 	}
 	read += 3
 

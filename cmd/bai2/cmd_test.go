@@ -77,6 +77,27 @@ func TestParse_ParseError(t *testing.T) {
 	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
 }
 
+func TestParse_IgnoreVersion(t *testing.T) {
+	path := filepath.Join("..", "..", "test", "testdata", "spec-section3.txt")
+	data, err := os.ReadFile(path)
+	assert.NoError(t, err)
+	v3 := bytes.Replace(data, []byte(",2/"), []byte(",3/"), 1)
+	tmp, err := os.CreateTemp("", "bai2-v3-*.txt")
+	assert.NoError(t, err)
+	defer os.Remove(tmp.Name())
+	_, err = tmp.Write(v3)
+	assert.NoError(t, err)
+	assert.NoError(t, tmp.Close())
+
+	defer func() { ignoreVersion = false }()
+
+	_, err = executeCommand(rootCmd, "parse", "--input", tmp.Name())
+	assert.Error(t, err)
+
+	_, err = executeCommand(rootCmd, "parse", "--input", tmp.Name(), "--ignoreVersion")
+	assert.NoError(t, err)
+}
+
 func TestFormat_ParseError(t *testing.T) {
 	_, err := executeCommand(rootCmd, "format", "--input", parseErrorFileName)
 	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")

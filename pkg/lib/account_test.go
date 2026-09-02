@@ -72,7 +72,7 @@ func TestAccountOutputWithContinuationRecord(t *testing.T) {
 
 	result := account.String()
 	expectedResult := `03,9876543210,,010,-500000,,,100,1000000,,,400,2000000,,,190,500000,,,110,1000000,,,072,500000,,,074,500000,,,040,-1500000,,/
-16,115,500000,S,0,200000,300000,,,LOCK BOX NO.68751/
+16,115,500000,S,0,200000,300000,,,LOCK BOX NO.68751
 49,4000000,5/`
 	require.Equal(t, expectedResult, result)
 
@@ -81,7 +81,7 @@ func TestAccountOutputWithContinuationRecord(t *testing.T) {
 88,2000000,,,190,500000,,,110,1000000,,,072/
 88,500000,,,074,500000,,,040,-1500000,,/
 16,115,500000,S,0,200000,300000,,/
-88,LOCK BOX NO.68751/
+88,LOCK BOX NO.68751
 49,4000000,5/`
 	require.Equal(t, expectedResult, result)
 
@@ -143,7 +143,6 @@ func TestSumAccountTotal(t *testing.T) {
 	}
 	account = Account{}
 	account.AccountNumber = "9876543210"
-	account.AccountNumber = "9876543210"
 	account.Summaries = append(account.Summaries, AccountSummary{
 		TypeCode: "400",
 		Amount:   "-20000",
@@ -151,7 +150,7 @@ func TestSumAccountTotal(t *testing.T) {
 	account.Details = details
 	sum, err = account.SumDetailAmounts()
 	require.NoError(t, err)
-	require.Equal(t, "-8214394", sum)
+	require.Equal(t, "8174394", sum)
 
 	details = []Detail{}
 	for i := 101; i <= 699; i++ {
@@ -171,5 +170,5 @@ func TestSumAccountTotal(t *testing.T) {
 	account.Details = details
 	sum, err = account.SumDetailAmounts()
 	require.NoError(t, err)
-	require.Equal(t, "0", sum)
+	require.Equal(t, "16443600", sum)
 }

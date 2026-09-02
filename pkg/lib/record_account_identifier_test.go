@@ -66,7 +66,7 @@ func TestAccountIdentifierCurrentWithSample2(t *testing.T) {
 	require.Equal(t, 16, size)
 
 	require.Equal(t, "5765432", record.AccountNumber)
-	require.Equal(t, 1, len(record.Summaries))
+	require.Equal(t, 0, len(record.Summaries))
 
 	require.Equal(t, sample, record.string())
 }

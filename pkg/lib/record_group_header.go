@@ -30,7 +30,7 @@ func (h *groupHeader) validate() error {
 	if h.Originator == "" {
 		return fmt.Errorf(ghValidateErrorFmt, "Originator")
 	}
-	if h.GroupStatus < 0 || h.GroupStatus > 4 {
+	if h.GroupStatus < 1 || h.GroupStatus > 4 {
 		return fmt.Errorf(ghValidateErrorFmt, "GroupStatus")
 	}
 	if h.AsOfDate == "" {
@@ -65,7 +65,7 @@ func (h *groupHeader) parse(data string) (int, error) {
 
 	// RecordCode
 	if util.GroupHeaderCode != data[:2] {
-		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
+		return 0, fmt.Errorf(ghParseErrorFmt, "RecordCode")
 	}
 	read += 3
 

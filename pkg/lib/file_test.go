@@ -22,6 +22,7 @@ func TestFileWithSampleData(t *testing.T) {
 		"sample3.txt",
 		"sample4-continuations-newline-delimited.txt",
 		"sample5-issue113.txt",
+		"spec-section3.txt",
 	}
 
 	for _, path := range paths {
@@ -62,8 +63,8 @@ func TestFileWithContinuationRecord(t *testing.T) {
 03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,,046,+000000000000,,/
 88,047,+000000000000,,,048,+000000000000,,,049,+000000000000,,,050/
 88,+000000000000,,,051,+000000000000,,,052,+000000000000,,,053,+000000000000,,/
-16,409,000000000002500,V,060316,1300,,,RETURNED CHEQUE     /
-16,409,000000000090000,V,060316,1300,,,RTN-UNKNOWN         /
+16,409,000000000002500,V,060316,1300,,,RETURNED CHEQUE     
+16,409,000000000090000,V,060316,1300,,,RTN-UNKNOWN         
 49,+00000000000834000,14/
 98,+00000000001280000,2,25/
 99,+00000000001280000,1,27/`
@@ -205,7 +206,7 @@ func TestBuildFileAggregates(t *testing.T) {
 	file.NumberOfGroups = file.SumNumberOfGroups()
 	file.NumberOfRecords = file.SumRecords()
 
-	require.Equal(t, "-5460120", file.FileControlTotal)
+	require.Equal(t, "5500120", file.FileControlTotal)
 	require.Equal(t, int64(1), file.NumberOfGroups)
 	require.Equal(t, int64(29), file.NumberOfRecords)
 

@@ -7,6 +7,7 @@ package lib
 import (
 	"bytes"
 	"fmt"
+	"unicode"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -88,7 +89,10 @@ func (r *accountIdentifier) parse(data string) (int, error) {
 		read += size
 	}
 
-	for read < len(data) {
+	for read < len(line) {
+		if remainingFieldsEmpty(line[read:]) {
+			break
+		}
 
 		var summary AccountSummary
 
@@ -119,7 +123,16 @@ func (r *accountIdentifier) parse(data string) (int, error) {
 			read += size
 		}
 
+		// Spec: a defaulted type code means no status/summary is reported for this slot.
+		if summary.TypeCode == "" && summary.Amount == "" {
+			continue
+		}
+
 		r.Summaries = append(r.Summaries, summary)
+	}
+
+	if remainingFieldsEmpty(line[read:]) {
+		read = len(line)
 	}
 
 	if err = r.validate(); err != nil {
@@ -172,4 +185,13 @@ func (r *accountIdentifier) string(opts ...int64) string {
 	total.WriteString(buf.String())
 
 	return total.String()
+}
+
+func remainingFieldsEmpty(s string) bool {
+	for _, r := range s {
+		if r != ',' && r != '/' && !unicode.IsSpace(r) {
+			return false
+		}
+	}
+	return true
 }

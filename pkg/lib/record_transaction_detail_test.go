@@ -41,9 +41,9 @@ func TestTransactionDetailWithSample(t *testing.T) {
 	require.Equal(t, "", record.FundsType.Time)
 	require.Equal(t, "", record.BankReferenceNumber)
 	require.Equal(t, "", record.CustomerReferenceNumber)
-	require.Equal(t, "RETURNED CHEQUE     /", record.Text)
+	require.Equal(t, "RETURNED CHEQUE     ", record.Text)
 
-	require.Equal(t, sample, record.string())
+	require.Equal(t, "16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     ", record.string())
 }
 
 func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
@@ -91,14 +91,14 @@ func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
 	}
 
 	result := record.string()
-	expectResult := `16,409,111111111111111,D,5,1,1000000000,2,2000000000,3,3000000000,4,4000000000,5,5000000000,6,6000000000,7,7000000000,222222222222222,333333333333333,RETURNED CHEQUE     444444444444444/`
+	expectResult := `16,409,111111111111111,D,5,1,1000000000,2,2000000000,3,3000000000,4,4000000000,5,5000000000,6,6000000000,7,7000000000,222222222222222,333333333333333,RETURNED CHEQUE     444444444444444`
 	require.Equal(t, expectResult, result)
 	require.Equal(t, len(expectResult), len(result))
 
 	result = record.string(80)
 	expectResult = `16,409,111111111111111,D,5,1,1000000000,2,2000000000,3,3000000000,4,4000000000/
 88,5,5000000000,6,6000000000,7,7000000000,222222222222222,333333333333333/
-88,RETURNED CHEQUE     444444444444444/`
+88,RETURNED CHEQUE     444444444444444`
 	require.Equal(t, expectResult, result)
 	require.Equal(t, len(expectResult), len(result))
 
@@ -107,7 +107,7 @@ func TestTransactionDetailOutputWithContinuationRecords(t *testing.T) {
 88,2000000000,3,3000000000,4,4000000000,5/
 88,5000000000,6,6000000000,7,7000000000/
 88,222222222222222,333333333333333/
-88,RETURNED CHEQUE     444444444444444/`
+88,RETURNED CHEQUE     444444444444444`
 	require.Equal(t, expectResult, result)
 	require.Equal(t, len(expectResult), len(result))
 
@@ -144,6 +144,6 @@ func TestTransactionDetailOutput_ContinuationRecordWithNewlineDelimiter(t *testi
 	require.Equal(t, 75, size)
 
 	result := record.string()
-	expectResult := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-/`
+	expectResult := `16,266,1912,,GI2118700002010,20210706MMQFMPU8000001,Outgoing Wire Return,-`
 	require.Equal(t, expectResult, result)
 }

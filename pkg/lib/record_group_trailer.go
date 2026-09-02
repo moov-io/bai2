@@ -44,7 +44,7 @@ func (h *groupTrailer) parse(data string) (int, error) {
 
 	// RecordCode
 	if util.GroupTrailerCode != data[:2] {
-		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
+		return 0, fmt.Errorf(gtParseErrorFmt, "RecordCode")
 	}
 	read += 3
 

@@ -40,6 +40,8 @@ func populateCorpus(f *testing.F) {
 	f.Add("")
 	f.Add("01,")
 	f.Add("01,SENDER,RECEIVER,250101,1200,1,,,2/\n99,0,0,0/")
+	f.Add("01,122099999,123456789,040621,0200,1,,,2/\n02,031001234,122099999,1,040620,2359,,2/\n03,5765432,,,,,/\n49,0,2/\n98,0,1,4/\n99,0,1,6/")
+	f.Add("16,890,,,,,detail reports will be delayed until 11:00 AM.")
 
 	err := filepath.Walk(filepath.Join("..", "testdata"), func(path string, info fs.FileInfo, _ error) error {
 		path = filepath.ToSlash(path)

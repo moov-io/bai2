@@ -44,13 +44,13 @@ func (h *fileTrailer) parse(data string) (int, error) {
 
 	// RecordCode
 	if util.FileTrailerCode != line[:2] {
-		return 0, fmt.Errorf(fhParseErrorFmt, "RecordCode")
+		return 0, fmt.Errorf(ftParseErrorFmt, "RecordCode")
 	}
 	read += 3
 
 	// GroupControlTotal
 	if h.FileControlTotal, size, err = util.ReadField(line, read); err != nil {
-		return 0, fmt.Errorf(ftParseErrorFmt, "GroupControlTotal")
+		return 0, fmt.Errorf(ftParseErrorFmt, "FileControlTotal")
 	} else {
 		read += size
 	}

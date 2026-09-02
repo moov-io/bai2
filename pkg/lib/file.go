@@ -95,10 +95,6 @@ type Bai2 struct {
 	options Options
 }
 
-type Options struct {
-	IgnoreVersion bool
-}
-
 func (r *Bai2) SetOptions(options Options) {
 	r.options = options
 }
@@ -122,13 +118,13 @@ func (r *Bai2) copyRecords() {
 	}
 }
 
-// Sums the groups NumberOfRecords plus file header and trailer. Maps to the NumberOfRecords field.
+// SumRecords is the number of records in the file: the sum of each group's
+// NumberOfRecords plus the file header (01) and file trailer (99).
 func (f *Bai2) SumRecords() int64 {
 	var sum int64
 	for _, group := range f.Groups {
 		sum += group.NumberOfRecords
 	}
-	// Add two for the group header and trailer records
 	return sum + 2
 }
 
@@ -192,7 +188,13 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 	}
 
 	var err error
+	sawHeader := false
+	sawTrailer := false
+
 	for line := scan.ScanLine(); line != ""; line = scan.ScanLine() {
+		if err := scan.Err(); err != nil {
+			return err
+		}
 
 		// find record code
 		if len(line) < 3 {
@@ -201,6 +203,9 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 
 		switch line[0:2] {
 		case util.FileHeaderCode:
+			if sawHeader {
+				return fmt.Errorf("ERROR parsing file on line %d (duplicate file header)", scan.GetLineIndex())
+			}
 
 			newRecord := fileHeader{}
 			_, err = newRecord.parse(line, r.options)
@@ -216,8 +221,13 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 			r.PhysicalRecordLength = newRecord.PhysicalRecordLength
 			r.BlockSize = newRecord.BlockSize
 			r.VersionNumber = newRecord.VersionNumber
+			sawHeader = true
+			scan.SetPhysicalRecordLength(r.PhysicalRecordLength)
 
 		case util.GroupHeaderCode:
+			if !sawHeader {
+				return fmt.Errorf("ERROR parsing file on line %d (file header is required before groups)", scan.GetLineIndex())
+			}
 
 			newGroup := NewGroup()
 			err = newGroup.Read(scan, true)
@@ -228,7 +238,6 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 			r.Groups = append(r.Groups, *newGroup)
 
 		case util.FileTrailerCode:
-
 			newRecord := fileTrailer{}
 			_, err = newRecord.parse(line)
 			if err != nil {
@@ -238,13 +247,31 @@ func (r *Bai2) Read(scan *Bai2Scanner) error {
 			r.FileControlTotal = newRecord.FileControlTotal
 			r.NumberOfGroups = newRecord.NumberOfGroups
 			r.NumberOfRecords = newRecord.NumberOfRecords
+			sawTrailer = true
 
-			return nil
+			return r.finishRead(sawHeader, sawTrailer)
 
 		default:
 			return fmt.Errorf("ERROR parsing file on line %d (unsupported record type %s)", scan.GetLineIndex(), line[0:2])
 		}
 	}
 
+	if err := scan.Err(); err != nil {
+		return err
+	}
+
+	return r.finishRead(sawHeader, sawTrailer)
+}
+
+func (r *Bai2) finishRead(sawHeader, sawTrailer bool) error {
+	if !sawHeader {
+		return errors.New("missing file header (01)")
+	}
+	if !sawTrailer {
+		return errors.New("missing file trailer (99)")
+	}
+	if r.options.StrictControlTotals {
+		return r.validateControlTotals()
+	}
 	return nil
 }

@@ -30,6 +30,14 @@ func outputSuccess(w http.ResponseWriter, output string) {
 	})
 }
 
+func optionsFromRequest(r *http.Request) lib.Options {
+	v := r.URL.Query().Get("ignoreVersion")
+	return lib.Options{
+		IgnoreVersion:       v == "true" || v == "1",
+		StrictControlTotals: r.URL.Query().Get("strictControlTotals") == "true",
+	}
+}
+
 func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 	inputFile, _, err := r.FormFile("input")
 	if err != nil {
@@ -42,9 +50,8 @@ func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 		return nil, err
 	}
 
-	// convert byte slice to io.Reader
 	scan := lib.NewBai2Scanner(bytes.NewReader(input.Bytes()))
-	f := lib.NewBai2()
+	f := lib.NewBai2With(optionsFromRequest(r))
 
 	err = f.Read(&scan)
 	if err != nil {
@@ -76,7 +83,7 @@ func parse(w http.ResponseWriter, r *http.Request) {
 
 	err = f.Validate()
 	if err != nil {
-		outputError(w, http.StatusNotImplemented, err)
+		outputError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -93,7 +100,7 @@ func print(w http.ResponseWriter, r *http.Request) {
 
 	err = f.Validate()
 	if err != nil {
-		outputError(w, http.StatusNotImplemented, err)
+		outputError(w, http.StatusBadRequest, err)
 		return
 	}
 
@@ -110,7 +117,7 @@ func format(w http.ResponseWriter, r *http.Request) {
 
 	err = f.Validate()
 	if err != nil {
-		outputError(w, http.StatusNotImplemented, err)
+		outputError(w, http.StatusBadRequest, err)
 		return
 	}
 

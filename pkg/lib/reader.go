@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"strings"
 	"unicode"
 
@@ -17,9 +16,11 @@ import (
 )
 
 type Bai2Scanner struct {
-	reader      *bufio.Reader
-	currentLine *bytes.Buffer
-	index       int
+	reader               *bufio.Reader
+	currentLine          *bytes.Buffer
+	index                int
+	err                  error
+	physicalRecordLength int64
 }
 
 func NewBai2Scanner(fd io.Reader) Bai2Scanner {
@@ -34,6 +35,16 @@ func (b *Bai2Scanner) GetLineIndex() int {
 
 func (b *Bai2Scanner) GetLine() string {
 	return strings.TrimSpace(b.currentLine.String())
+}
+
+func (b *Bai2Scanner) Err() error {
+	return b.err
+}
+
+// SetPhysicalRecordLength limits each physical record to n characters when the
+// file has no newlines (blocked/mainframe style). n <= 0 disables the limit.
+func (b *Bai2Scanner) SetPhysicalRecordLength(n int64) {
+	b.physicalRecordLength = n
 }
 
 // ScanLine returns a line from the underlying reader
@@ -52,19 +63,21 @@ func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 	// Reset the read buffer every time we read a new line.
 	b.currentLine.Reset()
 
+	physicalCount := 0
 	for {
 		// Read each rune in the file until a newline or a `/` or EOF.
-		rune, _, err := b.reader.ReadRune()
+		r, _, err := b.reader.ReadRune()
 		if err != nil {
 			if err != io.EOF {
-				log.Fatal(err)
+				b.err = err
 			}
 			break
 		}
 
-		char := string(rune)
+		char := string(r)
 		switch char {
 		case "/":
+			physicalCount++
 			// Add `/` to line if it exists. Parsers use this to help internally represent the delineation
 			// between records.
 			b.currentLine.WriteString(char)
@@ -73,14 +86,23 @@ func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 			// the record is terminated by a newline followed by record code.
 			line := strings.TrimSpace(b.currentLine.String())
 			if strings.HasPrefix(line, util.TransactionDetailCode) || strings.HasPrefix(line, util.ContinuationCode) {
+				if b.atPhysicalLimit(physicalCount) {
+					goto fullLine
+				}
 				continue
 			}
+			b.skipPhysicalPadding(&physicalCount)
 			goto fullLine
 		case "\n", "\r":
 			// On observing a newline character, check to see if we have a full record available for processing.
 			goto fullLine
 		default:
+			physicalCount++
 			b.currentLine.WriteString(char)
+		}
+
+		if b.atPhysicalLimit(physicalCount) {
+			goto fullLine
 		}
 
 		continue
@@ -105,18 +127,22 @@ func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 		// If a line ends with a newline character, look ahead to the next three bytes. If the next line
 		// is a new record, it will have a defined and valid record code. If a valid record code is not
 		// observed, continue parsing lines until a distinct record is observed.
-		bytes, err := b.reader.Peek(3)
+		peeked, err := b.reader.Peek(3)
 		if err != nil && err != io.EOF {
-			log.Fatal(err)
+			b.err = err
+			break
 		}
 
 		// If the next three bytes are any of the defined BAI2 record codes (followed by a comma), we consider the next line
 		// as a new record and process the current line up to this point.
-		nextThreeBytes := string(bytes)
+		nextThreeBytes := string(peeked)
 		headerCodes := []string{util.FileHeaderCode, util.GroupHeaderCode, util.AccountIdentifierCode, util.TransactionDetailCode, util.ContinuationCode, util.AccountTrailerCode, util.GroupTrailerCode, util.FileTrailerCode}
 		nextLineHasNewRecord := false
 		for _, header := range headerCodes {
 			if nextThreeBytes == fmt.Sprintf("%s,", header) {
+				padded := bytes.TrimRight(b.currentLine.Bytes(), " \t")
+				b.currentLine.Reset()
+				b.currentLine.Write(padded)
 				b.currentLine.WriteString("/")
 				nextLineHasNewRecord = true
 				break
@@ -134,6 +160,32 @@ func (b *Bai2Scanner) ScanLine(arg ...bool) string {
 
 	b.index++
 	return b.GetLine()
+}
+
+func (b *Bai2Scanner) atPhysicalLimit(count int) bool {
+	return b.physicalRecordLength > 0 && int64(count) >= b.physicalRecordLength
+}
+
+func (b *Bai2Scanner) skipPhysicalPadding(count *int) {
+	if b.physicalRecordLength <= 0 {
+		return
+	}
+	for int64(*count) < b.physicalRecordLength {
+		r, _, err := b.reader.ReadRune()
+		if err != nil {
+			if err != io.EOF {
+				b.err = err
+			}
+			return
+		}
+		if r == '\n' || r == '\r' {
+			if unreadErr := b.reader.UnreadRune(); unreadErr != nil {
+				b.err = unreadErr
+			}
+			return
+		}
+		*count++
+	}
 }
 
 func blankLine(line string) bool {

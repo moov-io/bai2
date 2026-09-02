@@ -6,6 +6,8 @@ package lib
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -62,7 +64,14 @@ func (r *Detail) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			find = true
 
 		case util.ContinuationCode:
-			rawData = rawData[:len(rawData)-1] + "," + line[3:]
+			if rawData == "" {
+				return fmt.Errorf("ERROR parsing transaction detail on line %d (continuation without a preceding record)", scan.GetLineIndex())
+			}
+			if strings.HasSuffix(rawData, "/") {
+				rawData = rawData[:len(rawData)-1] + "," + line[3:]
+			} else {
+				rawData = rawData + "," + line[3:]
+			}
 
 		default:
 			isBreak = true

@@ -416,7 +416,11 @@ By design, Bai2  **does not persist** (save) any data about the files or entry d
 
 ### Go library
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.18 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
+
+Files whose 01 header is not version 2 are rejected unless you pass `Options{IgnoreVersion: true}` (CLI: `--ignoreVersion`, HTTP: `?ignoreVersion=true`). That flag is for BAI2 files that banks stamp with another version number. It is not a BTR3 / BAI3 reader.
+
+Appendix A type codes are in `pkg/lib` (`LookupTypeCode`, `ClassifyTypeCode`). Call `file.Create()` to fill 49/98/99 control totals from the file body.
 
 ```
 $ git@github.com:moov-io/bai2.git
@@ -446,8 +450,9 @@ Available Commands:
   web         Launches web server
 
 Flags:
-  -h, --help           help for this command
-      --input string   bai2 report file
+  -h, --help                  help for this command
+      --ignoreVersion         ignore the version number in the file header
+      --input string          bai2 report file
 
 Use " [command] --help" for more information about a command.
 ```
@@ -473,7 +478,7 @@ Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter fee
 
 Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started!
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go v1.18 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
 
 ### Releasing
 

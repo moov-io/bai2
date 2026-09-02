@@ -204,5 +204,8 @@ func (r *Group) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		}
 	}
 
-	return nil
+	if err := scan.Err(); err != nil {
+		return err
+	}
+	return errors.New("missing group trailer (98)")
 }

@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strconv"
+	"strings"
 
 	"github.com/moov-io/bai2/pkg/util"
 )
@@ -76,35 +76,33 @@ func (a *Account) SumRecords(opts ...int64) int64 {
 	return int64(len(result))
 }
 
-// Sums the Amount fields from all 03 and 16 records. Maps to the AccountControlTotal field
+// SumDetailAmounts is the algebraic sum of every Amount field on the 03 record
+// and its 16 records, matching the Account Control Total definition in the spec.
+// Funds Type amounts and item counts are not included. Empty amounts are zero.
 func (a *Account) SumDetailAmounts() (string, error) {
 	if err := a.Validate(); err != nil {
 		return "0", err
 	}
-	var sum int64
-	for _, detail := range a.Details {
-		amt, err := strconv.ParseInt(detail.Amount, 10, 64)
-		if err != nil {
-			return "0", err
-		}
-		switch string(detail.TypeCode[0]) {
-		case "1", "2", "3":
-			sum += amt
+	return a.sumAmounts()
+}
 
-		case "4", "5", "6":
-			sum -= amt
-		default:
-			return "0", fmt.Errorf("TypeCode %v is invalid for transaction detail", detail.TypeCode)
-		}
-	}
+func (a *Account) sumAmounts() (string, error) {
+	var sum int64
 	for _, summary := range a.Summaries {
-		amt, err := strconv.ParseInt(summary.Amount, 10, 64)
+		amt, err := parseAmount(summary.Amount)
 		if err != nil {
 			return "0", err
 		}
 		sum += amt
 	}
-	return fmt.Sprint(sum), nil
+	for _, detail := range a.Details {
+		amt, err := parseAmount(detail.Amount)
+		if err != nil {
+			return "0", err
+		}
+		sum += amt
+	}
+	return formatAmount(sum), nil
 }
 
 func (r *Account) String(opts ...int64) string {
@@ -185,8 +183,13 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			find = true
 
 		case util.ContinuationCode:
-			if len(rawData) > 0 {
+			if rawData == "" {
+				return fmt.Errorf("ERROR parsing account on line %d (continuation without a preceding record)", scan.GetLineIndex())
+			}
+			if strings.HasSuffix(rawData, "/") {
 				rawData = rawData[:len(rawData)-1] + "," + line[3:]
+			} else {
+				rawData = rawData + "," + line[3:]
 			}
 
 		case util.AccountTrailerCode:
@@ -226,5 +229,8 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		}
 	}
 
-	return nil
+	if err := scan.Err(); err != nil {
+		return err
+	}
+	return errors.New("missing account trailer (49)")
 }
