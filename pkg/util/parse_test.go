@@ -66,6 +66,17 @@ func TestReadField(t *testing.T) {
 		},
 		{
 			Input: input{
+				Data:  " 122099999 ,",
+				Start: 0,
+			},
+			Want: want{
+				Error: false,
+				Read:  12,
+				Value: "122099999",
+			},
+		},
+		{
+			Input: input{
 				Data:  "01/",
 				Start: 0,
 			},

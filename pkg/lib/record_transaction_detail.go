@@ -17,12 +17,23 @@ const (
 )
 
 type transactionDetail struct {
-	TypeCode                string
-	Amount                  string
-	FundsType               FundsType
-	BankReferenceNumber     string
-	CustomerReferenceNumber string
-	Text                    string
+	TypeCode                string          `json:"TypeCode"`
+	Amount                  string          `json:"Amount"`
+	FundsType               FundsType       `json:"FundsType"`
+	BankReferenceNumber     string          `json:"BankReferenceNumber"`
+	CustomerReferenceNumber string          `json:"CustomerReferenceNumber"`
+	Text                    string          `json:"Text"`
+	Transaction             TransactionKind `json:"Transaction,omitempty"`
+	Level                   TypeLevel       `json:"Level,omitempty"`
+	Description             string          `json:"Description,omitempty"`
+}
+
+// TypeInfo returns the Appendix A catalog entry for this detail's type code.
+func (r *Detail) TypeInfo() (TypeCode, bool) {
+	if r == nil {
+		return TypeCode{}, false
+	}
+	return LookupTypeCode(r.TypeCode)
 }
 
 func (r *transactionDetail) validate() error {
@@ -109,6 +120,7 @@ func (r *transactionDetail) parse(data string) (int, error) {
 	// text records are delimited by the next non-88 record. Strip a single trailing
 	// record delimiter; slashes inside the text are kept.
 	r.Text = strings.TrimSuffix(r.Text, "/")
+	r.Transaction, r.Level, r.Description = typeMeta(r.TypeCode)
 
 	if err = r.validate(); err != nil {
 		return 0, err

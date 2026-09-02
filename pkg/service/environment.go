@@ -9,6 +9,8 @@ import (
 	"github.com/moov-io/base/config"
 	"github.com/moov-io/base/log"
 	"github.com/moov-io/base/stime"
+
+	bai2 "github.com/moov-io/bai2"
 )
 
 // Environment - Contains everything thats been instantiated for this service.
@@ -30,7 +32,7 @@ func NewEnvironment(env *Environment) (*Environment, error) {
 		ConfigService := config.NewService(env.Logger)
 
 		global := &GlobalConfig{}
-		if err := ConfigService.Load(global); err != nil {
+		if err := ConfigService.LoadFromFS(global, bai2.ConfigDefaults); err != nil {
 			return nil, err
 		}
 

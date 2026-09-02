@@ -118,6 +118,13 @@ func (h *groupHeader) parse(data string) (int, error) {
 		read += size
 	}
 
+	if h.GroupStatus == 0 {
+		h.GroupStatus = DefaultGroupStatus
+	}
+	if h.CurrencyCode == "" {
+		h.CurrencyCode = DefaultCurrency
+	}
+
 	if err = h.validate(); err != nil {
 		return 0, err
 	}

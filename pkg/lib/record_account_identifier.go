@@ -14,14 +14,22 @@ import (
 
 const (
 	aiParseErrorFmt    = "AccountIdentifier: unable to parse %s"
-	aiValidateErrorFmt = "AccountIdentifierCurrent: invalid %s"
+	aiValidateErrorFmt = "AccountIdentifier: invalid %s"
 )
 
 type AccountSummary struct {
-	TypeCode  string
-	Amount    string
-	ItemCount int64
-	FundsType FundsType
+	TypeCode    string          `json:"TypeCode"`
+	Amount      string          `json:"Amount"`
+	ItemCount   int64           `json:"ItemCount"`
+	FundsType   FundsType       `json:"FundsType"`
+	Transaction TransactionKind `json:"Transaction,omitempty"`
+	Level       TypeLevel       `json:"Level,omitempty"`
+	Description string          `json:"Description,omitempty"`
+}
+
+// TypeInfo returns the Appendix A catalog entry for this summary's type code.
+func (s AccountSummary) TypeInfo() (TypeCode, bool) {
+	return LookupTypeCode(s.TypeCode)
 }
 
 type accountIdentifier struct {
@@ -128,6 +136,7 @@ func (r *accountIdentifier) parse(data string) (int, error) {
 			continue
 		}
 
+		summary.Transaction, summary.Level, summary.Description = typeMeta(summary.TypeCode)
 		r.Summaries = append(r.Summaries, summary)
 	}
 

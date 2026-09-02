@@ -23,3 +23,11 @@ type Options struct {
 	IgnoreVersion       bool
 	StrictControlTotals bool
 }
+
+// DefaultCurrency is used when a group or account omits Currency Code.
+// Spec: group default is USD; account default is the group currency.
+const DefaultCurrency = "USD"
+
+// DefaultGroupStatus is used when a group omits Group Status.
+// Spec: most transmissions are Update (1).
+const DefaultGroupStatus int64 = 1

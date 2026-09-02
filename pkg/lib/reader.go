@@ -25,6 +25,10 @@ type Bai2Scanner struct {
 
 func NewBai2Scanner(fd io.Reader) Bai2Scanner {
 	reader := bufio.NewReader(fd)
+	// Windows/export tools often prefix files with a UTF-8 BOM.
+	if b, err := reader.Peek(3); err == nil && len(b) >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
+		_, _ = reader.Discard(3)
+	}
 	currentLine := new(bytes.Buffer)
 	return Bai2Scanner{reader: reader, currentLine: currentLine}
 }

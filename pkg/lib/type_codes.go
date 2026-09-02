@@ -38,6 +38,14 @@ func LookupTypeCode(code string) (TypeCode, bool) {
 	return tc, ok
 }
 
+func typeMeta(code string) (TransactionKind, TypeLevel, string) {
+	if tc, ok := LookupTypeCode(code); ok {
+		return tc.Transaction, tc.Level, tc.Description
+	}
+	level, kind := ClassifyTypeCode(code)
+	return kind, level, ""
+}
+
 // ClassifyTypeCode returns level and transaction kind from the spec ranges
 // (Appendix A, Type Code Ranges). Unknown 3-digit codes still classify by range
 // so custom 900–999 codes work. Empty or malformed codes return zero values.

@@ -82,6 +82,7 @@ func TestGroupHeaderWithoutOptional(t *testing.T) {
 
 	require.Equal(t, "0004", record.Originator)
 	require.Equal(t, "060317", record.AsOfDate)
-
-	require.Equal(t, sample, record.string())
+	require.Equal(t, DefaultCurrency, record.CurrencyCode)
+	require.Equal(t, DefaultGroupStatus, record.GroupStatus)
+	require.Equal(t, "02,,0004,1,060317,,USD,/", record.string())
 }

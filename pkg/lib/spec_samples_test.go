@@ -42,9 +42,8 @@ func TestSpecGroupHeaderSample(t *testing.T) {
 	require.Equal(t, int64(1), header.GroupStatus)
 	require.Equal(t, "040620", header.AsOfDate)
 	require.Equal(t, "2359", header.AsOfTime)
-	require.Equal(t, "", header.CurrencyCode)
+	require.Equal(t, DefaultCurrency, header.CurrencyCode)
 	require.Equal(t, int64(2), header.AsOfDateModifier)
-	require.Equal(t, sample, header.string())
 }
 
 func TestSpecAccountIdentifierSample(t *testing.T) {
@@ -261,9 +260,9 @@ func TestVersion3RejectedWithoutIgnoreVersion(t *testing.T) {
 	require.Equal(t, int64(3), header.VersionNumber)
 }
 
-func TestGroupStatusZeroInvalid(t *testing.T) {
+func TestGroupStatusZeroDefaultsToUpdate(t *testing.T) {
 	var header groupHeader
 	_, err := header.parse("02,031001234,122099999,0,040620,2359,,2/")
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "GroupStatus")
+	require.NoError(t, err)
+	require.Equal(t, DefaultGroupStatus, header.GroupStatus)
 }

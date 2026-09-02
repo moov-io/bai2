@@ -89,7 +89,10 @@ func TestParse_IgnoreVersion(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, tmp.Close())
 
-	defer func() { ignoreVersion = false }()
+	defer func() {
+		ignoreVersion = false
+		strictControlTotals = false
+	}()
 
 	_, err = executeCommand(rootCmd, "parse", "--input", tmp.Name())
 	assert.Error(t, err)

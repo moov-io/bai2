@@ -420,7 +420,7 @@ This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25
 
 Files whose 01 header is not version 2 are rejected unless you pass `Options{IgnoreVersion: true}` (CLI: `--ignoreVersion`, HTTP: `?ignoreVersion=true`). That flag is for BAI2 files that banks stamp with another version number. It is not a BTR3 / BAI3 reader.
 
-Appendix A type codes are in `pkg/lib` (`LookupTypeCode`, `ClassifyTypeCode`). Call `file.Create()` to fill 49/98/99 control totals from the file body.
+Appendix A type codes are in `pkg/lib` (`LookupTypeCode`, `ClassifyTypeCode`) and are attached to parsed summaries and details. Call `file.Create()` to fill 49/98/99 control totals from the file body. The HTTP server loads `configs/config.default.yml` from the binary via `go:embed`; set `APP_CONFIG` to override.
 
 ```
 $ git@github.com:moov-io/bai2.git
@@ -451,8 +451,9 @@ Available Commands:
 
 Flags:
   -h, --help                  help for this command
-      --ignoreVersion         ignore the version number in the file header
-      --input string          bai2 report file
+      --ignoreVersion          ignore the version number in the file header
+      --input string           bai2 report file
+      --strictControlTotals    reject files whose trailer totals do not match the body
 
 Use " [command] --help" for more information about a command.
 ```

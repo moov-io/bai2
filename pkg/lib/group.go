@@ -184,6 +184,12 @@ func (r *Group) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 				return err
 			}
 
+			if newAccount.CurrencyCode == "" {
+				newAccount.CurrencyCode = r.CurrencyCode
+				if newAccount.CurrencyCode == "" {
+					newAccount.CurrencyCode = DefaultCurrency
+				}
+			}
 			r.Accounts = append(r.Accounts, *newAccount)
 
 		case util.GroupTrailerCode:

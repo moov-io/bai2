@@ -21,9 +21,10 @@ import (
 )
 
 var (
-	documentFileName string
-	ignoreVersion    bool
-	documentBuffer   []byte
+	documentFileName    string
+	ignoreVersion       bool
+	strictControlTotals bool
+	documentBuffer      []byte
 )
 
 var WebCmd = &cobra.Command{
@@ -57,14 +58,7 @@ var Parse = &cobra.Command{
 	Short: "parse bai2 report",
 	Long:  "Parse an incoming bai2 report",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		var err error
-
-		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2With(lib.Options{
-			IgnoreVersion: ignoreVersion,
-		})
-		err = f.Read(&scan)
+		f, err := parseDocument()
 		if err != nil {
 			return err
 		}
@@ -85,14 +79,7 @@ var Print = &cobra.Command{
 	Short: "Print bai2 report",
 	Long:  "Print an incoming bai2 report after parse",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		var err error
-
-		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2With(lib.Options{
-			IgnoreVersion: ignoreVersion,
-		})
-		err = f.Read(&scan)
+		f, err := parseDocument()
 		if err != nil {
 			return err
 		}
@@ -112,14 +99,7 @@ var Format = &cobra.Command{
 	Short: "Format bai2 report",
 	Long:  "Format an incoming bai2 report after parse",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		var err error
-
-		scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-		f := lib.NewBai2With(lib.Options{
-			IgnoreVersion: ignoreVersion,
-		})
-		err = f.Read(&scan)
+		f, err := parseDocument()
 		if err != nil {
 			return err
 		}
@@ -189,10 +169,23 @@ func initRootCmd() {
 	rootCmd.SilenceUsage = true
 	rootCmd.PersistentFlags().StringVar(&documentFileName, "input", "", "bai2 report file")
 	rootCmd.PersistentFlags().BoolVar(&ignoreVersion, "ignoreVersion", false, "set to ignore bai file version in the header")
+	rootCmd.PersistentFlags().BoolVar(&strictControlTotals, "strictControlTotals", false, "reject files whose 49/98/99 totals do not match the body")
 	rootCmd.AddCommand(WebCmd)
 	rootCmd.AddCommand(Print)
 	rootCmd.AddCommand(Parse)
 	rootCmd.AddCommand(Format)
+}
+
+func parseDocument() (*lib.Bai2, error) {
+	scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
+	f := lib.NewBai2With(lib.Options{
+		IgnoreVersion:       ignoreVersion,
+		StrictControlTotals: strictControlTotals,
+	})
+	if err := f.Read(&scan); err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 func main() {

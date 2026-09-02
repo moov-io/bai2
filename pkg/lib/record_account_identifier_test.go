@@ -23,7 +23,7 @@ func TestAccountIdentifierCurrent(t *testing.T) {
 
 	record.AccountNumber = ""
 	require.Error(t, record.validate())
-	require.Equal(t, "AccountIdentifierCurrent: invalid AccountNumber", record.validate().Error())
+	require.Equal(t, "AccountIdentifier: invalid AccountNumber", record.validate().Error())
 
 }
 
