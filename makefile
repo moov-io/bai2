@@ -91,9 +91,25 @@ AUTHORS:
 	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
 	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
 
-dist: clean build
-ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/bai2.exe cmd/bai2/*
+# Map uname -m to Go GOARCH (linux/windows dist). Darwin is always arm64.
+UNAME_M := $(shell uname -m)
+ifeq ($(UNAME_M),x86_64)
+  HOST_ARCH := amd64
+else ifeq ($(UNAME_M),amd64)
+  HOST_ARCH := amd64
+else ifeq ($(UNAME_M),aarch64)
+  HOST_ARCH := arm64
+else ifeq ($(UNAME_M),arm64)
+  HOST_ARCH := arm64
 else
-	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/bai2-$(PLATFORM)-amd64 cmd/bai2/*
+  HOST_ARCH := $(UNAME_M)
+endif
+
+dist: clean
+ifeq ($(OS),Windows_NT)
+	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2.exe github.com/moov-io/bai2/cmd/bai2
+else ifeq ($(PLATFORM),darwin)
+	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-darwin-arm64 github.com/moov-io/bai2/cmd/bai2
+else
+	CGO_ENABLED=1 GOOS=$(PLATFORM) GOARCH=$(HOST_ARCH) go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-$(PLATFORM)-$(HOST_ARCH) github.com/moov-io/bai2/cmd/bai2
 endif

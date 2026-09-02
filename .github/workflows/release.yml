@@ -97,7 +97,7 @@ jobs:
         if [ "$RUNNER_OS" = "Linux" ]; then
           asset=./bin/bai2-linux-amd64
         elif [ "$RUNNER_OS" = "macOS" ]; then
-          asset=./bin/bai2-darwin-amd64
+          asset=./bin/bai2-darwin-arm64
         else
           asset=./bin/bai2.exe
         fi
