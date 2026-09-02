@@ -31,7 +31,7 @@ var typeCodeCatalog = map[string]TypeCode{
 	"055": {Code: "055", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Average Closing Available YTD"},
 	"056": {Code: "056", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Loan Balance"},
 	"057": {Code: "057", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Total Investment Position"},
-	"059": {Code: "059", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Current Available (CRS Supressed)"},
+	"059": {Code: "059", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Current Available (CRS Suppressed)"},
 	"060": {Code: "060", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Current Available"},
 	"061": {Code: "061", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Average Current Available MTD"},
 	"062": {Code: "062", Transaction: TransactionNA, Level: TypeLevelStatus, Description: "Average Current Available YTD"},
