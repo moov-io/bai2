@@ -32,7 +32,7 @@ Moov's mission is to give developers an easy way to create and integrate bank pr
 
 This project is a reader, writer, and validator for [BAI2](https://en.wikipedia.org/wiki/BAI_(file_format)) (Cash Management Balance Reporting Specifications Version 2) and X9.121 BTR3 (BAI3) files. It ships as a Go module (`github.com/moov-io/bai2`), a CLI, and an HTTP server in a [Docker image](#docker).
 
-v1.0.0 is a stable release. If you imported `pkg/lib`, see [Migrating](docs/MIGRATING.md).
+v1.1.0 is a stable release. If you imported `pkg/lib`, see [Migrating](docs/MIGRATING.md).
 
 ## Table of contents
 
@@ -51,7 +51,7 @@ v1.0.0 is a stable release. If you imported `pkg/lib`, see [Migrating](docs/MIGR
 
 ## Project status
 
-Moov Bai2 is used in production. v1.0.0 follows [semver](https://semver.org/): BAI2 lives in `pkg/bai2`, BAI3 / BTR3 in `pkg/bai3`, and `github.com/moov-io/bai2.Read` picks the parser from the file header. Please star the project if you are interested in its progress. Issues and pull requests are welcome.
+Moov Bai2 is used in production. v1.1.0 follows [semver](https://semver.org/): BAI2 lives in `pkg/bai2`, BAI3 / BTR3 in `pkg/bai3`, and `github.com/moov-io/bai2.Read` picks the parser from the file header. Please star the project if you are interested in its progress. Issues and pull requests are welcome.
 
 ## BAI2 and BAI3
 
@@ -202,7 +202,7 @@ By design, Bai2 **does not persist** any data about the files or entry details c
 This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
 
 ```
-go get github.com/moov-io/bai2@v1.0.0
+go get github.com/moov-io/bai2@v1.1.0
 ```
 
 `Read` looks at the 01 Version Number and returns a BAI2 or BAI3 document:
@@ -308,7 +308,7 @@ This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25
 
 ### Releasing
 
-Release notes live on [GitHub Releases](https://github.com/moov-io/bai2/releases). To cut a release, push a semver tag (`git push origin v1.0.1`); CI tests, publishes binaries, and pushes the Docker image.
+Release notes live on [GitHub Releases](https://github.com/moov-io/bai2/releases). To cut a release, push a semver tag (`git push origin v1.1.0`). CI runs tests, [GoReleaser](https://goreleaser.com/) publishes CLI binaries (linux/darwin/windows, amd64 and arm64), and the Docker image is pushed to `moov/bai2`.
 
 ### Testing
 

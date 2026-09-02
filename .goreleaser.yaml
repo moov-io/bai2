@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: bai2
+
+builds:
+  - id: bai2
+    main: ./cmd/bai2
+    binary: bai2
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X github.com/moov-io/bai2.Version={{ .Tag }}
+
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore\\(deps\\)"
+
+release:
+  name_template: "v{{ .Version }}"
+  header: |
+    CLI binaries from GoReleaser: linux (amd64, arm64), darwin (amd64, arm64), windows (amd64).
+
+    ```
+    go get github.com/moov-io/bai2@{{ .Tag }}
+    docker pull moov/bai2:{{ .Tag }}
+    ```

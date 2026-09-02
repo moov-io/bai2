@@ -105,11 +105,13 @@ else
   HOST_ARCH := $(UNAME_M)
 endif
 
+# Tagged GitHub releases are built by GoReleaser (.goreleaser.yaml).
+# This target is a local one-off for the host OS/arch.
 dist: clean
 ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2.exe github.com/moov-io/bai2/cmd/bai2
+	CGO_ENABLED=0 GOOS=windows go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2.exe github.com/moov-io/bai2/cmd/bai2
 else ifeq ($(PLATFORM),darwin)
-	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-darwin-arm64 github.com/moov-io/bai2/cmd/bai2
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-darwin-arm64 github.com/moov-io/bai2/cmd/bai2
 else
-	CGO_ENABLED=1 GOOS=$(PLATFORM) GOARCH=$(HOST_ARCH) go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-$(PLATFORM)-$(HOST_ARCH) github.com/moov-io/bai2/cmd/bai2
+	CGO_ENABLED=0 GOOS=$(PLATFORM) GOARCH=$(HOST_ARCH) go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2-$(PLATFORM)-$(HOST_ARCH) github.com/moov-io/bai2/cmd/bai2
 endif

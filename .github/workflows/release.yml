@@ -35,38 +35,12 @@ jobs:
     - name: Check
       run: make check
 
-  create_release:
+  release:
     permissions:
       contents: write
-    name: Create Release
+    name: Release
     needs: [testing]
     runs-on: ubuntu-latest
-    steps:
-    - name: Ensure GitHub Release
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAG: ${{ github.ref_name }}
-        REPO: ${{ github.repository }}
-      run: |
-        set -euo pipefail
-        if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-          echo "Release $TAG already exists — reusing"
-        else
-          gh release create "$TAG" \
-            --repo "$REPO" \
-            --title "Release $TAG" \
-            --prerelease
-        fi
-
-  publish:
-    permissions:
-      contents: write
-    name: Publish
-    needs: [testing, create_release]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -78,35 +52,21 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        fetch-depth: 0
         persist-credentials: false
 
-    - name: Install
-      run: make install
-
-    - name: Distribute
-      run: make dist
-
-    - name: Upload release asset
+    - uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+      with:
+        distribution: goreleaser
+        version: 'latest'
+        args: release --clean
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TAG: ${{ github.ref_name }}
-        REPO: ${{ github.repository }}
-      shell: bash
-      run: |
-        set -euo pipefail
-        if [ "$RUNNER_OS" = "Linux" ]; then
-          asset=./bin/bai2-linux-amd64
-        elif [ "$RUNNER_OS" = "macOS" ]; then
-          asset=./bin/bai2-darwin-arm64
-        else
-          asset=./bin/bai2.exe
-        fi
-        gh release upload "$TAG" "$asset" --repo "$REPO" --clobber
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   docker:
     name: Docker
     if: github.repository_owner == 'moov-io' && !github.event.repository.fork
-    needs: [testing, create_release]
+    needs: [testing, release]
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go 1.x
