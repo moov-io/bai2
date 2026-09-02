@@ -1,10 +1,13 @@
 # Migrating from `pkg/lib`
 
-`pkg/lib` was renamed to `pkg/bai2`. BAI3 / BTR3 (X9.121 version 3) lives in `pkg/bai3`.
-A version-detecting reader sits on the module root.
+This applies to **v1.0.0**. `pkg/lib` was renamed to `pkg/bai2`. BAI3 / BTR3
+(X9.121 version 3) lives in `pkg/bai3`. A version-detecting reader sits on the
+module root.
 
 `pkg/lib` remains as a compatibility shim. Existing `import "github.com/moov-io/bai2/pkg/lib"`
 code continues to compile. New code should import `pkg/bai2` or the root `Read` helper.
+
+Release notes: [v1.0.0](https://github.com/moov-io/bai2/releases/tag/v1.0.0).
 
 ## Import paths
 

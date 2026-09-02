@@ -2,7 +2,7 @@ openapi: 3.0.2
 info:
   version: v1
   title: BAI2 API
-  description: Moov Bai2 ([Automated Clearing House](https://en.wikipedia.org/wiki/Automated_Clearing_House)) implements an HTTP API for creating, parsing and validating Bais files. BAI2- a widely accepted and used Bank Statement Format for Bank Reconciliation.
+  description: Moov Bai2 implements an HTTP API for parsing, printing, and validating BAI2 and X9.121 BTR3 (BAI3) cash management balance reporting files.
   contact:
     url: https://github.com/moov-io/bai2
   license:
@@ -16,7 +16,9 @@ servers:
 tags:
   - name: 'Bai2 Files'
     description: |
-      BAI2 file format is a standardized set of codes which comes in text format.
+      BAI2 and BAI3 (X9.121 BTR3) cash management balance reporting files.
+      The 01 Version Number selects the grammar (2 → BAI2, 3 → BAI3).
+      Pass ignoreVersion=true to parse as BAI2 regardless of that field.
 
 paths:
   /health:
@@ -38,8 +40,19 @@ paths:
     post:
       tags: ['Bai2 Files']
       summary: Print bai2 file after parse bin file
-      description: Print bai2 file.
+      description: Print a BAI2 or BAI3 file. Version is detected from the 01 header.
       operationId: print
+      parameters:
+        - name: ignoreVersion
+          in: query
+          schema:
+            type: boolean
+          description: Parse as BAI2 regardless of the 01 Version Number.
+        - name: strictControlTotals
+          in: query
+          schema:
+            type: boolean
+          description: Reject files whose 49/98/99 totals do not match the body.
       requestBody:
         content:
           multipart/form-data:
@@ -121,8 +134,19 @@ paths:
     post:
       tags: ['Bai2 Files']
       summary: Parse bai2 file after parse bin file
-      description: parse bai2 file.
+      description: Parse and validate a BAI2 or BAI3 file. Version is detected from the 01 header.
       operationId: parse
+      parameters:
+        - name: ignoreVersion
+          in: query
+          schema:
+            type: boolean
+          description: Parse as BAI2 regardless of the 01 Version Number.
+        - name: strictControlTotals
+          in: query
+          schema:
+            type: boolean
+          description: Reject files whose 49/98/99 totals do not match the body.
       requestBody:
         content:
           multipart/form-data:
@@ -152,8 +176,19 @@ paths:
     post:
       tags: ['Bai2 Files']
       summary: Format bai2 file after parse bin file
-      description: format bai2 file.
+      description: Format a BAI2 or BAI3 file as JSON. Version is detected from the 01 header. BAI3 JSON uses Banks instead of Groups.
       operationId: format
+      parameters:
+        - name: ignoreVersion
+          in: query
+          schema:
+            type: boolean
+          description: Parse as BAI2 regardless of the 01 Version Number.
+        - name: strictControlTotals
+          in: query
+          schema:
+            type: boolean
+          description: Reject files whose 49/98/99 totals do not match the body.
       requestBody:
         content:
           multipart/form-data:

@@ -1,11 +1,11 @@
 [![Moov Banner Logo](https://user-images.githubusercontent.com/20115216/104214617-885b3c80-53ec-11eb-8ce0-9fc745fb5bfc.png)](https://github.com/moov-io)
 
 <p align="center">
-  <a href="https://moov-io.github.io/bai2/">Project Documentation</a>
+  <a href="https://pkg.go.dev/github.com/moov-io/bai2">GoDoc</a>
   ·
-  <a href="https://moov-io.github.io/bai2/api/#overview">API Endpoints</a>
+  <a href="https://moov.io/blog/craft/bai2-api-guide/">API Guide</a>
   ·
-  <a href="https://moov.io/blog/education/bai2-api-guide/">API Guide</a>
+  <a href="https://github.com/moov-io/bai2/releases">Releases</a>
   ·
   <a href="https://slack.moov.io/">Community</a>
   ·
@@ -14,7 +14,7 @@
   <br>
 </p>
 
-[![GoDoc](https://godoc.org/github.com/moov-io/bai2?status.svg)](https://godoc.org/github.com/moov-io/bai2)
+[![GoDoc](https://pkg.go.dev/badge/github.com/moov-io/bai2.svg)](https://pkg.go.dev/github.com/moov-io/bai2)
 [![Build Status](https://github.com/moov-io/bai2/workflows/Go/badge.svg)](https://github.com/moov-io/bai2/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/bai2/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/bai2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/bai2)](https://goreportcard.com/report/github.com/moov-io/bai2)
@@ -30,16 +30,19 @@
 
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
 
-Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) (BAI2) and X9.121 BTR3 (BAI3). This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`. See [Migrating](docs/MIGRATING.md) if you imported `pkg/lib`.
+This project is a reader, writer, and validator for [BAI2](https://en.wikipedia.org/wiki/BAI_(file_format)) (Cash Management Balance Reporting Specifications Version 2) and X9.121 BTR3 (BAI3) files. It ships as a Go module (`github.com/moov-io/bai2`), a CLI, and an HTTP server in a [Docker image](#docker).
+
+v1.0.0 is a stable release. If you imported `pkg/lib`, see [Migrating](docs/MIGRATING.md).
 
 ## Table of contents
 
 - [Project status](#project-status)
+- [BAI2 and BAI3](#bai2-and-bai3)
 - [Usage](#usage)
   - [As an API](#docker)
   - [As a Go module](#go-library)
   - [As a command line tool](#command-line)
-- [Learn about Bai 2](#learn-about-bai-2)
+- [Learn about BAI](#learn-about-bai)
 - [Getting help](#getting-help)
 - [Supported and tested platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
@@ -48,15 +51,24 @@ Bai2 implements a reader, writer, and validator for the [Cash Management Balance
 
 ## Project status
 
-Moov Bai2 is being used in pre-production and production environments. We are actively improving the library and refactoring to make the interfaces better for developers. Please star the project if you are interested in its progress. If you have layers above Bai2 to simplify tasks, perform business operations, or found bugs we would appreciate an issue or pull request. Thanks!
+Moov Bai2 is used in production. v1.0.0 follows [semver](https://semver.org/): BAI2 lives in `pkg/bai2`, BAI3 / BTR3 in `pkg/bai3`, and `github.com/moov-io/bai2.Read` picks the parser from the file header. Please star the project if you are interested in its progress. Issues and pull requests are welcome.
+
+## BAI2 and BAI3
+
+Both formats use the same 01/02/03/16/88/49/98/99 envelope. The 01 Version Number chooses the grammar.
+
+| Version | Package | Notes |
+|---|---|---|
+| 2 | [`pkg/bai2`](https://pkg.go.dev/github.com/moov-io/bai2/pkg/bai2) | Group header on record 02. Omitted group currency defaults to USD. |
+| 3 | [`pkg/bai3`](https://pkg.go.dev/github.com/moov-io/bai2/pkg/bai3) | Bank header on record 02. Account currency is required. |
+
+`ReadOptions.IgnoreVersion` (CLI `--ignoreVersion`, HTTP `?ignoreVersion=true`) still means **parse as BAI2**. Use that for BAI2 files banks stamp with version `3`. It does not enable the BAI3 grammar.
 
 ## Usage
 
-The Bai2 project implements an HTTP server and [Go library](https://pkg.go.dev/github.com/moov-io/bai2) for creating and modifying files in bai 2 format, which developed a generic format and widely accepted by most of the Banks in USA.
-
 ### Docker
 
-We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release of Bai2. No configuration is required to serve on `:8208`. <!-- We also have Docker images for [OpenShift](https://quay.io/repository/moov/bai2?tab=tags) published as `quay.io/moov/bai2`. -->
+We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release. No configuration is required to serve on `:8208`.
 
 Pull & start the Docker image:
 ```
@@ -66,7 +78,7 @@ docker run -p 8208:8208 moov/bai2:latest web
 
 Upload a file and parse it:
 ```
-curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/parse
+curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/parse
 ```
 ```
 {"status":"valid file"}
@@ -74,7 +86,7 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/parse
 
 Print a file after parse:
 ```
-curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/print
+curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/print
 ```
 ```
 01,0004,12345,060321,0829,001,80,1,2/
@@ -82,34 +94,13 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/print
 03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/
 88,100,000000000208500,00003,V,060316,,400,000000000208500,00008,V,060316,/
 16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     /
-16,409,000000000090000,V,060316,,,,RTN-UNKNOWN         /
-16,409,000000000000500,V,060316,,,,RTD CHQ SERVICE CHRG/
-16,108,000000000203500,V,060316,,,,TFR 1020 0345678    /
-16,108,000000000002500,V,060316,,,,MACLEOD MALL        /
-16,108,000000000002500,V,060316,,,,MASCOUCHE QUE       /
-16,409,000000000020000,V,060316,,,,1000 ISLANDS MALL   /
-16,409,000000000090000,V,060316,,,,PENHORA MALL        /
-16,409,000000000002000,V,060316,,,,CAPILANO MALL       /
-16,409,000000000002500,V,060316,,,,GALERIES LA CAPITALE/
-16,409,000000000001000,V,060316,,,,PLAZA ROCK FOREST   /
-49,+00000000000834000,000000014/
-03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/
-88,100,000000000111500,00002,V,060317,,400,000000000111500,00004,V,060317,/
-16,108,000000000011500,V,060317,,,,TFR 1020 0345678    /
-16,108,000000000100000,V,060317,,,,MONTREAL            /
-16,409,000000000100000,V,060317,,,,GRANDFALL NB        /
-16,409,000000000009000,V,060317,,,,HAMILTON ON         /
-16,409,000000000002000,V,060317,,,,WOODSTOCK NB        /
-16,409,000000000000500,V,060317,,,,GALERIES RICHELIEU  /
-49,+00000000000446000,000000009/
-98,+00000000001280000,000000002,000000025/
-99,+00000000001280000,000000001,000000027/
 ...
+99,+00000000001280000,000000001,000000027/
 ```
 
 Format to JSON after parse:
 ```
-curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq .
+curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/format | jq .
 ```
 <details>
 <summary>JSON Response</summary>
@@ -186,222 +177,6 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq
               "BankReferenceNumber": "",
               "CustomerReferenceNumber": "",
               "Text": "RETURNED CHEQUE     "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000090000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "RTN-UNKNOWN         "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000000500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "RTD CHQ SERVICE CHRG"
-            },
-            {
-              "TypeCode": "108",
-              "Amount": "000000000203500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "TFR 1020 0345678    "
-            },
-            {
-              "TypeCode": "108",
-              "Amount": "000000000002500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "MACLEOD MALL        "
-            },
-            {
-              "TypeCode": "108",
-              "Amount": "000000000002500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "MASCOUCHE QUE       "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000020000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "1000 ISLANDS MALL   "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000090000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "PENHORA MALL        "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000002000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "CAPILANO MALL       "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000002500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "GALERIES LA CAPITALE"
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000001000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "PLAZA ROCK FOREST   "
-            }
-          ]
-        },
-        {
-          "accountNumber": "10200123456",
-          "currencyCode": "CAD",
-          "summaries": [
-            {
-              "TypeCode": "040",
-              "Amount": "+000000000000",
-              "ItemCount": 0,
-              "FundsType": {}
-            },
-            {
-              "TypeCode": "045",
-              "Amount": "+000000000000",
-              "ItemCount": 0,
-              "FundsType": {}
-            },
-            {
-              "TypeCode": "100",
-              "Amount": "000000000111500",
-              "ItemCount": 2,
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              }
-            },
-            {
-              "TypeCode": "400",
-              "Amount": "000000000111500",
-              "ItemCount": 4,
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              }
-            }
-          ],
-          "accountControlTotal": "+00000000000446000",
-          "numberRecords": 9,
-          "Details": [
-            {
-              "TypeCode": "108",
-              "Amount": "000000000011500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "TFR 1020 0345678    "
-            },
-            {
-              "TypeCode": "108",
-              "Amount": "000000000100000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "MONTREAL            "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000100000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "GRANDFALL NB        "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000009000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "HAMILTON ON         "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000002000",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "WOODSTOCK NB        "
-            },
-            {
-              "TypeCode": "409",
-              "Amount": "000000000000500",
-              "FundsType": {
-                "type_code": "V",
-                "date": "060317"
-              },
-              "BankReferenceNumber": "",
-              "CustomerReferenceNumber": "",
-              "Text": "GALERIES RICHELIEU  "
             }
           ]
         }
@@ -412,28 +187,73 @@ curl -X POST --form "input=@./data/sample.txt" http://localhost:8208/format | jq
 ```
 </details>
 
+Query flags on `/parse`, `/print`, and `/format`:
+
+- `?ignoreVersion=true` — parse as BAI2 regardless of the 01 version field
+- `?strictControlTotals=true` — reject files whose 49/98/99 totals do not match the body
+
+BAI3 `/format` JSON uses `Banks` (record 02 bank headers) instead of `Groups`.
+
 #### Data persistence
-By design, Bai2  **does not persist** (save) any data about the files or entry details created. The only storage occurs in memory of the process and upon restart Bai2 will have no files or data saved. Also, no in-memory encryption of the data is performed.
+By design, Bai2 **does not persist** any data about the files or entry details created. The only storage occurs in memory of the process and upon restart Bai2 will have no files or data saved. Also, no in-memory encryption of the data is performed.
 
 ### Go library
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
 
-`github.com/moov-io/bai2.Read` looks at the 01 Version Number and returns a BAI2 (`pkg/bai2`) or BAI3 (`pkg/bai3`) document. `Options{IgnoreVersion: true}` (CLI: `--ignoreVersion`, HTTP: `?ignoreVersion=true`) still means “parse as BAI2” for files banks stamp with the wrong version.
+```
+go get github.com/moov-io/bai2@v1.0.0
+```
+
+`Read` looks at the 01 Version Number and returns a BAI2 or BAI3 document:
+
+```go
+import (
+    "fmt"
+    "os"
+
+    moovbai "github.com/moov-io/bai2"
+    "github.com/moov-io/bai2/pkg/bai2"
+    "github.com/moov-io/bai2/pkg/bai3"
+)
+
+f, err := moovbai.Read(os.Stdin)
+if err != nil {
+    return err
+}
+if err := f.Validate(); err != nil {
+    return err
+}
+
+switch doc := f.(type) {
+case *bai2.Bai2:
+    fmt.Printf("BAI2 sender %s, %d groups\n", doc.Sender, len(doc.Groups))
+case *bai3.File:
+    fmt.Printf("BAI3 sender %s, %d banks\n", doc.Sender, len(doc.Banks))
+}
+```
+
+To parse only BAI2:
+
+```go
+scan := bai2.NewBai2Scanner(r)
+file := bai2.NewBai2()
+if err := file.Read(&scan); err != nil {
+    return err
+}
+```
 
 Appendix A type codes are on parsed summaries and details (`LookupTypeCode`, `TypeInfo()`). Call `Create()` to fill 49/98/99 control totals. The HTTP server loads `configs/config.default.yml` via `go:embed`; set `APP_CONFIG` to override.
 
 ```
-$ git@github.com:moov-io/bai2.git
-
-$ go get -u github.com/moov-io/bai2
-
-$ go doc github.com/moov-io/bai2
+go doc github.com/moov-io/bai2
+go doc github.com/moov-io/bai2/pkg/bai2
+go doc github.com/moov-io/bai2/pkg/bai3
 ```
 
 ### Command line
 
-Bai2 has a command line interface to manage Bai 2 files and launch a web service.
+Bai2 has a command line interface to parse files and launch the web service.
 
 ```
 $ bai2 --help
@@ -459,17 +279,21 @@ Flags:
 Use " [command] --help" for more information about a command.
 ```
 
-## Learn about Bai 2
+`parse`, `print`, and `format` auto-detect BAI2 vs BAI3 from the 01 version field.
 
-- [Bai 2](https://www.tdcommercialbanking.com/document/PDF/bai.pdf)
-- [Cash Management](https://www.bai.org/docs/default-source/libraries/site-general-downloads/cash_management_2005.pdf)
+## Learn about BAI
+
+- [BAI file format (Wikipedia)](https://en.wikipedia.org/wiki/BAI_(file_format))
+- [Cash Management Balance Reporting Specifications Version 2](docs/specifications/Cash%20Management%20Balance%20Reporting%20Specifications%20Version%202.pdf) (BAI2)
+- [X9.121 BTRS Version 3 Format Guide](https://x9.org/wp-content/uploads/2018/07/X9.121-2016-BTRS-Version-3.0.pdf) (public samples; the full standard is not vendored)
+- [BAI2 API guide](https://moov.io/blog/craft/bai2-api-guide/)
 
 ## Getting help
 
  channel | info
  ------- | -------
 Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
-[GitHub Issue](https://github.com/moov-io) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
+[GitHub Issue](https://github.com/moov-io/bai2/issues) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
 [moov-io slack](https://slack.moov.io/) | Join our (`#bai2`) slack channel to have an interactive discussion about the development of the project.
 
 ## Supported and tested platforms
@@ -478,13 +302,13 @@ Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter fee
 
 ## Contributing
 
-Yes please! Please review our [Contributing guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) to get started!
+Yes please! Open an issue or pull request. Join (`#bai2`) on [moov-io slack](https://slack.moov.io/) if you want to talk through a change.
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
 
 ### Releasing
 
-To make a release of bai2 simply open a pull request with `CHANGELOG.md` and `version.go` updated with the next version number and details. You'll also need to push the tag (i.e. `git push origin v1.0.0`) to origin in order for CI to make the release.
+Release notes live on [GitHub Releases](https://github.com/moov-io/bai2/releases). To cut a release, push a semver tag (`git push origin v1.0.1`); CI tests, publishes binaries, and pushes the Docker image.
 
 ### Testing
 
@@ -492,7 +316,7 @@ We maintain a comprehensive suite of unit tests and recommend table-driven testi
 
 ### Fuzzing
 
-We currently run fuzzing over ACH in the form of a [Github Action](https://github.com/moov-io/bai2/actions/workflows/fuzz.yml). Please report crashes examples to [`oss@moov.io`](mailto:oss@moov.io). Thanks!
+We currently run fuzzing over BAI2 and BAI3 in the form of a [GitHub Action](https://github.com/moov-io/bai2/actions/workflows/fuzz.yml). Please report crash examples to [`oss@moov.io`](mailto:oss@moov.io). Thanks!
 
 ## Related projects
 As part of Moov's initiative to offer open source fintech infrastructure, we have a large collection of active projects you may find useful:
@@ -503,7 +327,7 @@ As part of Moov's initiative to offer open source fintech infrastructure, we hav
 
 - [Moov Wire](https://github.com/moov-io/wire) implements an interface to write files for the Fedwire Funds Service, a real-time gross settlement funds transfer system operated by the United States Federal Reserve Banks.
 
-- [Moov ACH](https://github.com/moov-io/ach) provides ACH file generation and parsing, supporting all Standard Entry Codes for the primary method of money movement throughout the United States.
+- [Moov ACH](https://github.com/moov-io/ach) provides ACH file generation and parsing, supporting all Standard Entry Codes for the primary method of money movement throughout the United States.
 
 - [Moov Image Cash Letter](https://github.com/moov-io/imagecashletter) implements Image Cash Letter (ICL) files used for Check21, X.9 or check truncation files for exchange and remote deposit in the U.S.
 
