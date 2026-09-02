@@ -1,3 +1,21 @@
+## v0.4.1 (Released 2026-09-02)
+
+IMPROVEMENTS
+
+- fix: use constant format strings for go vet
+- test(fuzz): fix BAI2 fuzzer so invalid inputs do not fail the run
+- security: enable weekly scanners and fix alerts
+- ci: add scheduled Go fuzz testing workflow
+- ci: push docker images only on official moov-io releases
+
+BUILD
+
+- chore(deps): update go toolchain directive to v1.27.1
+- chore(deps): update golang docker tag to v1.27
+- fix(deps): update module github.com/moov-io/base to v0.63.3
+- fix(deps): update module github.com/spf13/cobra to v1.10.2
+- fix(deps): update module github.com/stretchr/testify to v1.12.1
+
 ## v0.4.0 (Released 2024-06-17)
 
 IMPROVEMENTS
