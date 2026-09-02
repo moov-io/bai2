@@ -30,7 +30,7 @@
 
 Moov's mission is to give developers an easy way to create and integrate bank processing into their own software products. Our open source projects are each focused on solving a single responsibility in financial services and designed around performance, scalability, and ease-of-use.
 
-Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) developed by [Bank Administration Institute](https://www.bai.org) (BAI). This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`.
+Bai2 implements a reader, writer, and validator for the [Cash Management Balance Reporting Specifications Version 2](https://en.wikipedia.org/wiki/BAI_(file_format)) (BAI2) and X9.121 BTR3 (BAI3). This project offers a HTTP server in a [Docker image](#docker) and a Go package `github.com/moov-io/bai2`. See [Migrating](docs/MIGRATING.md) if you imported `pkg/lib`.
 
 ## Table of contents
 
@@ -43,6 +43,7 @@ Bai2 implements a reader, writer, and validator for the [Cash Management Balance
 - [Getting help](#getting-help)
 - [Supported and tested platforms](#supported-and-tested-platforms)
 - [Contributing](#contributing)
+- [Migrating from pkg/lib](docs/MIGRATING.md)
 - [Related projects](#related-projects)
 
 ## Project status
@@ -418,9 +419,9 @@ By design, Bai2  **does not persist** (save) any data about the files or entry d
 
 This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. You can download the source code and we offer [tagged and released versions](https://github.com/moov-io/bai2/releases/latest) as well. We highly recommend you use a tagged release for production.
 
-Files whose 01 header is not version 2 are rejected unless you pass `Options{IgnoreVersion: true}` (CLI: `--ignoreVersion`, HTTP: `?ignoreVersion=true`). That flag is for BAI2 files that banks stamp with another version number. It is not a BTR3 / BAI3 reader.
+`github.com/moov-io/bai2.Read` looks at the 01 Version Number and returns a BAI2 (`pkg/bai2`) or BAI3 (`pkg/bai3`) document. `Options{IgnoreVersion: true}` (CLI: `--ignoreVersion`, HTTP: `?ignoreVersion=true`) still means “parse as BAI2” for files banks stamp with the wrong version.
 
-Appendix A type codes are in `pkg/lib` (`LookupTypeCode`, `ClassifyTypeCode`) and are attached to parsed summaries and details. Call `file.Create()` to fill 49/98/99 control totals from the file body. The HTTP server loads `configs/config.default.yml` from the binary via `go:embed`; set `APP_CONFIG` to override.
+Appendix A type codes are on parsed summaries and details (`LookupTypeCode`, `TypeInfo()`). Call `Create()` to fill 49/98/99 control totals. The HTTP server loads `configs/config.default.yml` via `go:embed`; set `APP_CONFIG` to override.
 
 ```
 $ git@github.com:moov-io/bai2.git

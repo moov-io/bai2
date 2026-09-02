@@ -1,3 +1,12 @@
+## Unreleased
+
+IMPROVEMENTS
+
+- feat: rename `pkg/lib` to `pkg/bai2` and keep `pkg/lib` as a compatibility shim
+- feat: add `pkg/bai3` parser for X9.121 BTR3 (version 3) with public format-guide golden files
+- feat: `github.com/moov-io/bai2.Read` dispatches to BAI2 or BAI3 from the 01 Version Number
+- docs: add [Migrating from pkg/lib](docs/MIGRATING.md)
+
 ## v0.4.1 (Released 2026-09-02)
 
 IMPROVEMENTS

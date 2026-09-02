@@ -11,7 +11,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/moov-io/bai2/pkg/lib"
+	moovbai "github.com/moov-io/bai2"
+	"github.com/moov-io/bai2/pkg/bai2"
 )
 
 func FuzzReaderWriter(f *testing.F) {
@@ -23,13 +24,19 @@ func FuzzReaderWriter(f *testing.F) {
 			t.Skip()
 		}
 
-		scan := lib.NewBai2Scanner(strings.NewReader(contents))
-		file := lib.NewBai2()
+		scan := bai2.NewBai2Scanner(strings.NewReader(contents))
+		file := bai2.NewBai2()
 
 		// Read/Validate/String must never panic on arbitrary input.
 		_ = file.Read(&scan)
 		_ = file.Validate()
 		_ = file.String()
+
+		got, _ := moovbai.Read(strings.NewReader(contents))
+		if got != nil {
+			_ = got.Validate()
+			_ = got.String()
+		}
 	})
 }
 

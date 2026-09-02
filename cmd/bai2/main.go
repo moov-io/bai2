@@ -15,7 +15,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/moov-io/bai2/pkg/lib"
+	moovbai "github.com/moov-io/bai2"
 	"github.com/moov-io/bai2/pkg/service"
 	baseLog "github.com/moov-io/base/log"
 )
@@ -176,16 +176,11 @@ func initRootCmd() {
 	rootCmd.AddCommand(Format)
 }
 
-func parseDocument() (*lib.Bai2, error) {
-	scan := lib.NewBai2Scanner(bytes.NewReader(documentBuffer))
-	f := lib.NewBai2With(lib.Options{
+func parseDocument() (moovbai.File, error) {
+	return moovbai.ReadWithOptions(bytes.NewReader(documentBuffer), moovbai.ReadOptions{
 		IgnoreVersion:       ignoreVersion,
 		StrictControlTotals: strictControlTotals,
 	})
-	if err := f.Read(&scan); err != nil {
-		return nil, err
-	}
-	return f, nil
 }
 
 func main() {

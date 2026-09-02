@@ -11,7 +11,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/moov-io/bai2/pkg/lib"
+	moovbai "github.com/moov-io/bai2"
 )
 
 func outputError(w http.ResponseWriter, code int, err error) {
@@ -30,15 +30,15 @@ func outputSuccess(w http.ResponseWriter, output string) {
 	})
 }
 
-func optionsFromRequest(r *http.Request) lib.Options {
+func optionsFromRequest(r *http.Request) moovbai.ReadOptions {
 	v := r.URL.Query().Get("ignoreVersion")
-	return lib.Options{
+	return moovbai.ReadOptions{
 		IgnoreVersion:       v == "true" || v == "1",
 		StrictControlTotals: r.URL.Query().Get("strictControlTotals") == "true",
 	}
 }
 
-func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
+func parseInputFromRequest(r *http.Request) (moovbai.File, error) {
 	inputFile, _, err := r.FormFile("input")
 	if err != nil {
 		return nil, err
@@ -50,24 +50,16 @@ func parseInputFromRequest(r *http.Request) (*lib.Bai2, error) {
 		return nil, err
 	}
 
-	scan := lib.NewBai2Scanner(bytes.NewReader(input.Bytes()))
-	f := lib.NewBai2With(optionsFromRequest(r))
-
-	err = f.Read(&scan)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
+	return moovbai.ReadWithOptions(bytes.NewReader(input.Bytes()), optionsFromRequest(r))
 }
 
-func outputBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
+func outputBufferToWriter(w http.ResponseWriter, f moovbai.File) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte(f.String()))
 }
 
-func outputJsonBufferToWriter(w http.ResponseWriter, f *lib.Bai2) {
+func outputJsonBufferToWriter(w http.ResponseWriter, f moovbai.File) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(f)

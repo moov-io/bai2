@@ -69,12 +69,18 @@ func TestFormat(t *testing.T) {
 
 func TestPrint_ParseError(t *testing.T) {
 	_, err := executeCommand(rootCmd, "print", "--input", parseErrorFileName)
-	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
+	assert.Equal(t, err.Error(), `first record is "00,0004,1/", want 01 file header`)
 }
 
 func TestParse_ParseError(t *testing.T) {
 	_, err := executeCommand(rootCmd, "parse", "--input", parseErrorFileName)
-	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
+	assert.Equal(t, err.Error(), `first record is "00,0004,1/", want 01 file header`)
+}
+
+func TestParse_BAI3(t *testing.T) {
+	path := filepath.Join("..", "..", "test", "testdata", "bai3", "x9-mandatory.txt")
+	_, err := executeCommand(rootCmd, "parse", "--input", path)
+	assert.NoError(t, err)
 }
 
 func TestParse_IgnoreVersion(t *testing.T) {
@@ -103,5 +109,5 @@ func TestParse_IgnoreVersion(t *testing.T) {
 
 func TestFormat_ParseError(t *testing.T) {
 	_, err := executeCommand(rootCmd, "format", "--input", parseErrorFileName)
-	assert.Equal(t, err.Error(), "ERROR parsing file on line 1 (unsupported record type 00)")
+	assert.Equal(t, err.Error(), `first record is "00,0004,1/", want 01 file header`)
 }
