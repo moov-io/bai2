@@ -17,6 +17,11 @@ func TestValidateDate(t *testing.T) {
 	require.False(t, ValidateDate("xx040621"))
 	require.False(t, ValidateDate("040621x"))
 	require.False(t, ValidateDate("041321"))
+	require.False(t, ValidateDate("040431"))
+	require.False(t, ValidateDate("020230"))
+	require.False(t, ValidateDate("010229"))
+	require.True(t, ValidateDate("000229"))
+	require.True(t, ValidateDate("010131"))
 	require.False(t, ValidateDate(""))
 }
 

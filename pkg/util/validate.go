@@ -7,15 +7,16 @@ package util
 import (
 	"regexp"
 	"strconv"
+	"time"
 )
 
-var dateYYMMDDTypeRegex = regexp.MustCompile(`^[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$`)
 var singedNumber = regexp.MustCompile(`^(-|\+|)?[0-9]\d*$`)
 var currencyCodeRegex = regexp.MustCompile(`^[a-zA-Z]{3}$`)
 var typeCodeRegex = regexp.MustCompile(`^[0-9]{3}$`)
 
 func ValidateDate(input string) bool {
-	return dateYYMMDDTypeRegex.MatchString(input)
+	_, err := time.Parse("060102", input)
+	return err == nil
 }
 
 // ValidateTime reports whether input is a BAI2 military time.
