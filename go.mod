@@ -2,12 +2,12 @@ module github.com/moov-io/bai2
 
 go 1.26.0
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require (
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.1
-	github.com/moov-io/base v0.66.0
+	github.com/moov-io/base v0.68.2
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 )
