@@ -28,7 +28,7 @@ update:
 	go mod vendor
 
 build:
-	go build -mod=vendor -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2 github.com/moov-io/bai2/cmd/bai2
+	go build -ldflags "-X github.com/moov-io/bai2.Version=${VERSION}" -o bin/bai2 github.com/moov-io/bai2/cmd/bai2
 
 .PHONY: check
 check:

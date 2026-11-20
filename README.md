@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://pkg.go.dev/github.com/moov-io/bai2">GoDoc</a>
   ·
-  <a href="https://moov.io/blog/craft/bai2-api-guide/">API Guide</a>
+  <a href="api/api.yaml">OpenAPI</a>
   ·
   <a href="https://github.com/moov-io/bai2/releases">Releases</a>
   ·
@@ -20,7 +20,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/bai2)](https://goreportcard.com/report/github.com/moov-io/bai2)
 [![Repo Size](https://img.shields.io/github/languages/code-size/moov-io/bai2?label=project%20size)](https://github.com/moov-io/bai2)
 [![Apache 2 License](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/bai2/master/LICENSE)
-[![Slack Channel](https://slack.moov.io/badge.svg?bg=e01563&fgColor=fffff)](https://slack.moov.io/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/moov/bai2)](https://hub.docker.com/r/moov/bai2)
 [![GitHub Stars](https://img.shields.io/github/stars/moov-io/bai2)](https://github.com/moov-io/bai2)
 [![Twitter](https://img.shields.io/twitter/follow/moov?style=social)](https://twitter.com/moov?lang=en)
@@ -68,13 +67,19 @@ Both formats use the same 01/02/03/16/88/49/98/99 envelope. The 01 Version Numbe
 
 ### Docker
 
-We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release. No configuration is required to serve on `:8208`.
+We publish a [public Docker image `moov/bai2`](https://hub.docker.com/r/moov/bai2/) on Docker Hub with each tagged release. No configuration is required to serve the public API on `:8208`. The admin server (health probes and metrics) listens on `:8209`.
 
 Pull & start the Docker image:
 ```
 docker pull moov/bai2:latest
-docker run -p 8208:8208 moov/bai2:latest web
+docker run -p 8208:8208 -p 8209:8209 moov/bai2:latest web
 ```
+
+Probes:
+
+- Public API: `http://localhost:8208/health`
+- Admin live/ready: `http://localhost:8209/live` and `http://localhost:8209/ready`
+- Metrics: `http://localhost:8209/metrics`
 
 Upload a file and parse it:
 ```
@@ -91,17 +96,24 @@ curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/p
 ```
 01,0004,12345,060321,0829,001,80,1,2/
 02,12345,0004,1,060317,,CAD,/
-03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,/
-88,100,000000000208500,00003,V,060316,,400,000000000208500,00008,V,060316,/
-16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     /
+03,10200123456,CAD,040,+000000000000,,,045,+000000000000,,,100,000000000208500/
+88,3,V,060316,,400,000000000208500,8,V,060316,/
+16,409,000000000002500,V,060316,,,,RETURNED CHEQUE     
+16,409,000000000090000,V,060316,,,,RTN-UNKNOWN         
 ...
-99,+00000000001280000,000000001,000000027/
+49,+00000000000446000,9/
+98,+00000000001280000,2,25/
+99,+00000000001280000,1,27/
 ```
+
+The printer wraps records at 80 characters when the file sets a physical record length of 80. Some 16 records do not have a trailing `/`.
 
 Format to JSON after parse:
 ```
 curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/format | jq .
 ```
+The response includes `Transaction`, `Level`, and `Description` on every summary and detail. The example below is shortened.
+
 <details>
 <summary>JSON Response</summary>
 
@@ -137,31 +149,19 @@ curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/f
               "TypeCode": "040",
               "Amount": "+000000000000",
               "ItemCount": 0,
-              "FundsType": {}
+              "FundsType": {},
+              "Transaction": "NA",
+              "Level": "Status",
+              "Description": "Opening Available"
             },
             {
               "TypeCode": "045",
               "Amount": "+000000000000",
               "ItemCount": 0,
-              "FundsType": {}
-            },
-            {
-              "TypeCode": "100",
-              "Amount": "000000000208500",
-              "ItemCount": 3,
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              }
-            },
-            {
-              "TypeCode": "400",
-              "Amount": "000000000208500",
-              "ItemCount": 8,
-              "FundsType": {
-                "type_code": "V",
-                "date": "060316"
-              }
+              "FundsType": {},
+              "Transaction": "NA",
+              "Level": "Status",
+              "Description": "Closing Available"
             }
           ],
           "accountControlTotal": "+00000000000834000",
@@ -176,7 +176,10 @@ curl -X POST --form "input=@./test/testdata/sample1.txt" http://localhost:8208/f
               },
               "BankReferenceNumber": "",
               "CustomerReferenceNumber": "",
-              "Text": "RETURNED CHEQUE     "
+              "Text": "RETURNED CHEQUE     ",
+              "Transaction": "DB",
+              "Level": "Detail",
+              "Description": "Debit (Any Type)"
             }
           ]
         }
@@ -199,7 +202,7 @@ By design, Bai2 **does not persist** any data about the files or entry details c
 
 ### Go library
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules). The current `master` branch requires Go 1.26 or newer. The v1.1.0 release requires Go 1.25.8 or newer. See [Golang's install instructions](https://golang.org/doc/install) for help setting up Go. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
 
 ```
 go get github.com/moov-io/bai2@v1.1.0
@@ -208,6 +211,8 @@ go get github.com/moov-io/bai2@v1.1.0
 `Read` looks at the 01 Version Number and returns a BAI2 or BAI3 document:
 
 ```go
+package main
+
 import (
     "fmt"
     "os"
@@ -217,19 +222,29 @@ import (
     "github.com/moov-io/bai2/pkg/bai3"
 )
 
-f, err := moovbai.Read(os.Stdin)
-if err != nil {
-    return err
-}
-if err := f.Validate(); err != nil {
-    return err
+func main() {
+    if err := run(); err != nil {
+        fmt.Fprintln(os.Stderr, err)
+        os.Exit(1)
+    }
 }
 
-switch doc := f.(type) {
-case *bai2.Bai2:
-    fmt.Printf("BAI2 sender %s, %d groups\n", doc.Sender, len(doc.Groups))
-case *bai3.File:
-    fmt.Printf("BAI3 sender %s, %d banks\n", doc.Sender, len(doc.Banks))
+func run() error {
+    f, err := moovbai.Read(os.Stdin)
+    if err != nil {
+        return err
+    }
+    if err := f.Validate(); err != nil {
+        return err
+    }
+
+    switch doc := f.(type) {
+    case *bai2.Bai2:
+        fmt.Printf("BAI2 sender %s, %d groups\n", doc.Sender, len(doc.Groups))
+    case *bai3.File:
+        fmt.Printf("BAI3 sender %s, %d banks\n", doc.Sender, len(doc.Banks))
+    }
+    return nil
 }
 ```
 
@@ -253,14 +268,22 @@ go doc github.com/moov-io/bai2/pkg/bai3
 
 ### Command line
 
-Bai2 has a command line interface to parse files and launch the web service.
+Install the `bai2` command with Go:
+
+```
+go install github.com/moov-io/bai2/cmd/bai2@v1.1.0
+```
+
+You can also download a release archive from the [Releases](https://github.com/moov-io/bai2/releases) page, or build from source with `make build` (the binary is written to `bin/bai2`). You do not need to run `make install` first.
 
 ```
 $ bai2 --help
 ```
 ```
+Parse, print, and format BAI2 and BAI3 reports
+
 Usage:
-   [command]
+  bai2 [command]
 
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -271,22 +294,24 @@ Available Commands:
   web         Launches web server
 
 Flags:
-  -h, --help                  help for this command
-      --ignoreVersion          ignore the version number in the file header
-      --input string           bai2 report file
-      --strictControlTotals    reject files whose trailer totals do not match the body
+  -h, --help                  help for bai2
+      --ignoreVersion         set to ignore bai file version in the header
+      --input string          bai2 report file
+      --strictControlTotals   reject files whose 49/98/99 totals do not match the body
+  -v, --version               version for bai2
 
-Use " [command] --help" for more information about a command.
+Use "bai2 [command] --help" for more information about a command.
 ```
 
-`parse`, `print`, and `format` auto-detect BAI2 vs BAI3 from the 01 version field.
+`parse`, `print`, and `format` auto-detect BAI2 vs BAI3 from the 01 version field. Use `bai2 --version` to print the build version.
 
 ## Learn about BAI
 
 - [BAI file format (Wikipedia)](https://en.wikipedia.org/wiki/BAI_(file_format))
 - [Cash Management Balance Reporting Specifications Version 2](docs/specifications/Cash%20Management%20Balance%20Reporting%20Specifications%20Version%202.pdf) (BAI2)
 - [X9.121 BTRS Version 3 Format Guide](https://x9.org/wp-content/uploads/2018/07/X9.121-2016-BTRS-Version-3.0.pdf) (public samples; the full standard is not vendored)
-- [BAI2 API guide](https://moov.io/blog/craft/bai2-api-guide/)
+- [OpenAPI specification](api/api.yaml)
+- [Generated Go API client](pkg/client)
 
 ## Getting help
 
@@ -304,7 +329,7 @@ Twitter [@moov](https://twitter.com/moov)	| You can follow Moov.io's Twitter fee
 
 Yes please! Open an issue or pull request. Join (`#bai2`) on [moov-io slack](https://slack.moov.io/) if you want to talk through a change.
 
-This project uses [Go Modules](https://go.dev/blog/using-go-modules) and Go 1.25 or newer. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
+This project uses [Go Modules](https://go.dev/blog/using-go-modules). The current `master` branch requires Go 1.26 or newer. Use a [tagged release](https://github.com/moov-io/bai2/releases/latest) in production.
 
 ### Releasing
 
@@ -312,7 +337,7 @@ Release notes live on [GitHub Releases](https://github.com/moov-io/bai2/releases
 
 ### Testing
 
-We maintain a comprehensive suite of unit tests and recommend table-driven testing when a particular function warrants several very similar test cases. To run all test files in the current directory, use `go test`. Current overall coverage can be found on [Codecov](https://app.codecov.io/gh/moov-io/bai2/).
+We maintain a comprehensive suite of unit tests and recommend table-driven testing when a particular function warrants several very similar test cases. To run the full test suite, use `go test ./...` or `make check`. Current overall coverage can be found on [Codecov](https://app.codecov.io/gh/moov-io/bai2/).
 
 ### Fuzzing
 

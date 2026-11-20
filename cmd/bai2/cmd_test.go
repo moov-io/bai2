@@ -111,3 +111,10 @@ func TestFormat_ParseError(t *testing.T) {
 	_, err := executeCommand(rootCmd, "format", "--input", parseErrorFileName)
 	assert.Equal(t, err.Error(), `first record is "00,0004,1/", want 01 file header`)
 }
+
+func TestRootHelp(t *testing.T) {
+	output, err := executeCommand(rootCmd, "--help")
+	assert.NoError(t, err)
+	assert.Contains(t, output, "Usage:\n  bai2")
+	assert.Contains(t, output, "--version")
+}

@@ -17,4 +17,4 @@
 
 package bai2
 
-var Version string
+var Version = "dev"
