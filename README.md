@@ -305,6 +305,8 @@ Use "bai2 [command] --help" for more information about a command.
 
 `parse`, `print`, and `format` auto-detect BAI2 vs BAI3 from the 01 version field. Use `bai2 --version` to print the build version.
 
+The command exits `0` when it succeeds. It exits `1` when it fails, including a parse error, a missing `--input` file, or a control-total mismatch with `--strictControlTotals`.
+
 ## Learn about BAI
 
 - [BAI file format (Wikipedia)](https://en.wikipedia.org/wiki/BAI_(file_format))
