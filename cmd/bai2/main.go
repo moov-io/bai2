@@ -144,19 +144,15 @@ var rootCmd = &cobra.Command{
 			if documentFileName == "" {
 				path, err := os.Getwd()
 				if err != nil {
-					log.Fatal(err)
+					return fmt.Errorf("invalid input file: %w", err)
 				}
 				documentFileName = filepath.Join(path, "bai2.bin")
 			}
 
-			_, err := os.Stat(documentFileName)
-			if os.IsNotExist(err) {
-				return errors.New("invalid input file")
-			}
-
+			var err error
 			documentBuffer, err = os.ReadFile(documentFileName)
 			if err != nil {
-				return err
+				return fmt.Errorf("invalid input file: %w", err)
 			}
 		}
 
@@ -187,5 +183,7 @@ func parseDocument() (moovbai.File, error) {
 func main() {
 	initRootCmd()
 
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

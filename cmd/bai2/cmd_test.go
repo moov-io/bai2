@@ -118,3 +118,34 @@ func TestRootHelp(t *testing.T) {
 	assert.Contains(t, output, "Usage:\n  bai2")
 	assert.Contains(t, output, "--version")
 }
+
+func resetCLIState() {
+	documentFileName = ""
+	documentBuffer = nil
+	ignoreVersion = false
+	strictControlTotals = false
+	if rootCmd.PersistentFlags().Lookup("input") != nil {
+		_ = rootCmd.PersistentFlags().Set("input", "")
+		_ = rootCmd.PersistentFlags().Set("ignoreVersion", "false")
+		_ = rootCmd.PersistentFlags().Set("strictControlTotals", "false")
+	}
+}
+
+func TestParse_MissingFile(t *testing.T) {
+	resetCLIState()
+	defer resetCLIState()
+
+	_, err := executeCommand(rootCmd, "parse", "--input", filepath.Join("missing", "no-such-file.bai2"))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid input file")
+	assert.NotEqual(t, "invalid input file", err.Error())
+}
+
+func TestParse_NoInput(t *testing.T) {
+	resetCLIState()
+	defer resetCLIState()
+
+	_, err := executeCommand(rootCmd, "parse")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invalid input file")
+}
