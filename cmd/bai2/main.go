@@ -38,7 +38,7 @@ var WebCmd = &cobra.Command{
 
 		env, err := service.NewEnvironment(env)
 		if err != nil {
-			env.Logger.Fatal().LogErrorf("Error loading up environment.", err).Err()
+			env.Logger.Fatal().LogErrorf("Error loading up environment: %v", err).Err()
 			os.Exit(1)
 		}
 		defer env.Shutdown()
@@ -120,9 +120,10 @@ var Format = &cobra.Command{
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "",
-	Short: "",
-	Long:  "",
+	Use:     "bai2",
+	Short:   "Parse, print, and format BAI2 and BAI3 reports",
+	Long:    "Parse, print, and format BAI2 and BAI3 reports",
+	Version: moovbai.Version,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		isWeb := false
 		cmdNames := make([]string, 0)

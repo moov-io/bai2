@@ -19,14 +19,11 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y ca-certificates c
 COPY --from=builder /src/bin/bai2 /app/
 COPY /configs/ /configs/
 
-ENV HTTP_PORT=8484
-ENV HEALTH_PORT=9494
-
-EXPOSE ${HTTP_PORT}/tcp
-EXPOSE ${HEALTH_PORT}/tcp
+EXPOSE 8208/tcp
+EXPOSE 8209/tcp
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-	CMD curl -f http://localhost:${HEALTH_PORT}/live || exit 1
+	CMD curl -f http://localhost:8209/live || exit 1
 
 VOLUME [ "/data", "/configs" ]
 
