@@ -82,7 +82,7 @@ func (f *Bai2) validateControlTotals() error {
 			if !amountsEqual(got, a.AccountControlTotal) {
 				return fmt.Errorf("account %s control total %s does not match computed %s", a.AccountNumber, a.AccountControlTotal, got)
 			}
-			n := a.SumRecords(f.PhysicalRecordLength)
+			n := a.recordCount(f.PhysicalRecordLength)
 			if a.NumberRecords != n {
 				return fmt.Errorf("account %s record count %d does not match computed %d", a.AccountNumber, a.NumberRecords, n)
 			}

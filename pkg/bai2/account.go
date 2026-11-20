@@ -48,6 +48,10 @@ type Account struct {
 
 	Details []Detail
 
+	// physicalRecordCount is the number of 03, 16, 88, and 49 records seen
+	// during Read. It is 0 for accounts that are built in memory.
+	physicalRecordCount int64
+
 	header  accountIdentifier
 	trailer accountTrailer
 }
@@ -74,6 +78,17 @@ func (a *Account) SumRecords(opts ...int64) int64 {
 	acctString := a.String(opts...)
 	result := accountIdentifierCountExpression.FindAllStringSubmatch(acctString, 10000)
 	return int64(len(result))
+}
+
+// recordCount is the number of physical 03, 16, 88, and 49 records in the
+// account. After a successful Read, this is the count from the input file.
+// For an account that is built in memory, this is SumRecords with the given
+// physical record length, which matches the wrap that String() writes.
+func (a *Account) recordCount(recordLength int64) int64 {
+	if a.physicalRecordCount > 0 {
+		return a.physicalRecordCount
+	}
+	return a.SumRecords(recordLength)
 }
 
 // SumDetailAmounts is the algebraic sum of every Amount field on the 03 record
@@ -163,6 +178,8 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 		return nil
 	}
 
+	r.physicalRecordCount = 0
+
 	var rawData string
 	find := false
 
@@ -179,6 +196,7 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 				break
 			}
 
+			r.physicalRecordCount++
 			rawData = line
 			find = true
 
@@ -191,6 +209,7 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			} else {
 				rawData = rawData + "," + line[3:]
 			}
+			r.physicalRecordCount++
 
 		case util.AccountTrailerCode:
 			if err := parseAccountIdentifier(rawData); err != nil {
@@ -205,6 +224,7 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 
 			r.AccountControlTotal = newRecord.AccountControlTotal
 			r.NumberRecords = newRecord.NumberRecords
+			r.physicalRecordCount++
 
 			return nil
 
@@ -216,11 +236,12 @@ func (r *Account) Read(scan *Bai2Scanner, useCurrentLine bool) error {
 			}
 
 			detail := NewDetail()
-			err := detail.Read(scan, true)
+			n, err := detail.readAndCount(scan, true)
 			if err != nil {
 				return err
 			}
 
+			r.physicalRecordCount += n
 			r.Details = append(r.Details, *detail)
 			useCurrentLine = true
 		default:

@@ -36,11 +36,17 @@ func (r *Detail) String(opts ...int64) string {
 }
 
 func (r *Detail) Read(scan *util.Scanner, useCurrentLine bool) error {
+	_, err := r.readAndCount(scan, useCurrentLine)
+	return err
+}
+
+func (r *Detail) readAndCount(scan *util.Scanner, useCurrentLine bool) (int64, error) {
 	if scan == nil {
-		return errors.New("invalid bai3 scanner")
+		return 0, errors.New("invalid bai3 scanner")
 	}
 
 	var rawData string
+	var count int64
 	find := false
 	isBreak := false
 
@@ -62,16 +68,18 @@ func (r *Detail) Read(scan *util.Scanner, useCurrentLine bool) error {
 
 			rawData = line
 			find = true
+			count++
 
 		case util.ContinuationCode:
 			if rawData == "" {
-				return fmt.Errorf("ERROR parsing transaction detail on line %d (continuation without a preceding record)", scan.GetLineIndex())
+				return 0, fmt.Errorf("ERROR parsing transaction detail on line %d (continuation without a preceding record)", scan.GetLineIndex())
 			}
 			if strings.HasSuffix(rawData, "/") {
 				rawData = rawData[:len(rawData)-1] + "," + line[3:]
 			} else {
 				rawData = rawData + "," + line[3:]
 			}
+			count++
 
 		default:
 			isBreak = true
@@ -83,5 +91,5 @@ func (r *Detail) Read(scan *util.Scanner, useCurrentLine bool) error {
 	}
 
 	_, err := (*transactionDetail)(r).parse(rawData)
-	return err
+	return count, err
 }
